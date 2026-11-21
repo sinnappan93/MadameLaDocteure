@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { AIRES, periodeParId } from '../domain/catalogue';
 import { db } from '../lib/db';
 import { useLive } from '../lib/useLive';
+import { RechercheMusees } from './RechercheMusees';
 import { Vignette } from './Vignette';
 
 const normaliser = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
@@ -10,6 +11,7 @@ export function ListeOeuvres({ ouvrir, creer, aireInitiale }: { ouvrir: (id: str
   const oeuvres = useLive(() => db.oeuvres.toArray(), []);
   const [texte, setTexte] = useState('');
   const [aire, setAire] = useState(aireInitiale ?? '');
+  const [musees, setMusees] = useState(false);
 
   const visibles = useMemo(() => {
     const q = normaliser(texte.trim());
@@ -48,6 +50,11 @@ export function ListeOeuvres({ ouvrir, creer, aireInitiale }: { ouvrir: (id: str
           </button>
         </div>
       )}
+
+      <button className="bouton large importer" onClick={() => setMusees(true)}>
+        Importer une œuvre d’un musée
+      </button>
+      {musees && <RechercheMusees fermer={() => setMusees(false)} ouvrirFiche={ouvrir} />}
 
       {oeuvres && oeuvres.length > 0 && <p className="discret compteur">{visibles.length} œuvre(s)</p>}
       {oeuvres && aire && visibles.length === 0 && <p className="discret">Aucune fiche dans cette aire pour l’instant.</p>}

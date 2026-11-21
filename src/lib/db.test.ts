@@ -63,3 +63,45 @@ describe('fiches de référence', () => {
     }
   });
 });
+
+describe('mises à jour et images des fiches préparées', () => {
+  it('corrige les fiches non modifiées et respecte les fiches personnalisées', async () => {
+    const { REFERENCES } = await import('../data/references');
+    const { installerReferences, mettreAJourReferences, modifierOeuvre } = await import('./db');
+    await installerReferences(base);
+    const [a, b] = REFERENCES;
+    // Simule une ancienne version installée : titre différent.
+    await base.oeuvres.update(a.id, { titre: 'Ancien titre' });
+    await base.oeuvres.update(b.id, { titre: 'Mon titre' });
+    await modifierOeuvre(b.id, { personnalisee: true }, base);
+    expect(await mettreAJourReferences(base)).toBe(1);
+    expect((await base.oeuvres.get(a.id))?.titre).toBe(a.titre);
+    expect((await base.oeuvres.get(b.id))?.titre).toBe('Mon titre');
+    expect(await mettreAJourReferences(base)).toBe(0);
+  });
+
+  it('télécharge une image par fiche préparée, une seule fois', async () => {
+    const { REFERENCES } = await import('../data/references');
+    const { installerReferences, supprimerImage, imagesDe: images } = await import('./db');
+    const { telechargerImagesReferences } = await import('./imagesReferences');
+    await installerReferences(base);
+    const avecImage = REFERENCES.filter((r) => r.imageCommons);
+    // Réponse simulée de Commons pour chaque fichier demandé.
+    const fetchOriginal = globalThis.fetch;
+    globalThis.fetch = (async (url: string) => {
+      const titres = new URL(url).searchParams.get('titles')!.split('|');
+      const pages = titres.map((t) => ({ title: t, imageinfo: [{ url: `https://u/${t}`, descriptionurl: `https://c/${t}`, width: 100, height: 100, mime: 'image/jpeg', extmetadata: { LicenseShortName: { value: 'CC BY 4.0' } } }] }));
+      return new Response(JSON.stringify({ query: { pages } }));
+    }) as typeof fetch;
+    try {
+      const telecharger = async () => ({ blob: new Blob(['x'], { type: 'image/jpeg' }), largeur: 100, hauteur: 100 });
+      expect(await telechargerImagesReferences(base, telecharger)).toBe(avecImage.length);
+      const [premiere] = await images(avecImage[0].id, base);
+      expect(premiere.licence).toBe('CC BY 4.0');
+      await supprimerImage(premiere.id, base);
+      expect(await telechargerImagesReferences(base, telecharger)).toBe(0);
+    } finally {
+      globalThis.fetch = fetchOriginal;
+    }
+  });
+});

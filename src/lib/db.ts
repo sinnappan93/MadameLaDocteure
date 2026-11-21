@@ -3,7 +3,8 @@
  * pour réviser hors ligne. Les fichiers sont dans une table à part pour garder les listes légères.
  */
 import Dexie, { type EntityTable } from 'dexie';
-import { REFERENCES } from '../data/references';
+import { type FicheReference, REFERENCES } from '../data/references';
+import type { NoticeMusee } from '../domain/musees';
 import { type ImageOeuvre, type ImageSource, type NouvelleOeuvre, type Oeuvre, oeuvreVide } from '../domain/types';
 
 export interface Meta {
@@ -52,7 +53,7 @@ export async function modifierOeuvre(id: string, changements: Partial<NouvelleOe
 export async function supprimerOeuvre(id: string, base: Base = db): Promise<void> {
   await base.transaction('rw', base.oeuvres, base.images, base.fichiers, async () => {
     const images = await base.images.where('oeuvreId').equals(id).toArray();
-    await base.fichiers.bulkDelete(images.map((i) => i.fichierId));
+    await base.fichiers.bulkDelete(images.flatMap((i) => (i.fichierId ? [i.fichierId] : [])));
     await base.images.bulkDelete(images.map((i) => i.id));
     await base.oeuvres.delete(id);
   });
@@ -60,6 +61,8 @@ export async function supprimerOeuvre(id: string, base: Base = db): Promise<void
 
 export interface MetaImage {
   source: ImageSource;
+  /** Pour une image en ligne non téléchargeable : son adresse (aucun fichier n'est alors stocké). */
+  urlDistante?: string;
   largeur?: number;
   hauteur?: number;
   titre?: string;
@@ -68,11 +71,11 @@ export interface MetaImage {
   urlOrigine?: string;
 }
 
-/** Enregistre une image pour une œuvre ; la première devient l'image principale. */
-export async function ajouterImage(oeuvreId: string, blob: Blob, meta: MetaImage, base: Base = db): Promise<ImageOeuvre> {
-  const image: ImageOeuvre = { ...meta, id: nouvelId(), oeuvreId, fichierId: nouvelId(), ajouteeLe: maintenant() };
+/** Enregistre une image pour une œuvre (fichier, ou adresse en ligne si `blob` est absent) ; la première devient l'image principale. */
+export async function ajouterImage(oeuvreId: string, blob: Blob | undefined, meta: MetaImage, base: Base = db): Promise<ImageOeuvre> {
+  const image: ImageOeuvre = { ...meta, id: nouvelId(), oeuvreId, fichierId: blob ? nouvelId() : undefined, ajouteeLe: maintenant() };
   await base.transaction('rw', base.oeuvres, base.images, base.fichiers, async () => {
-    await base.fichiers.add({ id: image.fichierId, blob });
+    if (blob && image.fichierId) await base.fichiers.add({ id: image.fichierId, blob });
     await base.images.add(image);
     const oeuvre = await base.oeuvres.get(oeuvreId);
     if (oeuvre && !oeuvre.imagePrincipaleId) await base.oeuvres.update(oeuvreId, { imagePrincipaleId: image.id });
@@ -84,7 +87,7 @@ export async function supprimerImage(imageId: string, base: Base = db): Promise<
   await base.transaction('rw', base.oeuvres, base.images, base.fichiers, async () => {
     const image = await base.images.get(imageId);
     if (!image) return;
-    await base.fichiers.delete(image.fichierId);
+    if (image.fichierId) await base.fichiers.delete(image.fichierId);
     await base.images.delete(imageId);
     const oeuvre = await base.oeuvres.get(image.oeuvreId);
     if (oeuvre?.imagePrincipaleId === imageId) {
@@ -101,8 +104,49 @@ export async function imagesDe(oeuvreId: string, base: Base = db): Promise<Image
 
 const CLE_REFERENCES = 'references-installees';
 
-function ficheDeReference(ref: (typeof REFERENCES)[number], date: string): Oeuvre {
-  return { ...oeuvreVide(), ...ref, reference: true, creeeLe: date, modifieeLe: date };
+function ficheDeReference(ref: FicheReference, date: string): Oeuvre {
+  const { imageCommons: _image, ...contenu } = ref;
+  return { ...oeuvreVide(), ...contenu, reference: true, creeeLe: date, modifieeLe: date };
+}
+
+/**
+ * Applique les corrections des fiches préparées (nouvelle version de l'application) aux fiches
+ * que l'utilisatrice n'a jamais modifiées. Les images, notices et dates de création sont conservées.
+ */
+export async function mettreAJourReferences(base: Base = db): Promise<number> {
+  return base.transaction('rw', base.oeuvres, async () => {
+    const presentes = await base.oeuvres.bulkGet(REFERENCES.map((r) => r.id));
+    let n = 0;
+    for (const [i, ref] of REFERENCES.entries()) {
+      const o = presentes[i];
+      if (!o || o.personnalisee) continue;
+      const neuve = ficheDeReference(ref, o.creeeLe);
+      const suivante: Oeuvre = { ...neuve, imagePrincipaleId: o.imagePrincipaleId, notices: o.notices, modifieeLe: o.modifieeLe };
+      if (JSON.stringify(suivante) !== JSON.stringify(o)) {
+        await base.oeuvres.put(suivante);
+        n++;
+      }
+    }
+    return n;
+  });
+}
+
+/** Ajoute une notice de musée à une fiche (sans doublon). */
+export async function ajouterNotice(oeuvreId: string, notice: NoticeMusee, base: Base = db): Promise<void> {
+  await base.transaction('rw', base.oeuvres, async () => {
+    const o = await base.oeuvres.get(oeuvreId);
+    if (!o) return;
+    const autres = (o.notices ?? []).filter((n) => !(n.source === notice.source && n.idMusee === notice.idMusee));
+    await base.oeuvres.update(oeuvreId, { notices: [...autres, { ...notice, recupereeLe: maintenant() }] });
+  });
+}
+
+export async function retirerNotice(oeuvreId: string, notice: Pick<NoticeMusee, 'source' | 'idMusee'>, base: Base = db): Promise<void> {
+  await base.transaction('rw', base.oeuvres, async () => {
+    const o = await base.oeuvres.get(oeuvreId);
+    if (!o) return;
+    await base.oeuvres.update(oeuvreId, { notices: (o.notices ?? []).filter((n) => !(n.source === notice.source && n.idMusee === notice.idMusee)) });
+  });
 }
 
 /**

@@ -78,3 +78,26 @@ describe('Wikimedia Commons', () => {
     expect(urlRedimensionnee('https://x/y.jpg', 'https://x/orig.jpg', 5000, 1280)).toBe('https://x/orig.jpg');
   });
 });
+
+describe('informations sur des fichiers précis', () => {
+  it('retrouve chaque fichier, y compris sous son nom demandé avant normalisation', async () => {
+    const { lireInfosFichiers, urlInfosFichiers } = await import('./commons');
+    const url = new URL(urlInfosFichiers(['File:A.jpg', 'File:B c.jpg']));
+    expect(url.searchParams.get('titles')).toBe('File:A.jpg|File:B c.jpg');
+    const carte = lireInfosFichiers({
+      query: {
+        normalized: [{ from: 'File:B_c.jpg', to: 'File:B c.jpg' }],
+        pages: [
+          {
+            title: 'File:B c.jpg',
+            imageinfo: [{ url: 'https://u/B.jpg', descriptionurl: 'https://c/B', thumburl: 'https://u/thumb/B.jpg/330px-B.jpg', width: 3000, height: 2000, mime: 'image/jpeg', extmetadata: { LicenseShortName: { value: 'CC0' } } }],
+          },
+          { title: 'File:Absent.jpg', missing: true },
+        ],
+      },
+    });
+    expect(carte.get('File:B_c.jpg')?.licence).toBe('CC0');
+    expect(carte.get('File:B c.jpg')?.urlImport).toBe('https://u/thumb/B.jpg/1280px-B.jpg');
+    expect(carte.has('File:Absent.jpg')).toBe(false);
+  });
+});

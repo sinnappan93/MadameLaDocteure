@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { aireParId, periodeParId } from '../domain/catalogue';
-import { db, imagesDe, modifierOeuvre, supprimerImage, supprimerOeuvre } from '../lib/db';
+import { MUSEES } from '../domain/musees';
+import { db, imagesDe, modifierOeuvre, retirerNotice, supprimerImage, supprimerOeuvre } from '../lib/db';
 import { useLive } from '../lib/useLive';
 import { AjoutImage } from './AjoutImage';
+import { NoticeDetaillee, RechercheMusees } from './RechercheMusees';
 import { Vignette } from './Vignette';
 
 export function FicheOeuvre({ id, retour, modifier }: { id: string; retour: () => void; modifier: () => void }) {
   const oeuvre = useLive(() => db.oeuvres.get(id), [id]);
   const images = useLive(() => imagesDe(id), [id]);
   const [ajout, setAjout] = useState(false);
+  const [musees, setMusees] = useState(false);
   const [selection, setSelection] = useState<string>();
 
   if (!oeuvre) return null;
@@ -99,6 +102,45 @@ export function FicheOeuvre({ id, retour, modifier }: { id: string; retour: () =
       {oeuvre.iconographie && <Bloc titre="Iconographie" texte={oeuvre.iconographie} />}
       {oeuvre.notes && <Bloc titre="Points à retenir" texte={oeuvre.notes} />}
       {oeuvre.bibliographie && <Bloc titre="Bibliographie" texte={oeuvre.bibliographie} />}
+
+      <section className="section-musees">
+        <div className="titre-section">
+          <h2>Dans les musées</h2>
+          <button className="lien" onClick={() => setMusees(true)}>
+            Chercher
+          </button>
+        </div>
+        {(oeuvre.notices ?? []).length === 0 && (
+          <button className="carte-revision invitation" onClick={() => setMusees(true)}>
+            <span>
+              <span className="carte-revision-titre">Ajouter des œuvres réelles comparables</span>
+              <span className="discret">Notices officielles de Cleveland, du Met et de Chicago : inventaire, dimensions, provenance, bibliographie.</span>
+            </span>
+            <span className="plus-rond" aria-hidden>
+              +
+            </span>
+          </button>
+        )}
+        {(oeuvre.notices ?? []).map((n) => (
+          <details key={`${n.source}-${n.idMusee}`} className="notice-jointe">
+            <summary>
+              <span className="carte-revision-titre">{n.titre}</span>
+              <span className="discret">
+                {MUSEES[n.source].court} · inv. {n.inventaire}
+              </span>
+            </summary>
+            <NoticeDetaillee notice={n} compacte />
+            <button
+              className="lien danger"
+              onClick={() => {
+                if (confirm('Retirer cette notice de la fiche ?')) void retirerNotice(id, n);
+              }}
+            >
+              Retirer la notice
+            </button>
+          </details>
+        ))}
+      </section>
       {oeuvre.etiquettes.length > 0 && (
         <p className="etiquettes">
           {oeuvre.etiquettes.map((t) => (
@@ -117,6 +159,7 @@ export function FicheOeuvre({ id, retour, modifier }: { id: string; retour: () =
       </div>
 
       {ajout && <AjoutImage oeuvre={oeuvre} fermer={() => setAjout(false)} />}
+      {musees && <RechercheMusees oeuvre={oeuvre} fermer={() => setMusees(false)} />}
     </article>
   );
 }

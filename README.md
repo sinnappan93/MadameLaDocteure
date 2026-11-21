@@ -23,7 +23,18 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 - Contenu de départ **à vérifier** avec le programme et les manuels (badge « Fiche préparée » ; datations débattues signalées)
 - Modifiables et supprimables comme les autres ; une fiche supprimée n'est pas réinstallée,
   mais le menu permet de **restaurer les fiches préparées supprimées**
-- Chaque fiche a des mots-clés de recherche d'images (bouton « Trouver une image »)
+- **Photo de l'œuvre elle-même** pour 50 fiches : fichier Wikimedia Commons choisi à la main et vérifié d'après sa
+  description (souvent le cartel du musée), téléchargé automatiquement au premier lancement avec auteur et licence
+- Corrections apportées aux fiches préparées : appliquées automatiquement aux fiches **non modifiées** ;
+  une fiche modifiée à la main n'est jamais écrasée
+
+### Œuvres réelles des musées
+- Recherche dans les bases ouvertes du **Cleveland Museum of Art**, du **Metropolitan Museum of Art** et de
+  l'**Art Institute of Chicago** (API sans clé, données et images CC0)
+- **Notice officielle** : inventaire, datation, culture, matériau, dimensions, acquisition, texte du musée,
+  provenance et bibliographie (Cleveland, Chicago) ; lien vers la notice en ligne
+- Joindre une notice (et son image) à une fiche comme **œuvre comparable**, ou **créer une fiche** à partir d'une œuvre de musée
+- Images : enregistrées sur l'appareil quand le musée le permet (Chicago), sinon affichées en ligne (Cleveland, Met)
 
 ### Fiches œuvres
 - Titre, datation (libre et en années pour le tri), période, aire, site, matériau, lieu de conservation,

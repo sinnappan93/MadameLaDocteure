@@ -11,6 +11,8 @@ export const LARGEUR_VIGNETTE = 330;
 export const LARGEUR_IMPORT = 1280;
 
 export interface ResultatCommons {
+  /** Nom du fichier sur Commons (« File:… »). */
+  fichier: string;
   titre: string;
   vignette: string;
   /** Image à télécharger (taille réduite si l'original est plus grand que LARGEUR_IMPORT). */
@@ -107,6 +109,7 @@ export function lireReponse(json: unknown): PageResultats {
     const meta = info.extmetadata ?? {};
     const vignette = info.thumburl ?? info.url;
     resultats.push({
+      fichier: page.title,
       titre: texteBrut(meta.ObjectName?.value) ?? page.title.replace(/^File:/, '').replace(/\.[a-z0-9]+$/i, ''),
       vignette,
       urlImport: urlRedimensionnee(vignette, info.url, info.width, LARGEUR_IMPORT),
@@ -119,6 +122,35 @@ export function lireReponse(json: unknown): PageResultats {
     });
   }
   return { resultats, suite: rep.continue?.gsroffset };
+}
+
+/** Informations (adresse, crédits) sur des fichiers précis, au plus 50 par requête. */
+export function urlInfosFichiers(fichiers: string[]): string {
+  const params = new URLSearchParams({
+    action: 'query',
+    format: 'json',
+    formatversion: '2',
+    origin: '*',
+    titles: fichiers.join('|'),
+    prop: 'imageinfo',
+    iiprop: 'url|size|mime|extmetadata',
+    iiurlwidth: String(LARGEUR_VIGNETTE),
+    iiextmetadatafilter: 'Artist|LicenseShortName|ImageDescription|ObjectName',
+  });
+  return `${COMMONS_API}?${params}`;
+}
+
+/** Lit la réponse d'`urlInfosFichiers` en tenant compte des titres normalisés par Commons. */
+export function lireInfosFichiers(json: unknown): Map<string, ResultatCommons> {
+  const rep = json as { query?: { normalized?: Array<{ from: string; to: string }> } };
+  const versDemande = new Map((rep.query?.normalized ?? []).map((n) => [n.to, n.from]));
+  const carte = new Map<string, ResultatCommons>();
+  for (const r of lireReponse(json).resultats) {
+    carte.set(r.fichier, r);
+    const demande = versDemande.get(r.fichier);
+    if (demande) carte.set(demande, r);
+  }
+  return carte;
 }
 
 export async function rechercherCommons(requete: string, decalage = 0, signal?: AbortSignal): Promise<PageResultats> {

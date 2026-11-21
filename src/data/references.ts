@@ -6,7 +6,13 @@
  */
 import type { NouvelleOeuvre } from '../domain/types';
 
-export type FicheReference = Partial<NouvelleOeuvre> & { id: string; titre: string; requeteImage: string };
+export type FicheReference = Partial<NouvelleOeuvre> & {
+  id: string;
+  titre: string;
+  requeteImage: string;
+  /** Photo de l'œuvre elle-même sur Wikimedia Commons, choisie et vérifiée d'après sa description (souvent le cartel du musée). */
+  imageCommons?: string;
+};
 
 export const REFERENCES: FicheReference[] = [
   // ——— Civilisation de l'Indus ———
@@ -19,12 +25,13 @@ export const REFERENCES: FicheReference[] = [
     periodeId: 'harappa',
     aireId: 'inde-nord',
     site: 'Mohenjo-daro (Sind, Pakistan)',
-    materiau: 'Stéatite',
-    conservation: 'Musée national du Pakistan, Karachi',
+    materiau: 'Stéatite ; H. 17,5 cm',
+    conservation: 'Musée national du Pakistan, Karachi (découvert en 1927)',
     iconographie: 'Buste masculin barbu, yeux mi-clos, bandeau frontal, manteau à motifs de trèfles.',
     notes: 'Le titre « prêtre-roi » est une interprétation des fouilleurs, sans appui textuel : l’écriture de l’Indus n’est pas déchiffrée.',
     etiquettes: ['sculpture', 'Indus'],
     requeteImage: 'Priest-King Mohenjo-daro',
+    imageCommons: 'File:Mohenjo-daro Priesterkönig.jpeg',
   },
   {
     id: 'ref-sceau-pashupati',
@@ -41,6 +48,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'L’identification à un « proto-Śiva » (John Marshall) est très discutée : exemple classique d’interprétation à nuancer.',
     etiquettes: ['sceau', 'Indus'],
     requeteImage: 'Pashupati seal Mohenjo-daro',
+    imageCommons: 'File:Shiva Pashupati.jpg',
   },
 
   // ——— Maurya, Shunga ———
@@ -60,6 +68,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Emblème national de l’Inde. Le poli « maurya » et l’influence achéménide sont des points classiques. Commémore le premier sermon du Bouddha.',
     etiquettes: ['bouddhisme', 'sculpture', 'Aśoka'],
     requeteImage: 'Lion Capital of Ashoka Sarnath',
+    imageCommons: 'File:Lion capital of Ashoka, Sarnath.jpg',
   },
   {
     id: 'ref-yakshi-didarganj',
@@ -76,6 +85,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Datation discutée : le poli évoque l’époque maurya, le style suggère une date plus tardive. Bon sujet de discussion méthodologique.',
     etiquettes: ['sculpture', 'yakṣī'],
     requeteImage: 'Didarganj Yakshi',
+    imageCommons: 'File:Didarganj Yakshi statue in the Bihar Museum.jpg',
   },
   {
     id: 'ref-bharhut',
@@ -87,11 +97,12 @@ export const REFERENCES: FicheReference[] = [
     aireId: 'inde-nord',
     site: 'Bharhut (Madhya Pradesh)',
     materiau: 'Grès rouge',
-    conservation: 'Indian Museum, Kolkata (balustrade et porte remontées)',
+    conservation: 'Indian Museum, Kolkata (balustrade et porte remontées) ; éléments au Musée national de New Delhi',
     iconographie: 'Jātaka et scènes de la vie du Bouddha, yakṣa et yakṣī ; inscriptions identifiant les scènes.',
     notes: 'Phase « aniconique » : le Bouddha est figuré par des symboles (trône vide, arbre, empreintes, roue).',
     etiquettes: ['bouddhisme', 'relief', 'aniconisme'],
     requeteImage: 'Bharhut stupa railing relief',
+    imageCommons: 'File:Railing of the Bharhut Stupa, c. 100 BC. Indian Museum, Calcutta ei05-23.jpg',
   },
   {
     id: 'ref-sanchi',
@@ -108,6 +119,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Agrandi après Aśoka ; les toraṇa portent des inscriptions de donateurs, dont la guilde des ivoiriers de Vidiśā. Période des toraṇa souvent associée aux Sātavāhana.',
     etiquettes: ['bouddhisme', 'architecture', 'stūpa'],
     requeteImage: 'Sanchi Great Stupa torana',
+    imageCommons: 'File:Stupa 1, Sanchi 02.jpg',
   },
 
   // ——— Kushān : Gandhāra, Mathurā ———
@@ -127,22 +139,24 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Pièce majeure du Guimet pour le Gandhāra. Comparer au traitement du drapé et des visages à Mathurā.',
     etiquettes: ['bouddhisme', 'sculpture', 'Guimet'],
     requeteImage: 'Bodhisattva Shahbaz-Garhi Guimet',
+    imageCommons: 'File:Bodhisattva Gandhara Guimet 181171.jpg',
   },
   {
     id: 'ref-genie-hadda',
     titre: 'Génie porteur de fleurs, Hadda',
-    datation: 'IVe–Ve s. (environ)',
-    debut: 300,
-    fin: 500,
+    datation: 'IIIe–IVe s.',
+    debut: 200,
+    fin: 400,
     aireId: 'gandhara',
-    site: 'Hadda (Afghanistan)',
-    materiau: 'Stuc',
+    site: 'Hadda (Afghanistan), monastère de Tapa Kalan (TK 142)',
+    materiau: 'Stuc ; H. 55 cm',
     conservation: 'Musée Guimet, Paris',
     iconographie: 'Jeune génie tenant des fleurs dans un pan de son vêtement.',
     style: 'Stucs de Hadda, tradition gréco-bouddhique tardive',
-    notes: 'Fouilles françaises (DAFA) des années 1920-1930 : partage des trouvailles entre Kaboul et Paris. Datation à vérifier.',
+    notes: 'Fouilles de la DAFA, mission Jules Barthoux (1926-1928) : partage des trouvailles entre Kaboul et Paris. Le style prolonge la sculpture grecque de la fin du IVe s. av. J.-C. (datation et mesures d’après le cartel du Guimet).',
     etiquettes: ['bouddhisme', 'stuc', 'Guimet', 'DAFA'],
     requeteImage: 'Hadda stucco Guimet genie flowers',
+    imageCommons: 'File:Génie aux fleurs. Hadda. Musée des arts asiatiques - Guimet.jpg',
   },
   {
     id: 'ref-bouddha-katra',
@@ -154,12 +168,13 @@ export const REFERENCES: FicheReference[] = [
     aireId: 'inde-nord',
     site: 'Katra, Mathurā (Uttar Pradesh)',
     materiau: 'Grès rouge tacheté',
-    conservation: 'Government Museum, Mathurā',
+    conservation: 'Government Museum, Mathurā (inv. A-1)',
     iconographie: 'Bouddha (ou Bodhisattva selon l’inscription) assis, main droite en abhaya-mudrā, deux porte-chasse-mouches, arbre de la bodhi.',
     style: 'École de Mathurā',
     notes: 'L’inscription le nomme « bodhisattva » : témoigne des débuts de l’image du Bouddha. Opposer à Gandhāra (débat Foucher / Coomaraswamy sur l’origine de l’image).',
     etiquettes: ['bouddhisme', 'sculpture', 'image du Bouddha'],
     requeteImage: 'Katra Buddha Mathura',
+    imageCommons: 'File:Inscribed Seated Buddha Image in Abhaya Mudra - Kushan Period - Katra Keshav Dev - ACCN A-1 - Government Museum - Mathura 2013-02-24 5972.JPG',
   },
   {
     id: 'ref-kanishka',
@@ -176,6 +191,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Portrait dynastique (sanctuaire de Mat) ; inscription au nom de Kaniṣka. Costume d’Asie centrale.',
     etiquettes: ['portrait royal', 'sculpture'],
     requeteImage: 'Kanishka statue Mathura',
+    imageCommons: 'File:Kanishka enhanced.jpg',
   },
   {
     id: 'ref-bamiyan',
@@ -191,6 +207,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Exemple central pour les questions de destruction et de protection du patrimoine. Datations radiocarbone récentes autour des VIe–VIIe s.',
     etiquettes: ['bouddhisme', 'sculpture rupestre', 'patrimoine en péril'],
     requeteImage: 'Bamiyan Buddha',
+    imageCommons: 'File:Afghanistan Statua di Budda 1.jpg',
   },
 
   // ——— Gupta, Vākāṭaka ———
@@ -203,29 +220,32 @@ export const REFERENCES: FicheReference[] = [
     periodeId: 'gupta',
     aireId: 'inde-nord',
     site: 'Sarnath (Uttar Pradesh)',
-    materiau: 'Grès de Chunar',
-    conservation: 'Musée archéologique de Sarnath',
+    materiau: 'Grès de Chunar ; H. 1,60 m',
+    conservation: 'Musée archéologique de Sarnath (découvert en 1905)',
     iconographie: 'Bouddha assis en dharmacakra-mudrā ; sur le socle, la roue de la Loi, deux gazelles et des disciples ; grand nimbe orné.',
     style: 'École de Sarnath (robe « mouillée », sans plis)',
     notes: 'Premier sermon au parc des gazelles. Modèle classique de l’image gupta. Comparer au Bouddha debout de Mathurā (plis en cordelettes).',
     etiquettes: ['bouddhisme', 'sculpture'],
     requeteImage: 'Sarnath Buddha preaching first sermon',
+    imageCommons: 'File:Buddha in Sarnath Museum (Dhammajak Mutra).jpg',
   },
   {
     id: 'ref-bouddha-mathura-gupta',
-    titre: 'Bouddha debout de Mathurā',
+    titre: 'Bouddha debout de Jamalpur (Mathurā)',
     datation: 'Ve s.',
     debut: 400,
     fin: 500,
     periodeId: 'gupta',
     aireId: 'inde-nord',
-    site: 'Mathurā (Uttar Pradesh)',
+    site: 'Tertre de Jamalpur, Mathurā (Uttar Pradesh)',
     materiau: 'Grès rouge tacheté',
-    conservation: 'Government Museum, Mathurā',
+    conservation: 'Government Museum, Mathurā (inv. 00-A-5)',
     iconographie: 'Bouddha debout, robe couvrant les deux épaules, plis en cordelettes régulières, grand nimbe sculpté.',
     style: 'École de Mathurā, époque gupta',
+    notes: 'Inscription au nom du moine donateur Yaśadinna. Comparer au Bouddha prêchant de Sarnath : même époque, traitement opposé du drapé.',
     etiquettes: ['bouddhisme', 'sculpture'],
     requeteImage: 'Standing Buddha Mathura Gupta',
+    imageCommons: 'File:Standing Buddha Installed by Buddist Monk Yasadinna - Circa 5th Century CE - Jamalpur Mound - ACCN 00-A-5 - Government Museum Mathura.jpg',
   },
   {
     id: 'ref-ajanta-padmapani',
@@ -242,6 +262,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Grottes de la phase récente rattachées au règne du Vākāṭaka Hariṣeṇa (chronologie de Walter Spink, discutée).',
     etiquettes: ['bouddhisme', 'peinture', 'site rupestre'],
     requeteImage: 'Ajanta Padmapani cave 1',
+    imageCommons: 'File:Bodhisattva Padmapani, cave 1, Ajanta, India.jpg',
   },
   {
     id: 'ref-deogarh',
@@ -258,6 +279,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Un des premiers temples en pierre, sur plate-forme ; panneaux sculptés sur trois côtés.',
     etiquettes: ['hindouisme', 'vishnouisme', 'relief', 'temple'],
     requeteImage: 'Deogarh Vishnu Anantashayana',
+    imageCommons: 'File:Anantasayi Vishnu Deogarh.jpg',
   },
 
   // ——— Dekkan et Inde du Sud ———
@@ -275,6 +297,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Attribution dynastique discutée (souvent les Kalacuri). À rattacher au Dekkan plutôt qu’à l’Inde du Sud au sens strict.',
     etiquettes: ['hindouisme', 'shivaïsme', 'site rupestre'],
     requeteImage: 'Elephanta Trimurti Sadashiva',
+    imageCommons: 'File:Sadashiva Trimurti Pancamukha Shiva Elephanta island.jpg',
   },
   {
     id: 'ref-mahabalipuram-penitence',
@@ -291,6 +314,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Identification du sujet débattue (pénitence d’Arjuna ou descente du Gange). Souvent rattaché à Narasiṃhavarman Ier Māmalla.',
     etiquettes: ['hindouisme', 'relief', 'site rupestre'],
     requeteImage: 'Descent of the Ganges Mahabalipuram',
+    imageCommons: 'File:Descent of the Ganges 01.jpg',
   },
   {
     id: 'ref-kailasanatha-kanchi',
@@ -308,6 +332,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Fondation de Narasiṃhavarman II Rājasiṃha. Comparer au temple du Rivage de Mahabalipuram, du même règne.',
     etiquettes: ['hindouisme', 'shivaïsme', 'architecture', 'temple'],
     requeteImage: 'Kailasanathar Temple Kanchipuram',
+    imageCommons: 'File:Kanchi Kailasanathar Temple at Kanchipuram, Tamil Nadu 01.jpg',
   },
   {
     id: 'ref-virupaksha-pattadakal',
@@ -324,6 +349,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Fondé par la reine Lokamahādevī pour célébrer la victoire de Vikramāditya II sur les Pallava : emprunts au Kailāsanātha de Kanchipuram. Pattadakal juxtapose styles du Nord et du Sud.',
     etiquettes: ['hindouisme', 'shivaïsme', 'architecture', 'temple'],
     requeteImage: 'Virupaksha Temple Pattadakal',
+    imageCommons: 'File:Virupaksha Temple-Pattadakal-Karnataka-01.jpg',
   },
   {
     id: 'ref-kailasa-ellora',
@@ -340,6 +366,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Attribué à Kṛṣṇa Ier. Ellora réunit grottes bouddhiques, hindoues et jaïnes.',
     etiquettes: ['hindouisme', 'shivaïsme', 'architecture rupestre'],
     requeteImage: 'Kailasa temple Ellora',
+    imageCommons: 'File:Ellora Cave 16 Kailasa Temple.jpg',
   },
   {
     id: 'ref-brihadishvara',
@@ -356,6 +383,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Fondation de Rājarāja Ier. Inscriptions détaillant donations et personnel du temple : source majeure d’histoire sociale.',
     etiquettes: ['hindouisme', 'shivaïsme', 'architecture', 'temple'],
     requeteImage: 'Brihadeeswarar Temple Thanjavur',
+    imageCommons: 'File:A view of Brihadeeswarar Temple.jpg',
   },
   {
     id: 'ref-nataraja-chola',
@@ -373,6 +401,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Image processionnelle (trous de fixation pour porteurs). Savoir décrire chaque attribut et sa signification.',
     etiquettes: ['hindouisme', 'shivaïsme', 'bronze'],
     requeteImage: 'Nataraja Chola bronze',
+    imageCommons: 'File:Nataraja, Chola period bronze, 11th century, Government Museum, Chennai.jpg',
   },
   {
     id: 'ref-kandariya',
@@ -389,6 +418,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Archétype du temple nāgara pleinement développé. Ne pas réduire Khajuraho à son imagerie érotique.',
     etiquettes: ['hindouisme', 'shivaïsme', 'architecture', 'temple'],
     requeteImage: 'Kandariya Mahadeva Temple Khajuraho',
+    imageCommons: 'File:Kandariya Mahadeva Temple, Khajuraho, Madhya Pradesh.jpg',
   },
   {
     id: 'ref-konark',
@@ -404,6 +434,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Attribué à Narasiṃha Ier (Gaṅga orientaux). Dynastie absente du catalogue des périodes : à classer.',
     etiquettes: ['hindouisme', 'architecture', 'temple'],
     requeteImage: 'Konark Sun Temple wheel',
+    imageCommons: 'File:Sun Temple Main Structure, Konark, Orissa.jpg',
   },
   {
     id: 'ref-belur',
@@ -420,6 +451,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Fondé par le roi Viṣṇuvardhana. La pierre tendre permet un décor d’une finesse d’orfèvrerie.',
     etiquettes: ['hindouisme', 'vishnouisme', 'architecture', 'temple'],
     requeteImage: 'Chennakeshava Temple Belur',
+    imageCommons: 'File:Chennakeshava Temple at Belur.jpg',
   },
   {
     id: 'ref-hampi-vitthala',
@@ -436,6 +468,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Capitale de Vijayanagara, pillée après la bataille de Talikota (1565).',
     etiquettes: ['hindouisme', 'vishnouisme', 'architecture', 'temple'],
     requeteImage: 'Vittala Temple Hampi stone chariot',
+    imageCommons: 'File:Hampi Garuda stone chariot.jpg',
   },
 
   // ——— Bengale, Pāla ———
@@ -454,6 +487,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Fondation attribuée à Dharmapāla. Son plan a pu influencer l’architecture d’Asie du Sud-Est. Lien avec l’exposition « Art of the Ganges Delta » (Lefèvre et Boussac, 2008).',
     etiquettes: ['bouddhisme', 'architecture', 'monastère'],
     requeteImage: 'Somapura Mahavihara Paharpur',
+    imageCommons: 'File:Aerial view of Somapura Mahavihara.jpg',
   },
   {
     id: 'ref-manuscrit-pala',
@@ -470,6 +504,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Une des rares traditions de peinture conservées avant le XIVe s. en Inde du Nord ; diffusion vers le Népal et le Tibet.',
     etiquettes: ['bouddhisme', 'manuscrit', 'peinture'],
     requeteImage: 'Pala manuscript Prajnaparamita palm leaf',
+    imageCommons: 'File:Māmakī with a vajra on a lotus.jpg',
   },
 
   // ——— Islam, Moghols, cours rajpoutes ———
@@ -488,6 +523,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Projet fondateur de l’atelier moghol, sous la direction de peintres persans (Mir Sayyid Ali, Abd al-Samad), avec des artistes indiens.',
     etiquettes: ['islam', 'peinture', 'manuscrit'],
     requeteImage: 'Hamzanama painting Akbar',
+    imageCommons: 'File:Mahlaj shows his skill to Zumurrud Shah and runs a spear through a tree (From the Hamzanama, Volume 11).jpg',
   },
   {
     id: 'ref-taj-mahal',
@@ -504,6 +540,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Construit par Shah Jahan pour Mumtaz Mahal. Comparer au tombeau de Humayun (Delhi), son modèle.',
     etiquettes: ['islam', 'architecture', 'mausolée'],
     requeteImage: 'Taj Mahal',
+    imageCommons: 'File:Taj Mahal, Agra, India edit2.jpg',
   },
   {
     id: 'ref-gita-govinda-kangra',
@@ -538,6 +575,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Architecte : Frederick William Stevens. Malgré son emplacement, aire classée ici « Inde du Nord » faute d’aire « Inde de l’Ouest » : à ajuster.',
     etiquettes: ['architecture', 'colonial'],
     requeteImage: 'Chhatrapati Shivaji Terminus',
+    imageCommons: 'File:Chhatrapati Shivaji Terminus (Victoria Terminus).jpg',
   },
   {
     id: 'ref-sher-gil-three-girls',
@@ -554,6 +592,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Formée à Paris, Sher-Gil (1913-1941) cherche une modernité indienne. Œuvre primée (Bombay Art Society, 1937). Artiste classée « trésor national » en Inde.',
     etiquettes: ['peinture', 'art moderne'],
     requeteImage: 'Amrita Sher-Gil Three Girls',
+    imageCommons: 'File:Group of Three Girls 1935.jpg',
   },
 
   // ——— Sri Lanka ———
@@ -572,6 +611,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Forteresse-palais du roi Kassapa Ier. Comparer avec Ajanta.',
     etiquettes: ['peinture'],
     requeteImage: 'Sigiriya frescoes',
+    imageCommons: 'File:Sigiriya 0161.jpg',
   },
   {
     id: 'ref-gal-vihara',
@@ -588,25 +628,27 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Règne de Parākramabāhu Ier.',
     etiquettes: ['bouddhisme', 'sculpture rupestre'],
     requeteImage: 'Gal Vihara Polonnaruwa',
+    imageCommons: 'File:Gal Vihara Polonnaruwa 1.jpg',
   },
 
   // ——— Cambodge ———
   {
     id: 'ref-harihara-maha-rosei',
     titre: 'Harihara d’Asram Maha Rosei',
-    datation: 'VIIe s.',
+    datation: 'VIIe s. (?)',
     debut: 600,
     fin: 700,
     periodeId: 'preangkorien',
     aireId: 'cambodge',
     site: 'Asram Maha Rosei, Phnom Da (province de Takeo, Cambodge)',
-    materiau: 'Grès',
-    conservation: 'Musée Guimet, Paris',
+    materiau: 'Grès ; H. 1,74 m environ',
+    conservation: 'Musée Guimet, Paris (MG 14910)',
     iconographie: 'Divinité syncrétique mi-Śiva (chignon, troisième œil) mi-Viṣṇu (mitre cylindrique) ; arc de soutien.',
     style: 'Art préangkorien (style de Phnom Da)',
     notes: 'Une des pièces majeures du Guimet pour le Cambodge. Arc de soutien typique de la statuaire préangkorienne en ronde-bosse.',
     etiquettes: ['hindouisme', 'sculpture', 'Guimet'],
     requeteImage: 'Harihara Asram Maha Rosei Guimet',
+    imageCommons: 'File:Harihara-guimet.jpg',
   },
   {
     id: 'ref-banteay-srei',
@@ -623,6 +665,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Fondation d’un brahmane, Yajñavarāha, et non d’un roi. Affaire Malraux (1923) : vol de devatā. Restauration par anastylose (Henri Marchal, années 1930).',
     etiquettes: ['hindouisme', 'shivaïsme', 'architecture', 'Guimet'],
     requeteImage: 'Banteay Srei pediment',
+    imageCommons: 'File:Banteay Srei - 011 Temple Pediment (8582546512).jpg',
   },
   {
     id: 'ref-vishnu-mebon',
@@ -637,9 +680,10 @@ export const REFERENCES: FicheReference[] = [
     conservation: 'Musée national du Cambodge, Phnom Penh',
     iconographie: 'Viṣṇu couché (Anantaśayana), seuls subsistent le buste, la tête et deux bras droits.',
     style: 'Style du Baphuon',
-    notes: 'Le plus grand bronze angkorien connu. Découvert en 1936 dans le Mébon occidental.',
+    notes: 'Le plus grand bronze angkorien connu. Découvert en 1936 dans le Mébon occidental. Présenté au Musée Guimet dans l’exposition « Bronzes royaux d’Angkor, un art du divin ».',
     etiquettes: ['hindouisme', 'vishnouisme', 'bronze'],
     requeteImage: 'West Mebon Vishnu bronze',
+    imageCommons: 'File:Reclining Vishnu (Angkor).jpg',
   },
   {
     id: 'ref-angkor-vat',
@@ -656,23 +700,25 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Temple vishnouite de Sūryavarman II, orienté à l’ouest (fonction funéraire discutée).',
     etiquettes: ['hindouisme', 'vishnouisme', 'architecture', 'temple'],
     requeteImage: 'Angkor Wat',
+    imageCommons: 'File:Angkor Wat with its reflection (cropped).jpg',
   },
   {
     id: 'ref-jayavarman-vii',
-    titre: 'Tête de Jayavarman VII',
+    titre: 'Tête de Jayavarman VII (portrait présumé)',
     datation: 'fin du XIIe – début du XIIIe s.',
     debut: 1181,
     fin: 1220,
     periodeId: 'angkor',
     aireId: 'cambodge',
-    site: 'Preah Khan de Kompong Svay (Cambodge)',
+    site: 'Cambodge, région d’Angkor (?), province de Siem Reap',
     materiau: 'Grès',
     conservation: 'Musée Guimet, Paris',
     iconographie: 'Portrait du roi, yeux clos, léger sourire, chignon : expression méditative.',
     style: 'Style du Bayon',
-    notes: 'Roi bouddhiste du Mahāyāna. Autres portraits connus (Phnom Penh, Bangkok). Pièce phare du Guimet.',
+    notes: 'Le cartel du Guimet parle de « portrait présumé » et indique une provenance incertaine, région d’Angkor (?). Roi bouddhiste du Mahāyāna. D’autres têtes comparables sont conservées ailleurs, notamment au Musée national du Cambodge (Phnom Penh).',
     etiquettes: ['bouddhisme', 'portrait royal', 'sculpture', 'Guimet'],
     requeteImage: 'Head of Jayavarman VII Guimet',
+    imageCommons: 'File:Jayavarman VII Guimet 90508 1.jpg',
   },
   {
     id: 'ref-bayon',
@@ -690,6 +736,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Temple d’État de Jayavarman VII, centre de la ville d’Angkor Thom.',
     etiquettes: ['bouddhisme', 'architecture', 'temple'],
     requeteImage: 'Bayon face towers',
+    imageCommons: 'File:Bayon Face Tower.JPG',
   },
 
   // ——— Champa ———
@@ -708,13 +755,14 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Principal centre religieux du Champa. Classement des groupes par Henri Parmentier (EFEO).',
     etiquettes: ['hindouisme', 'shivaïsme', 'architecture', 'EFEO'],
     requeteImage: 'My Son sanctuary Cham towers',
+    imageCommons: 'File:My Son Sanctuary Vietnam 06.jpg',
   },
   {
     id: 'ref-autel-dong-duong',
     titre: 'Autel de Đồng Dương',
-    datation: 'fin du IXe s.',
+    datation: 'fin du IXe – début du Xe s.',
     debut: 875,
-    fin: 900,
+    fin: 925,
     periodeId: 'champa',
     aireId: 'champa',
     site: 'Đồng Dương (province de Quảng Nam, Viêt Nam)',
@@ -725,6 +773,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Monastère bouddhique (Lakṣmīndralokeśvara) fondé en 875 par Indravarman II.',
     etiquettes: ['bouddhisme', 'sculpture'],
     requeteImage: 'Dong Duong altar Cham Museum Da Nang',
+    imageCommons: 'File:Pedestal, Dong Duong, view 2, late 9th to early 10th century, Quang Nam - Museum of Cham Sculpture - Danang, Vietnam - DSC01762.JPG',
   },
   {
     id: 'ref-tra-kieu',
@@ -742,6 +791,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Les danseuses de Trà Kiệu sont une image emblématique de l’art cham. Datation à vérifier.',
     etiquettes: ['hindouisme', 'sculpture'],
     requeteImage: 'Tra Kieu pedestal dancers',
+    imageCommons: 'File:Danseuse et musicien (musée Cham, Da Nang) (4395499696).jpg',
   },
 
   // ——— Java ———
@@ -760,6 +810,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Dynastie Śailendra. Parcours ascendant symbolique. Grandes restaurations (Van Erp 1907-1911, UNESCO 1975-1982).',
     etiquettes: ['bouddhisme', 'architecture', 'relief'],
     requeteImage: 'Borobudur',
+    imageCommons: 'File:Borobudur-Nothwest-view.jpg',
   },
   {
     id: 'ref-prambanan',
@@ -776,6 +827,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Contemporain du bouddhique Borobudur : coexistence des deux religions à Java.',
     etiquettes: ['hindouisme', 'shivaïsme', 'architecture', 'temple'],
     requeteImage: 'Prambanan temple',
+    imageCommons: 'File:Prambanan temple, Central Java, Indonesia, 20220818 1311 9139.jpg',
   },
   {
     id: 'ref-prajnaparamita-singasari',
@@ -792,6 +844,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Longtemps conservée à Leyde, restituée à l’Indonésie en 1978 : exemple de restitution. Parfois identifiée à une reine (Ken Dedes), identification légendaire.',
     etiquettes: ['bouddhisme', 'sculpture', 'restitution'],
     requeteImage: 'Prajnaparamita Singhasari Java',
+    imageCommons: 'File:Prajnaparamita Java Front.JPG',
   },
 
   // ——— Birmanie, Thaïlande ———
@@ -805,11 +858,12 @@ export const REFERENCES: FicheReference[] = [
     aireId: 'birmanie-thai',
     site: 'Thaïlande centrale (Nakhon Pathom…)',
     materiau: 'Calcaire',
-    conservation: 'Plusieurs exemplaires (Musée national de Bangkok…)',
+    conservation: 'Plusieurs exemplaires, dont un au Musée Guimet, Paris (provenance exacte inconnue)',
     iconographie: 'Grande roue sur pilier, souvent associée à une gazelle couchée : évocation du premier sermon.',
     notes: 'Spécificité de Dvāravatī : persistance de symboles aniconiques d’origine indienne.',
-    etiquettes: ['bouddhisme', 'sculpture'],
+    etiquettes: ['bouddhisme', 'sculpture', 'Guimet'],
     requeteImage: 'Dvaravati dharmachakra',
+    imageCommons: 'File:Dharmachakra Guimet-HDR.jpg',
   },
   {
     id: 'ref-ananda-pagan',
@@ -826,6 +880,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Fondé par le roi Kyanzittha.',
     etiquettes: ['bouddhisme', 'architecture', 'temple'],
     requeteImage: 'Ananda Temple Bagan',
+    imageCommons: 'File:20160801 Ananda Temple Bagan Myanmar 6682.jpg',
   },
   {
     id: 'ref-bouddha-marchant-sukhothai',
@@ -843,6 +898,7 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Type iconographique propre à Sukhothai, en ronde-bosse.',
     etiquettes: ['bouddhisme', 'bronze'],
     requeteImage: 'Walking Buddha Sukhothai bronze',
+    imageCommons: 'File:069 Walking Buddha, 14c, Sukhothai (34443573793).jpg',
   },
 
   // ——— Népal ———
@@ -861,5 +917,6 @@ export const REFERENCES: FicheReference[] = [
     notes: 'Architecture newar sous les Malla. Thème de la reconstruction après séisme.',
     etiquettes: ['hindouisme', 'bouddhisme', 'architecture'],
     requeteImage: 'Patan Durbar Square Krishna Mandir',
+    imageCommons: 'File:Krishna Mandir, Patan Durbar Square, Lalitpur.jpg',
   },
 ];
