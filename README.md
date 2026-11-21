@@ -50,7 +50,17 @@ npm run typecheck
 npm run build
 ```
 
+## Version web (GitHub Pages)
+
+À chaque `push` sur `main`, le flux **Site web (GitHub Pages)** (`.github/workflows/pages.yml`) vérifie les types et les tests,
+construit l'application et la publie sur GitHub Pages : https://sinnappan93.github.io/MadameLaDocteure/
+(à activer une fois dans *Settings › Pages › Source : GitHub Actions*). Les données restent dans le navigateur
+de chaque appareil : rien n'est envoyé au serveur.
+
 ## Application Android (APK)
+
+> Flux désactivé pour l'instant : l'APK sera construit plus tard.
+
 
 À chaque `push`, le flux GitHub Actions **APK Android** (`.github/workflows/android.yml`) vérifie les types et les tests,
 compile l'APK et le publie dans la release **`apk-latest`** du dépôt. Sur le téléphone : télécharger
