@@ -68,11 +68,11 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 
 ## Feuille de route
 1. Démarches et plan de préparation (inscriptions, Prépa Talents, lectures) avec rappels
-3. Suivi de bibliographie
-4. Frise chronologique et carte des sites
-5. Sujets blancs chronométrés et correction par l'IA
-6. Simulateur d'oral (30 min de préparation et 30 min d'épreuve, jury joué par l'IA)
-7. Projection : couverture, mémorisation, notes des sujets blancs, rythme
+2. Suivi de bibliographie
+3. Frise chronologique et carte des sites
+4. Sujets blancs chronométrés et correction par l'IA
+5. Simulateur d'oral (30 min de préparation et 30 min d'épreuve, jury joué par l'IA)
+6. Projection : couverture, mémorisation, notes des sujets blancs, rythme
 
 ## Démarrer
 
