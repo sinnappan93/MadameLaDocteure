@@ -1,0 +1,36 @@
+{
+  "name": "madameladocteure",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MadameLaDocteure - application personnelle de préparation au concours de conservateur du patrimoine (option Inde et monde indianisé).",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "android:sync": "npm run build && npx cap sync android",
+    "android:apk": "npm run android:sync && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3",
+    "@fontsource-variable/nunito": "5.3.0",
+    "@fontsource/dancing-script": "5.3.0",
+    "dexie": "4.4.7",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@vitejs/plugin-react": "4.3.4",
+    "fake-indexeddb": "6.2.8",
+    "typescript": "5.6.3",
+    "vite": "6.0.3",
+    "vitest": "3.0.5"
+  }
+}

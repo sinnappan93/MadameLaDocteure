@@ -1,0 +1,69 @@
+# Construit l'APK Android de MadameLaDocteure et le publie dans une « release » GitHub.
+name: APK Android
+
+on:
+  push:
+    branches: [main, master, 'claude/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Tests et vérification des types
+        run: |
+          npm run typecheck
+          npm test
+
+      - name: Construire l'application web et la copier dans le projet Android
+        run: |
+          npm run build
+          npx cap sync android
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Compiler l'APK
+        working-directory: android
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/MadameLaDocteure.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MadameLaDocteure-apk
+          path: MadameLaDocteure.apk
+
+      - name: Publier l'APK (release « apk-latest »)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete apk-latest --yes --cleanup-tag || true
+          gh release create apk-latest MadameLaDocteure.apk \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "MadameLaDocteure — APK Android (version 1.0.${{ github.run_number }})" \
+            --notes "APK construit automatiquement depuis la branche ${{ github.ref_name }} (commit ${GITHUB_SHA::7}). Téléchargez MadameLaDocteure.apk ci-dessous et ouvrez-le sur votre téléphone Android."
