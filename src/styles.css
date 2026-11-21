@@ -225,3 +225,6 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); o
 .notice-jointe > summary::-webkit-details-marker { display: none; }
 .notice-jointe[open] > summary { margin-bottom: 10px; }
 .notice-jointe .bloc { background: var(--surface); }
+.points { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+.points li::marker { color: var(--primary); }
+.points strong { font-weight: 700; }
