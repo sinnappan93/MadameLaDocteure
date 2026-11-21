@@ -17,6 +17,15 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 - **Couverture du programme** : nombre de périodes ayant au moins une fiche
 - Thème **clair**, **sombre** ou **automatique** (comme le téléphone), dans le menu
 
+### Révision « identifie cette œuvre »
+- Cartes tirées des fiches illustrées : **identifier** (photo, puis réponse et auto-évaluation : à revoir, difficile, bien, facile)
+  et **dater** (QCM de quatre périodes, leurres de la même aire et d'époques proches, corrigé automatiquement)
+- **Répétition espacée** (variante simplifiée de SM-2) : intervalles croissants, carte ratée repassée dans la séance,
+  œuvre « maîtrisée » au-delà de 21 jours ; une seule carte par œuvre et par séance ; QCM proposé à partir du lendemain
+  de la première identification (5 au plus par séance)
+- Séance du jour : cartes dues + 0, 5, 10 ou 20 nouvelles œuvres, filtre par aire ; bilan en fin de séance
+- Carte « Révision du jour » sur l'accueil
+
 ### Fiches préparées
 - **51 fiches d'œuvres de référence** installées au premier lancement, de l'Indus à l'art moderne, de l'Inde à Java
   (`src/data/references.ts`) : datation, site, matériau, lieu de conservation, iconographie, points à retenir, étiquettes
@@ -51,7 +60,7 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 - Images réduites à 1 600 px de côté au maximum ; choix de l'image de couverture
 
 ## Feuille de route
-1. Révision « identifie cette œuvre » et glossaire iconographique, avec **répétition espacée**
+1. Glossaire iconographique en cartes de révision
 2. Démarches et plan de préparation (inscriptions, Prépa Talents, lectures) avec rappels
 3. Suivi de bibliographie
 4. Frise chronologique et carte des sites

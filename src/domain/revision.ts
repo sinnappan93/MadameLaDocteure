@@ -1,0 +1,219 @@
+/**
+ * Révision « identifie cette œuvre » : cartes tirées des fiches illustrées, planifiées par
+ * répétition espacée (variante simplifiée de l'algorithme SM-2 d'Anki).
+ * Logique pure, sans stockage : le temps et le hasard sont passés en paramètres pour les tests.
+ */
+import { PERIODES, periodeParId } from './catalogue';
+import type { Oeuvre } from './types';
+
+/** « identifier » : la photo, puis auto-évaluation ; « periode » : QCM sur la période. */
+export type TypeCarte = 'identifier' | 'periode';
+
+/** 0 : à revoir, 1 : difficile, 2 : bien, 3 : facile. */
+export type Note = 0 | 1 | 2 | 3;
+
+export interface EtatCarte {
+  /** `${oeuvreId}:${type}` */
+  id: string;
+  oeuvreId: string;
+  type: TypeCarte;
+  /** Réussites consécutives. */
+  repetitions: number;
+  /** Intervalle actuel, en jours (0 = à revoir dans la journée). */
+  intervalle: number;
+  /** Facilité (multiplicateur d'intervalle), entre 1,3 et 3. */
+  facilite: number;
+  /** Prochaine révision (ISO). */
+  echeance: string;
+  derniereRevision: string;
+  revisions: number;
+  erreurs: number;
+}
+
+export interface Carte {
+  id: string;
+  oeuvreId: string;
+  type: TypeCarte;
+  etat?: EtatCarte;
+}
+
+const JOUR = 86_400_000;
+const MINUTES_A_REVOIR = 10;
+export const SEUIL_MAITRISE = 21;
+export const QCM_PAR_SEANCE = 5;
+
+export const idCarte = (oeuvreId: string, type: TypeCarte) => `${oeuvreId}:${type}`;
+
+/** Nouvel état après une réponse. */
+export function noter(etat: EtatCarte | undefined, carte: Pick<Carte, 'oeuvreId' | 'type'>, note: Note, maintenant: Date): EtatCarte {
+  const e: EtatCarte = etat ?? {
+    id: idCarte(carte.oeuvreId, carte.type),
+    oeuvreId: carte.oeuvreId,
+    type: carte.type,
+    repetitions: 0,
+    intervalle: 0,
+    facilite: 2.5,
+    echeance: maintenant.toISOString(),
+    derniereRevision: maintenant.toISOString(),
+    revisions: 0,
+    erreurs: 0,
+  };
+  let { repetitions, intervalle, facilite } = e;
+  if (note === 0) {
+    repetitions = 0;
+    intervalle = 0;
+    facilite = Math.max(1.3, facilite - 0.2);
+  } else {
+    if (note === 1) {
+      intervalle = repetitions === 0 ? 1 : Math.max(intervalle + 1, Math.round(intervalle * 1.2));
+      facilite = Math.max(1.3, facilite - 0.15);
+    } else if (note === 2) {
+      intervalle = repetitions === 0 ? 1 : repetitions === 1 ? 3 : Math.max(intervalle + 1, Math.round(intervalle * facilite));
+    } else {
+      intervalle = repetitions === 0 ? 3 : Math.max(intervalle + 2, Math.round(intervalle * facilite * 1.3));
+      facilite = Math.min(3, facilite + 0.15);
+    }
+    repetitions += 1;
+  }
+  const delai = intervalle === 0 ? MINUTES_A_REVOIR * 60_000 : intervalle * JOUR;
+  return {
+    ...e,
+    repetitions,
+    intervalle,
+    facilite,
+    echeance: new Date(maintenant.getTime() + delai).toISOString(),
+    derniereRevision: maintenant.toISOString(),
+    revisions: e.revisions + 1,
+    erreurs: e.erreurs + (note === 0 ? 1 : 0),
+  };
+}
+
+/** Intervalle qu'aurait la carte pour chaque note (affiché sur les boutons). */
+export function apercuIntervalles(etat: EtatCarte | undefined, carte: Pick<Carte, 'oeuvreId' | 'type'>, maintenant: Date): Record<Note, string> {
+  const libelle = (n: Note) => {
+    const j = noter(etat, carte, n, maintenant).intervalle;
+    if (j === 0) return `${MINUTES_A_REVOIR} min`;
+    if (j < 30) return `${j} j`;
+    if (j < 365) return `${Math.round(j / 30)} mois`;
+    return `${(j / 365).toFixed(1).replace('.', ',')} an`;
+  };
+  return { 0: libelle(0), 1: libelle(1), 2: libelle(2), 3: libelle(3) };
+}
+
+/** Fin de la journée locale : une carte qui échoit aujourd'hui est due dès ce matin. */
+function finDeJournee(d: Date): number {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999).getTime();
+}
+
+function debutDeJournee(d: Date): number {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+}
+
+export const estDue = (etat: EtatCarte, maintenant: Date) => new Date(etat.echeance).getTime() <= finDeJournee(maintenant);
+
+/** Cartes possibles pour une fiche : il faut une image ; le QCM demande une période. */
+export function cartesDe(o: Oeuvre): TypeCarte[] {
+  if (!o.imagePrincipaleId) return [];
+  return o.periodeId && periodeParId(o.periodeId) ? ['identifier', 'periode'] : ['identifier'];
+}
+
+export interface OptionsSeance {
+  maintenant: Date;
+  /** Nombre maximal de cartes jamais vues. */
+  nouvelles: number;
+  /** Nombre maximal de cartes au total. */
+  maximum: number;
+  aireId?: string;
+  hasard?: () => number;
+}
+
+export function melanger<T>(liste: T[], hasard: () => number = Math.random): T[] {
+  const l = [...liste];
+  for (let i = l.length - 1; i > 0; i--) {
+    const j = Math.floor(hasard() * (i + 1));
+    [l[i], l[j]] = [l[j], l[i]];
+  }
+  return l;
+}
+
+/**
+ * Compose une séance : d'abord les cartes dues (les plus en retard d'abord), puis des nouvelles.
+ * Une seule carte par œuvre et par séance, pour ne pas révéler la réponse d'une carte par l'autre.
+ */
+export function composerSeance(oeuvres: Oeuvre[], etats: EtatCarte[], o: OptionsSeance): Carte[] {
+  const parId = new Map(etats.map((e) => [e.id, e]));
+  const candidates = oeuvres.filter((x) => !o.aireId || x.aireId === o.aireId);
+  const dues: Carte[] = [];
+  const nouvelles: Carte[] = [];
+  for (const oeuvre of candidates) {
+    for (const type of cartesDe(oeuvre)) {
+      const etat = parId.get(idCarte(oeuvre.id, type));
+      const carte = { id: idCarte(oeuvre.id, type), oeuvreId: oeuvre.id, type, etat };
+      if (!etat) nouvelles.push(carte);
+      else if (estDue(etat, o.maintenant)) dues.push(carte);
+    }
+  }
+  dues.sort((a, b) => a.etat!.echeance.localeCompare(b.etat!.echeance));
+  const nouvellesTriees = melanger(nouvelles, o.hasard);
+
+  const seance: Carte[] = [];
+  const oeuvresPrises = new Set<string>();
+  const ajouter = (c: Carte) => {
+    if (seance.length >= o.maximum || oeuvresPrises.has(c.oeuvreId)) return false;
+    seance.push(c);
+    oeuvresPrises.add(c.oeuvreId);
+    return true;
+  };
+  for (const c of dues) ajouter(c);
+  // QCM de période pour des œuvres déjà connues (identifiées un jour précédent) : 5 au plus par séance.
+  let qcm = 0;
+  for (const c of nouvellesTriees) {
+    if (c.type !== 'periode' || qcm >= QCM_PAR_SEANCE) continue;
+    const identifiee = parId.get(idCarte(c.oeuvreId, 'identifier'));
+    if (!identifiee || new Date(identifiee.derniereRevision).getTime() >= debutDeJournee(o.maintenant)) continue;
+    if (ajouter(c)) qcm++;
+  }
+  // Puis les œuvres jamais vues, selon le nombre choisi.
+  let n = 0;
+  for (const c of nouvellesTriees) {
+    if (n >= o.nouvelles) break;
+    if (c.type === 'identifier' && ajouter(c)) n++;
+  }
+  return melanger(seance, o.hasard);
+}
+
+/** Bilan pour l'accueil : cartes dues aujourd'hui, nouvelles disponibles, œuvres maîtrisées. */
+export function bilan(oeuvres: Oeuvre[], etats: EtatCarte[], maintenant: Date) {
+  const parId = new Map(etats.map((e) => [e.id, e]));
+  let dues = 0;
+  let nouvelles = 0;
+  let sansImage = 0;
+  for (const o of oeuvres) {
+    const types = cartesDe(o);
+    if (types.length === 0) sansImage++;
+    for (const t of types) {
+      const e = parId.get(idCarte(o.id, t));
+      if (!e) {
+        if (t === 'identifier') nouvelles++;
+      } else if (estDue(e, maintenant)) dues++;
+    }
+  }
+  const maitrisees = oeuvres.filter((o) => {
+    const e = parId.get(idCarte(o.id, 'identifier'));
+    return e && e.intervalle >= SEUIL_MAITRISE;
+  }).length;
+  return { dues, nouvelles, maitrisees, sansImage };
+}
+
+/** Choix du QCM : la bonne période et trois leurres, de préférence de la même aire et d'époques proches. */
+export function optionsPeriode(periodeId: string, hasard: () => number = Math.random): string[] {
+  const bonne = periodeParId(periodeId);
+  if (!bonne) return [];
+  const milieu = (p: { debut: number; fin: number }) => (p.debut + p.fin) / 2;
+  const autres = PERIODES.filter((p) => p.id !== bonne.id)
+    .map((p) => ({ p, score: (p.aireId === bonne.aireId ? 0 : 1500) + Math.abs(milieu(p) - milieu(bonne)) + hasard() * 400 }))
+    .sort((a, b) => a.score - b.score)
+    .slice(0, 3)
+    .map((x) => x.p.id);
+  return melanger([bonne.id, ...autres], hasard);
+}

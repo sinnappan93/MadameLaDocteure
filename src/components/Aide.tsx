@@ -29,6 +29,29 @@ export function Aide() {
         </ul>
       </Rubrique>
 
+      <Rubrique titre="La révision « identifie cette œuvre »">
+        <ul>
+          <li>
+            Depuis l’accueil (<em>Révision du jour</em>) ou le menu › <em>Révision</em>. Seules les fiches avec une image sont révisées.
+          </li>
+          <li>
+            <strong>Identifier</strong> : l’appli montre la photo. Cherche le titre, la datation, le lieu et le style, puis touche <em>Voir la réponse</em> et
+            note-toi honnêtement : <em>À revoir</em>, <em>Difficile</em>, <em>Bien</em> ou <em>Facile</em>.
+          </li>
+          <li>
+            <strong>Dater</strong> : une fois l’œuvre identifiée une première fois, un QCM te demande sa période parmi quatre, corrigé automatiquement.
+          </li>
+          <li>
+            <strong>Répétition espacée</strong> : une carte réussie revient de plus en plus tard (1 jour, 3 jours, une semaine, un mois…) ; une carte ratée
+            revient dans la même séance puis le lendemain. Une œuvre est « maîtrisée » quand elle ne revient pas avant 3 semaines.
+          </li>
+          <li>
+            Chaque jour : les cartes à revoir, plus quelques nouvelles œuvres (0, 5, 10 ou 20, à choisir). Tu peux limiter la séance à une aire.
+          </li>
+          <li>Le plus efficace : une séance courte chaque jour plutôt qu’une longue de temps en temps.</li>
+        </ul>
+      </Rubrique>
+
       <Rubrique titre="Aires et périodes">
         <p>
           Chaque fiche est classée dans une <strong>aire culturelle</strong> (grande zone géographique : Inde du Nord, Cambodge, Java…) et, si possible, une{' '}
@@ -159,7 +182,7 @@ export function Aide() {
       </Rubrique>
 
       <Rubrique titre="Bientôt">
-        <p>Révision « identifie cette œuvre » avec répétition espacée, démarches et plan de préparation, bibliographie, frise et carte, sujets blancs, simulateur d’oral.</p>
+        <p>Démarches et plan de préparation, bibliographie, frise et carte, sujets blancs, simulateur d’oral.</p>
       </Rubrique>
     </section>
   );

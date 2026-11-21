@@ -4,6 +4,7 @@ import { MUSEES } from '../domain/musees';
 import { db, imagesDe, modifierOeuvre, retirerNotice, supprimerImage, supprimerOeuvre } from '../lib/db';
 import { useLive } from '../lib/useLive';
 import { AjoutImage } from './AjoutImage';
+import { Bloc } from './Bloc';
 import { NoticeDetaillee, RechercheMusees } from './RechercheMusees';
 import { Vignette } from './Vignette';
 
@@ -161,27 +162,5 @@ export function FicheOeuvre({ id, retour, modifier }: { id: string; retour: () =
       {ajout && <AjoutImage oeuvre={oeuvre} fermer={() => setAjout(false)} />}
       {musees && <RechercheMusees oeuvre={oeuvre} fermer={() => setMusees(false)} />}
     </article>
-  );
-}
-
-/** Texte libre ; les lignes commençant par « • » deviennent une liste, avec l'éventuel intitulé (« Contexte : ») en gras. */
-function Bloc({ titre, texte }: { titre: string; texte: string }) {
-  const lignes = texte.split('\n').filter((l) => l.trim());
-  const enListe = lignes.length > 1 && lignes.every((l) => l.trimStart().startsWith('•'));
-  return (
-    <section className="bloc">
-      <h3>{titre}</h3>
-      {enListe ? (
-        <ul className="points">
-          {lignes.map((l, i) => {
-            const contenu = l.replace(/^\s*•\s*/, '');
-            const m = /^([^:]{2,40}) : (.*)$/s.exec(contenu);
-            return <li key={i}>{m ? <><strong>{m[1]} :</strong> {m[2]}</> : contenu}</li>;
-          })}
-        </ul>
-      ) : (
-        <p>{texte}</p>
-      )}
-    </section>
   );
 }

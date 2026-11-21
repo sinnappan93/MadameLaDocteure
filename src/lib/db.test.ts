@@ -105,3 +105,17 @@ describe('mises à jour et images des fiches préparées', () => {
     }
   });
 });
+
+describe('révisions', () => {
+  it('enregistre les réponses et les efface avec la fiche', async () => {
+    const { enregistrerReponse } = await import('./db');
+    const o = await creerOeuvre({ ...oeuvreVide(), titre: 'Bayon' }, base);
+    const carte = { id: `${o.id}:identifier`, oeuvreId: o.id, type: 'identifier' as const };
+    await enregistrerReponse(carte, 2, new Date(), base);
+    const e = await enregistrerReponse(carte, 2, new Date(), base);
+    expect(e.intervalle).toBe(3);
+    expect(e.revisions).toBe(2);
+    await supprimerOeuvre(o.id, base);
+    expect(await base.revisions.count()).toBe(0);
+  });
+});

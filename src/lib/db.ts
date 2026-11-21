@@ -5,6 +5,7 @@
 import Dexie, { type EntityTable } from 'dexie';
 import { type FicheReference, REFERENCES } from '../data/references';
 import type { NoticeMusee } from '../domain/musees';
+import { type Carte, type EtatCarte, type Note, noter } from '../domain/revision';
 import { type ImageOeuvre, type ImageSource, type NouvelleOeuvre, type Oeuvre, oeuvreVide } from '../domain/types';
 
 export interface Meta {
@@ -22,6 +23,7 @@ export class Base extends Dexie {
   images!: EntityTable<ImageOeuvre, 'id'>;
   fichiers!: EntityTable<Fichier, 'id'>;
   meta!: EntityTable<Meta, 'cle'>;
+  revisions!: EntityTable<EtatCarte, 'id'>;
 
   constructor(nom = 'madameladocteure') {
     super(nom);
@@ -31,6 +33,7 @@ export class Base extends Dexie {
       fichiers: 'id',
     });
     this.version(2).stores({ meta: 'cle' });
+    this.version(3).stores({ revisions: 'id, oeuvreId, echeance' });
   }
 }
 
@@ -51,7 +54,8 @@ export async function modifierOeuvre(id: string, changements: Partial<NouvelleOe
 
 /** Supprime l'œuvre, ses images et leurs fichiers. */
 export async function supprimerOeuvre(id: string, base: Base = db): Promise<void> {
-  await base.transaction('rw', base.oeuvres, base.images, base.fichiers, async () => {
+  await base.transaction('rw', [base.oeuvres, base.images, base.fichiers, base.revisions], async () => {
+    await base.revisions.where('oeuvreId').equals(id).delete();
     const images = await base.images.where('oeuvreId').equals(id).toArray();
     await base.fichiers.bulkDelete(images.flatMap((i) => (i.fichierId ? [i.fichierId] : [])));
     await base.images.bulkDelete(images.map((i) => i.id));
@@ -178,4 +182,12 @@ export async function restaurerReferences(base: Base = db): Promise<number> {
     await base.oeuvres.bulkAdd(manquantes.map((r) => ficheDeReference(r, date)));
     return manquantes.length;
   });
+}
+
+/** Enregistre la réponse à une carte de révision et renvoie son nouvel état. */
+export async function enregistrerReponse(carte: Carte, note: Note, maintenant = new Date(), base: Base = db): Promise<EtatCarte> {
+  const precedent = await base.revisions.get(carte.id);
+  const etat = noter(precedent, carte, note, maintenant);
+  await base.revisions.put(etat);
+  return etat;
 }

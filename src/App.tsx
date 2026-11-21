@@ -4,6 +4,7 @@ import { Aide } from './components/Aide';
 import { FicheOeuvre } from './components/FicheOeuvre';
 import { FormulaireOeuvre } from './components/FormulaireOeuvre';
 import { ListeOeuvres } from './components/ListeOeuvres';
+import { Revision } from './components/Revision';
 import { Logo, Menu } from './components/Menu';
 import { aireParId } from './domain/catalogue';
 import { creerOeuvre, db, installerReferences, mettreAJourReferences, modifierOeuvre } from './lib/db';
@@ -14,6 +15,7 @@ import { useLive } from './lib/useLive';
 type Vue =
   | { type: 'accueil' }
   | { type: 'aide' }
+  | { type: 'revision' }
   | { type: 'liste'; aireId?: string }
   | { type: 'fiche'; id: string }
   | { type: 'edition'; id?: string };
@@ -53,7 +55,9 @@ export function App() {
   const titre =
     vue.type === 'liste'
       ? aireParId(vue.aireId)?.nom ?? 'Œuvres de référence'
-      : vue.type === 'aide'
+      : vue.type === 'revision'
+        ? 'Révision'
+        : vue.type === 'aide'
         ? 'Comment m’utiliser ?'
         : vue.type === 'edition'
         ? vue.id
@@ -87,10 +91,19 @@ export function App() {
             reglages={reglages}
             ouvrirAire={(aireId) => aller({ type: 'liste', aireId })}
             ouvrirOeuvre={(id) => aller({ type: 'fiche', id })}
+            ouvrirRevision={() => aller({ type: 'revision' })}
             creer={() => aller({ type: 'edition' })}
           />
         )}
         {vue.type === 'aide' && <Aide />}
+        {vue.type === 'revision' && (
+          <Revision
+            retourAccueil={() => {
+              setHistorique([]);
+              setVue({ type: 'accueil' });
+            }}
+          />
+        )}
         {vue.type === 'liste' && (
           <ListeOeuvres key={vue.aireId ?? 'toutes'} aireInitiale={vue.aireId} ouvrir={(id) => aller({ type: 'fiche', id })} creer={() => aller({ type: 'edition' })} />
         )}
@@ -121,7 +134,7 @@ export function App() {
           aller={(ecran) => {
             setMenu(false);
             setHistorique([]);
-            setVue(ecran === 'accueil' ? { type: 'accueil' } : ecran === 'aide' ? { type: 'aide' } : { type: 'liste' });
+            setVue(ecran === 'accueil' ? { type: 'accueil' } : ecran === 'aide' ? { type: 'aide' } : ecran === 'revision' ? { type: 'revision' } : { type: 'liste' });
           }}
         />
       )}
