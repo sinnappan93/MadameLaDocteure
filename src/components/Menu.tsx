@@ -6,7 +6,7 @@ import type { Reglages, Theme } from '../lib/reglages';
 interface Props {
   reglages: Reglages;
   modifier: (c: Partial<Reglages>) => void;
-  aller: (ecran: 'accueil' | 'oeuvres') => void;
+  aller: (ecran: 'accueil' | 'oeuvres' | 'aide') => void;
   fermer: () => void;
 }
 
@@ -36,6 +36,9 @@ export function Menu({ reglages, modifier, aller, fermer }: Props) {
         </button>
         <button className="entree-menu" onClick={() => aller('oeuvres')}>
           Œuvres de référence
+        </button>
+        <button className="entree-menu entree-aide" onClick={() => aller('aide')}>
+          Comment m’utiliser ?
         </button>
         <p className="discret bientot">Bientôt : révisions, frise, carte, sujets blancs, oral.</p>
 

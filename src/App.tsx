@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Accueil } from './components/Accueil';
+import { Aide } from './components/Aide';
 import { FicheOeuvre } from './components/FicheOeuvre';
 import { FormulaireOeuvre } from './components/FormulaireOeuvre';
 import { ListeOeuvres } from './components/ListeOeuvres';
@@ -12,6 +13,7 @@ import { useLive } from './lib/useLive';
 
 type Vue =
   | { type: 'accueil' }
+  | { type: 'aide' }
   | { type: 'liste'; aireId?: string }
   | { type: 'fiche'; id: string }
   | { type: 'edition'; id?: string };
@@ -51,7 +53,9 @@ export function App() {
   const titre =
     vue.type === 'liste'
       ? aireParId(vue.aireId)?.nom ?? 'Œuvres de référence'
-      : vue.type === 'edition'
+      : vue.type === 'aide'
+        ? 'Comment m’utiliser ?'
+        : vue.type === 'edition'
         ? vue.id
           ? 'Modifier la fiche'
           : 'Nouvelle fiche'
@@ -86,6 +90,7 @@ export function App() {
             creer={() => aller({ type: 'edition' })}
           />
         )}
+        {vue.type === 'aide' && <Aide />}
         {vue.type === 'liste' && (
           <ListeOeuvres key={vue.aireId ?? 'toutes'} aireInitiale={vue.aireId} ouvrir={(id) => aller({ type: 'fiche', id })} creer={() => aller({ type: 'edition' })} />
         )}
@@ -116,7 +121,7 @@ export function App() {
           aller={(ecran) => {
             setMenu(false);
             setHistorique([]);
-            setVue(ecran === 'accueil' ? { type: 'accueil' } : { type: 'liste' });
+            setVue(ecran === 'accueil' ? { type: 'accueil' } : ecran === 'aide' ? { type: 'aide' } : { type: 'liste' });
           }}
         />
       )}

@@ -228,3 +228,19 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); o
 .points { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
 .points li::marker { color: var(--primary); }
 .points strong { font-weight: 700; }
+
+/* Aide */
+.entree-aide { background: var(--primary-soft); color: var(--primary); }
+.aide-intro { margin: 0 0 16px; }
+.rubrique { background: var(--surface-2); border-radius: var(--radius); margin-bottom: 10px; }
+.rubrique > summary { cursor: pointer; padding: 14px 16px; font-weight: 700; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+.rubrique > summary::-webkit-details-marker { display: none; }
+.rubrique > summary::after { content: '+'; color: var(--primary); font-size: 1.3rem; line-height: 1; }
+.rubrique[open] > summary::after { content: '–'; }
+.rubrique-contenu { padding: 0 16px 14px; }
+.rubrique-contenu p { margin: 0 0 10px; }
+.rubrique-contenu ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+.rubrique-contenu ul ul { margin-top: 6px; gap: 4px; }
+.rubrique-contenu li::marker { color: var(--primary); }
+.rubrique .badge-reference { margin: 2px 0; }
+.avertissement { background: var(--primary-soft); border-radius: 12px; padding: 10px 12px; }
