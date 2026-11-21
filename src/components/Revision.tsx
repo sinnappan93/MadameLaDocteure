@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { CATEGORIES_GLOSSAIRE, type CategorieGlossaire, GLOSSAIRE, type Terme } from '../data/glossaire';
+import { bilanGlossaire, composerSeanceGlossaire, optionsTermes, termeParId } from '../domain/glossaire';
 import { AIRES, aireParId, formatAnnee, periodeParId } from '../domain/catalogue';
 import { apercuIntervalles, bilan, type Carte, composerSeance, type Note, optionsPeriode, SEUIL_MAITRISE } from '../domain/revision';
 import type { Oeuvre } from '../domain/types';
@@ -22,20 +24,93 @@ export function Revision({ retourAccueil }: { retourAccueil: () => void }) {
   const [etape, setEtape] = useState<Etape>({ nom: 'depart' });
   const [aire, setAire] = useState('');
   const [nouvelles, setNouvelles] = useState(10);
+  const [mode, setMode] = useState<'oeuvres' | 'glossaire'>('oeuvres');
+  const [categorie, setCategorie] = useState<CategorieGlossaire | ''>('');
 
   if (!oeuvres || !etats) return <section className="panneau" />;
   const parId = new Map(oeuvres.map((o) => [o.id, o]));
 
+  const composerCartes = (hasard?: () => number) =>
+    mode === 'oeuvres'
+      ? composerSeance(oeuvres, etats, { maintenant: new Date(), nouvelles, maximum: MAXIMUM, aireId: aire || undefined, hasard })
+      : composerSeanceGlossaire(GLOSSAIRE, etats, { maintenant: new Date(), nouvelles, maximum: MAXIMUM, categorie: categorie || undefined, hasard });
+
   const demarrer = () => {
-    const cartes = composerSeance(oeuvres, etats, { maintenant: new Date(), nouvelles, maximum: MAXIMUM, aireId: aire || undefined });
+    const cartes = composerCartes();
     if (cartes.length) setEtape({ nom: 'seance', cartes, index: 0, resultats: [], repassees: {} });
   };
 
-  if (etape.nom === 'depart') {
-    const b = bilan(aire ? oeuvres.filter((o) => o.aireId === aire) : oeuvres, etats, new Date());
-    const apercu = composerSeance(oeuvres, etats, { maintenant: new Date(), nouvelles, maximum: MAXIMUM, aireId: aire || undefined, hasard: () => 0 });
+  const choixMode = (
+    <div className="onglets" role="tablist" aria-label="Que réviser ?">
+      <button role="tab" aria-selected={mode === 'oeuvres'} className={mode === 'oeuvres' ? 'actif' : ''} onClick={() => setMode('oeuvres')}>
+        Œuvres
+      </button>
+      <button role="tab" aria-selected={mode === 'glossaire'} className={mode === 'glossaire' ? 'actif' : ''} onClick={() => setMode('glossaire')}>
+        Glossaire
+      </button>
+    </div>
+  );
+
+  const choixNouvelles = (
+    <div>
+      <span className="libelle">{mode === 'oeuvres' ? 'Nouvelles œuvres par séance' : 'Nouveaux termes par séance'}</span>
+      <div className="onglets" role="radiogroup" aria-label="Nouveautés par séance">
+        {[0, 5, 10, 20].map((n) => (
+          <button key={n} role="radio" aria-checked={nouvelles === n} className={nouvelles === n ? 'actif' : ''} onClick={() => setNouvelles(n)}>
+            {n}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (etape.nom === 'depart' && mode === 'glossaire') {
+    const termes = categorie ? GLOSSAIRE.filter((t) => t.categorie === categorie) : GLOSSAIRE;
+    const b = bilanGlossaire(termes, etats, new Date());
+    const apercu = composerCartes(() => 0);
     return (
       <section className="panneau revision">
+        {choixMode}
+        <div className="stats-revision">
+          <Stat valeur={b.dues} libelle="à revoir aujourd’hui" />
+          <Stat valeur={b.nouveaux} libelle="termes jamais révisés" />
+          <Stat valeur={b.maitrises} libelle="termes maîtrisés" />
+        </div>
+        <p className="discret">
+          Gestes, postures, attributs, divinités, montures, architecture : retrouve la définition d’un terme, puis, les jours suivants, le terme qui correspond à une
+          définition.
+        </p>
+        <div className="formulaire">
+          <label>
+            Catégorie
+            <select value={categorie} onChange={(e) => setCategorie(e.target.value as CategorieGlossaire | '')}>
+              <option value="">Tout le glossaire ({GLOSSAIRE.length} termes)</option>
+              {CATEGORIES_GLOSSAIRE.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nom}
+                </option>
+              ))}
+            </select>
+          </label>
+          {choixNouvelles}
+        </div>
+        {apercu.length > 0 ? (
+          <button className="bouton principal large grand" onClick={demarrer}>
+            Commencer · {apercu.length} carte{apercu.length > 1 ? 's' : ''}
+          </button>
+        ) : (
+          <p className="vide-etat">{b.dues + b.nouveaux === 0 ? 'Rien à réviser pour aujourd’hui. Reviens demain !' : 'Choisis au moins un nouveau terme par séance.'}</p>
+        )}
+      </section>
+    );
+  }
+
+  if (etape.nom === 'depart') {
+    const b = bilan(aire ? oeuvres.filter((o) => o.aireId === aire) : oeuvres, etats, new Date());
+    const apercu = composerCartes(() => 0);
+    return (
+      <section className="panneau revision">
+        {choixMode}
         <div className="stats-revision">
           <Stat valeur={b.dues} libelle="à revoir aujourd’hui" />
           <Stat valeur={b.nouvelles} libelle="œuvres jamais révisées" />
@@ -57,16 +132,7 @@ export function Revision({ retourAccueil }: { retourAccueil: () => void }) {
               ))}
             </select>
           </label>
-          <div>
-            <span className="libelle">Nouvelles œuvres par séance</span>
-            <div className="onglets" role="radiogroup" aria-label="Nouvelles œuvres par séance">
-              {[0, 5, 10, 20].map((n) => (
-                <button key={n} role="radio" aria-checked={nouvelles === n} className={nouvelles === n ? 'actif' : ''} onClick={() => setNouvelles(n)}>
-                  {n}
-                </button>
-              ))}
-            </div>
-          </div>
+          {choixNouvelles}
         </div>
         {apercu.length > 0 ? (
           <button className="bouton principal large grand" onClick={demarrer}>
@@ -98,11 +164,12 @@ export function Revision({ retourAccueil }: { retourAccueil: () => void }) {
           </div>
           <ul className="liste-fin">
             {etape.resultats.map((r, i) => {
-              const o = parId.get(r.carte.oeuvreId);
+              const nom = parId.get(r.carte.oeuvreId)?.titre ?? termeParId(r.carte.oeuvreId)?.terme;
+              const libelle = { identifier: 'identification', periode: 'période', terme: 'définition', definition: 'terme' }[r.carte.type];
               return (
                 <li key={i} className={r.note === 0 ? 'rate' : 'reussi'}>
-                  <span aria-hidden>{r.note === 0 ? '✗' : '✓'}</span> {o?.titre}
-                  <span className="discret"> · {r.carte.type === 'periode' ? 'période' : 'identification'}</span>
+                  <span aria-hidden>{r.note === 0 ? '✗' : '✓'}</span> {nom}
+                  <span className="discret"> · {libelle}</span>
                 </li>
               );
             })}
@@ -122,6 +189,7 @@ export function Revision({ retourAccueil }: { retourAccueil: () => void }) {
 
   const carte = etape.cartes[etape.index];
   const oeuvre = parId.get(carte.oeuvreId);
+  const terme = termeParId(carte.oeuvreId);
   const repondre = async (note: Note) => {
     await enregistrerReponse(carte, note);
     const resultats = [...etape.resultats, { carte, note }];
@@ -149,7 +217,13 @@ export function Revision({ retourAccueil }: { retourAccueil: () => void }) {
           Arrêter
         </button>
       </div>
-      {oeuvre ? (
+      {terme ? (
+        carte.type === 'terme' ? (
+          <CarteTerme key={`${carte.id}-${etape.index}`} carte={carte} terme={terme} repondre={repondre} />
+        ) : (
+          <CarteDefinition key={`${carte.id}-${etape.index}`} terme={terme} repondre={repondre} />
+        )
+      ) : oeuvre ? (
         carte.type === 'identifier' ? (
           <CarteIdentifier key={`${carte.id}-${etape.index}`} carte={carte} oeuvre={oeuvre} repondre={repondre} />
         ) : (
@@ -276,6 +350,101 @@ function Reponse({ oeuvre: o }: { oeuvre: Oeuvre }) {
           {o.iconographie && <Bloc titre="Iconographie" texte={o.iconographie} />}
           {o.notes && <Bloc titre="Points à retenir" texte={o.notes} />}
         </details>
+      )}
+    </div>
+  );
+}
+
+const NOMS_CATEGORIES = Object.fromEntries(CATEGORIES_GLOSSAIRE.map((c) => [c.id, c.nom]));
+
+function BoutonsNotes({ carte, repondre }: { carte: Carte; repondre: (n: Note) => void }) {
+  const intervalles = useMemo(() => apercuIntervalles(carte.etat, carte, new Date()), [carte]);
+  const notes: Array<[Note, string]> = [
+    [0, 'À revoir'],
+    [1, 'Difficile'],
+    [2, 'Bien'],
+    [3, 'Facile'],
+  ];
+  return (
+    <div className="notes">
+      {notes.map(([n, libelle]) => (
+        <button key={n} className={`note note-${n}`} onClick={() => repondre(n)}>
+          <span>{libelle}</span>
+          <span className="note-delai">{intervalles[n]}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function CarteTerme({ carte, terme, repondre }: { carte: Carte; terme: Terme; repondre: (n: Note) => void }) {
+  const [revelee, setRevelee] = useState(false);
+  return (
+    <div className="carte-question">
+      <div className="carte-mot">
+        <span className="carte-mot-categorie">{NOMS_CATEGORIES[terme.categorie]}</span>
+        <span className="carte-mot-terme">{terme.terme}</span>
+      </div>
+      <p className="consigne">Que désigne ce terme ? Comment le reconnaître ?</p>
+      {!revelee ? (
+        <button className="bouton principal large grand" onClick={() => setRevelee(true)}>
+          Voir la définition
+        </button>
+      ) : (
+        <>
+          <DefinitionTerme terme={terme} />
+          <p className="discret centre">As-tu retrouvé l’essentiel ?</p>
+          <BoutonsNotes carte={carte} repondre={repondre} />
+        </>
+      )}
+    </div>
+  );
+}
+
+function CarteDefinition({ terme, repondre }: { terme: Terme; repondre: (n: Note) => void }) {
+  const options = useMemo(() => optionsTermes(terme.id), [terme.id]);
+  const [choix, setChoix] = useState<string>();
+  const juste = choix === terme.id;
+  return (
+    <div className="carte-question">
+      <div className="carte-mot definition">
+        <span className="carte-mot-categorie">{NOMS_CATEGORIES[terme.categorie]}</span>
+        <span className="carte-mot-definition">{terme.definition}</span>
+      </div>
+      <p className="consigne">Quel terme correspond à cette définition ?</p>
+      <div className="qcm">
+        {options.map((id) => {
+          const t = termeParId(id)!;
+          const etat = !choix ? '' : id === terme.id ? 'juste' : id === choix ? 'faux' : 'neutre';
+          return (
+            <button key={id} className={`option ${etat}`} disabled={!!choix} onClick={() => setChoix(id)}>
+              <span className="option-nom">{t.terme}</span>
+            </button>
+          );
+        })}
+      </div>
+      {choix && (
+        <>
+          <p className={`verdict ${juste ? 'juste' : 'faux'}`}>{juste ? 'Bonne réponse !' : `C’était : ${terme.terme}`}</p>
+          <button className="bouton principal large grand" onClick={() => repondre(juste ? 2 : 0)}>
+            Continuer
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Définition et fiches d'exemple (les titres des fiches, sans lien pour ne pas quitter la séance). */
+export function DefinitionTerme({ terme }: { terme: Terme }) {
+  const exemples = useLive(async () => (terme.exemples?.length ? (await db.oeuvres.bulkGet(terme.exemples)).filter((o): o is Oeuvre => !!o) : []), [terme.id]);
+  return (
+    <div className="reponse">
+      <p className="definition-texte">{terme.definition}</p>
+      {exemples && exemples.length > 0 && (
+        <p className="discret">
+          À voir dans tes fiches : {exemples.map((o) => o.titre).join(' ; ')}
+        </p>
       )}
     </div>
   );

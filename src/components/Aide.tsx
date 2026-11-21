@@ -1,3 +1,4 @@
+import { GLOSSAIRE } from '../data/glossaire';
 import { REFERENCES } from '../data/references';
 import { AIRES, PERIODES } from '../domain/catalogue';
 
@@ -49,6 +50,22 @@ export function Aide() {
             Chaque jour : les cartes à revoir, plus quelques nouvelles œuvres (0, 5, 10 ou 20, à choisir). Tu peux limiter la séance à une aire.
           </li>
           <li>Le plus efficace : une séance courte chaque jour plutôt qu’une longue de temps en temps.</li>
+        </ul>
+      </Rubrique>
+
+      <Rubrique titre="Le glossaire">
+        <ul>
+          <li>
+            Menu › <em>Glossaire</em> : {GLOSSAIRE.length} termes d’iconographie et d’architecture (gestes, postures, attributs, divinités, montures,
+            architecture, notions), avec recherche sans accents et filtre par catégorie. Chaque terme renvoie aux fiches où on le voit.
+          </li>
+          <li>
+            Sur chaque fiche, <em>Vocabulaire à connaître</em> rappelle les termes utiles pour la décrire.
+          </li>
+          <li>
+            <strong>Réviser</strong> : menu › <em>Révision</em> › onglet <em>Glossaire</em>. D’abord le terme, dont tu retrouves la définition (auto-évaluation) ;
+            les jours suivants, la définition, dont tu retrouves le terme parmi quatre (QCM). Même répétition espacée que pour les œuvres.
+          </li>
         </ul>
       </Rubrique>
 

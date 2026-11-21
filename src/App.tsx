@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Accueil } from './components/Accueil';
 import { Aide } from './components/Aide';
 import { FicheOeuvre } from './components/FicheOeuvre';
+import { Glossaire } from './components/Glossaire';
 import { FormulaireOeuvre } from './components/FormulaireOeuvre';
 import { ListeOeuvres } from './components/ListeOeuvres';
 import { Revision } from './components/Revision';
@@ -16,6 +17,7 @@ type Vue =
   | { type: 'accueil' }
   | { type: 'aide' }
   | { type: 'revision' }
+  | { type: 'glossaire' }
   | { type: 'liste'; aireId?: string }
   | { type: 'fiche'; id: string }
   | { type: 'edition'; id?: string };
@@ -55,7 +57,9 @@ export function App() {
   const titre =
     vue.type === 'liste'
       ? aireParId(vue.aireId)?.nom ?? 'Œuvres de référence'
-      : vue.type === 'revision'
+      : vue.type === 'glossaire'
+        ? 'Glossaire'
+        : vue.type === 'revision'
         ? 'Révision'
         : vue.type === 'aide'
         ? 'Comment m’utiliser ?'
@@ -96,6 +100,7 @@ export function App() {
           />
         )}
         {vue.type === 'aide' && <Aide />}
+        {vue.type === 'glossaire' && <Glossaire ouvrirFiche={(id) => aller({ type: 'fiche', id })} reviser={() => aller({ type: 'revision' })} />}
         {vue.type === 'revision' && (
           <Revision
             retourAccueil={() => {
@@ -134,7 +139,7 @@ export function App() {
           aller={(ecran) => {
             setMenu(false);
             setHistorique([]);
-            setVue(ecran === 'accueil' ? { type: 'accueil' } : ecran === 'aide' ? { type: 'aide' } : ecran === 'revision' ? { type: 'revision' } : { type: 'liste' });
+            setVue(ecran === 'accueil' ? { type: 'accueil' } : ecran === 'aide' ? { type: 'aide' } : ecran === 'revision' ? { type: 'revision' } : ecran === 'glossaire' ? { type: 'glossaire' } : { type: 'liste' });
           }}
         />
       )}

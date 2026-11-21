@@ -1,5 +1,7 @@
 import { AIRES, aireParId, periodeParId } from '../domain/catalogue';
 import { completude, couverture, joursAvant } from '../domain/progression';
+import { GLOSSAIRE } from '../data/glossaire';
+import { bilanGlossaire } from '../domain/glossaire';
 import { bilan } from '../domain/revision';
 import { db } from '../lib/db';
 import type { Reglages } from '../lib/reglages';
@@ -19,6 +21,8 @@ export function Accueil({ reglages, ouvrirAire, ouvrirOeuvre, creer, ouvrirRevis
   const oeuvres = useLive(() => db.oeuvres.toArray(), []);
   const etats = useLive(() => db.revisions.toArray(), []);
   const revision = oeuvres && etats ? bilan(oeuvres, etats, new Date()) : undefined;
+  const glossaire = etats ? bilanGlossaire(GLOSSAIRE, etats, new Date()) : undefined;
+  const dues = (revision?.dues ?? 0) + (glossaire?.dues ?? 0);
   const recentes = [...(oeuvres ?? [])].sort((a, b) => b.modifieeLe.localeCompare(a.modifieeLe)).slice(0, 3);
   const jours = joursAvant(reglages.dateEcrits);
   const total = couverture(oeuvres ?? []);
@@ -37,12 +41,12 @@ export function Accueil({ reglages, ouvrirAire, ouvrirOeuvre, creer, ouvrirRevis
       </section>
 
       <section className="panneau">
-        {revision && revision.dues + revision.nouvelles > 0 && (
+        {revision && dues + revision.nouvelles + (glossaire?.nouveaux ?? 0) > 0 && (
           <button className="carte-du-jour" onClick={ouvrirRevision}>
             <span>
               <span className="carte-du-jour-titre">Révision du jour</span>
               <span className="carte-du-jour-detail">
-                {revision.dues > 0 ? `${revision.dues} carte${revision.dues > 1 ? 's' : ''} à revoir` : 'Tout est à jour'}
+                {dues > 0 ? `${dues} carte${dues > 1 ? 's' : ''} à revoir` : 'Tout est à jour'}
                 {revision.nouvelles > 0 && ` · ${revision.nouvelles} œuvre${revision.nouvelles > 1 ? 's' : ''} à découvrir`}
               </span>
               {revision.maitrisees > 0 && <span className="carte-du-jour-detail">{revision.maitrisees} œuvre{revision.maitrisees > 1 ? 's' : ''} maîtrisée{revision.maitrisees > 1 ? 's' : ''}</span>}

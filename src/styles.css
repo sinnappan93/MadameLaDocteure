@@ -282,3 +282,23 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); o
 .liste-fin li { background: var(--surface-2); border-radius: 12px; padding: 8px 12px; }
 .liste-fin li.reussi > span:first-child { color: #3f9e6e; font-weight: 800; }
 .liste-fin li.rate > span:first-child { color: #d9534f; font-weight: 800; }
+
+/* Glossaire */
+.carte-mot { background: linear-gradient(135deg, var(--t0), var(--t1)); color: var(--tuile-texte); border-radius: var(--radius); min-height: 200px; padding: 24px 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 10px; }
+.carte-mot.definition { background: linear-gradient(135deg, var(--t2), var(--t7)); }
+.carte-mot-categorie { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.75; }
+.carte-mot-terme { font-size: 1.9rem; font-weight: 800; line-height: 1.15; }
+.carte-mot-definition { font-size: 1.05rem; font-weight: 600; line-height: 1.45; }
+.definition-texte { font-size: 1.05rem; margin: 0 0 8px; }
+.liste-termes { margin: 0; display: grid; gap: 8px; }
+.entree-terme { background: var(--surface-2); border-radius: 14px; padding: 12px 14px; }
+.entree-terme dt { font-weight: 800; color: var(--primary); }
+.entree-terme dd { margin: 2px 0 0; }
+.exemples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.puce-fiche { border: 0; background: var(--surface); border-radius: 999px; padding: 3px 10px; font-size: 0.78rem; font-weight: 700; cursor: pointer; color: var(--text); }
+.glossaire .puces { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+.glossaire .puces button { flex: none; }
+.vocabulaire > summary { cursor: pointer; font-weight: 700; }
+.vocabulaire dl { margin: 10px 0 0; display: grid; gap: 8px; }
+.vocabulaire dt { font-weight: 800; color: var(--primary); }
+.vocabulaire dd { margin: 0; font-size: 0.92rem; }

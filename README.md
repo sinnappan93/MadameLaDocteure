@@ -26,6 +26,13 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 - Séance du jour : cartes dues + 0, 5, 10 ou 20 nouvelles œuvres, filtre par aire ; bilan en fin de séance
 - Carte « Révision du jour » sur l'accueil
 
+### Glossaire iconographique
+- **110 termes** (`src/data/glossaire.ts`) : gestes (mudrā), postures et signes du Bouddha, attributs, divinités et figures,
+  montures, architecture, notions et techniques ; chaque terme renvoie aux fiches où on l'observe
+- Page **Glossaire** : recherche sans accents, filtre par catégorie ; bloc **Vocabulaire à connaître** sur chaque fiche
+- **Révision** (onglet Glossaire) : terme → définition (auto-évaluation), puis à partir du surlendemain définition → terme
+  (QCM de quatre termes de la même catégorie), même répétition espacée que pour les œuvres
+
 ### Fiches préparées
 - **51 fiches d'œuvres de référence** installées au premier lancement, de l'Indus à l'art moderne, de l'Inde à Java
   (`src/data/references.ts`) : datation, site, matériau, lieu de conservation, iconographie, points à retenir, étiquettes
@@ -60,8 +67,7 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 - Images réduites à 1 600 px de côté au maximum ; choix de l'image de couverture
 
 ## Feuille de route
-1. Glossaire iconographique en cartes de révision
-2. Démarches et plan de préparation (inscriptions, Prépa Talents, lectures) avec rappels
+1. Démarches et plan de préparation (inscriptions, Prépa Talents, lectures) avec rappels
 3. Suivi de bibliographie
 4. Frise chronologique et carte des sites
 5. Sujets blancs chronométrés et correction par l'IA

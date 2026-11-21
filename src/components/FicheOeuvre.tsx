@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { aireParId, periodeParId } from '../domain/catalogue';
+import { termesDeFiche } from '../domain/glossaire';
 import { MUSEES } from '../domain/musees';
 import { db, imagesDe, modifierOeuvre, retirerNotice, supprimerImage, supprimerOeuvre } from '../lib/db';
 import { useLive } from '../lib/useLive';
@@ -103,6 +104,19 @@ export function FicheOeuvre({ id, retour, modifier }: { id: string; retour: () =
       {oeuvre.iconographie && <Bloc titre="Iconographie" texte={oeuvre.iconographie} />}
       {oeuvre.notes && <Bloc titre="Points à retenir" texte={oeuvre.notes} />}
       {oeuvre.bibliographie && <Bloc titre="Bibliographie" texte={oeuvre.bibliographie} />}
+      {termesDeFiche(id).length > 0 && (
+        <details className="bloc vocabulaire">
+          <summary>Vocabulaire à connaître ({termesDeFiche(id).length})</summary>
+          <dl>
+            {termesDeFiche(id).map((t) => (
+              <div key={t.id}>
+                <dt>{t.terme}</dt>
+                <dd>{t.definition}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      )}
 
       <section className="section-musees">
         <div className="titre-section">

@@ -6,8 +6,11 @@
 import { PERIODES, periodeParId } from './catalogue';
 import type { Oeuvre } from './types';
 
-/** « identifier » : la photo, puis auto-évaluation ; « periode » : QCM sur la période. */
-export type TypeCarte = 'identifier' | 'periode';
+/**
+ * Œuvres : « identifier » (photo puis auto-évaluation) et « periode » (QCM).
+ * Glossaire : « terme » (terme puis définition, auto-évaluation) et « definition » (définition, QCM du terme).
+ */
+export type TypeCarte = 'identifier' | 'periode' | 'terme' | 'definition';
 
 /** 0 : à revoir, 1 : difficile, 2 : bien, 3 : facile. */
 export type Note = 0 | 1 | 2 | 3;
@@ -15,6 +18,7 @@ export type Note = 0 | 1 | 2 | 3;
 export interface EtatCarte {
   /** `${oeuvreId}:${type}` */
   id: string;
+  /** Identifiant du sujet de la carte : fiche d'œuvre, ou terme du glossaire (« gl-… »). */
   oeuvreId: string;
   type: TypeCarte;
   /** Réussites consécutives. */
@@ -136,19 +140,25 @@ export function melanger<T>(liste: T[], hasard: () => number = Math.random): T[]
   return l;
 }
 
+/** Un sujet de révision (œuvre ou terme) et les types de cartes qu'il permet. */
+export interface Sujet {
+  id: string;
+  types: TypeCarte[];
+}
+
 /**
- * Compose une séance : d'abord les cartes dues (les plus en retard d'abord), puis des nouvelles.
- * Une seule carte par œuvre et par séance, pour ne pas révéler la réponse d'une carte par l'autre.
+ * Compose une séance : d'abord les cartes dues (les plus en retard d'abord), puis des cartes de second
+ * niveau (QCM) pour des sujets déjà vus un jour précédent, puis des sujets jamais vus.
+ * Une seule carte par sujet et par séance, pour ne pas révéler la réponse d'une carte par l'autre.
  */
-export function composerSeance(oeuvres: Oeuvre[], etats: EtatCarte[], o: OptionsSeance): Carte[] {
+export function composer(sujets: Sujet[], etats: EtatCarte[], o: OptionsSeance, premier: TypeCarte, second: TypeCarte): Carte[] {
   const parId = new Map(etats.map((e) => [e.id, e]));
-  const candidates = oeuvres.filter((x) => !o.aireId || x.aireId === o.aireId);
   const dues: Carte[] = [];
   const nouvelles: Carte[] = [];
-  for (const oeuvre of candidates) {
-    for (const type of cartesDe(oeuvre)) {
-      const etat = parId.get(idCarte(oeuvre.id, type));
-      const carte = { id: idCarte(oeuvre.id, type), oeuvreId: oeuvre.id, type, etat };
+  for (const sujet of sujets) {
+    for (const type of sujet.types) {
+      const etat = parId.get(idCarte(sujet.id, type));
+      const carte = { id: idCarte(sujet.id, type), oeuvreId: sujet.id, type, etat };
       if (!etat) nouvelles.push(carte);
       else if (estDue(etat, o.maintenant)) dues.push(carte);
     }
@@ -157,29 +167,35 @@ export function composerSeance(oeuvres: Oeuvre[], etats: EtatCarte[], o: Options
   const nouvellesTriees = melanger(nouvelles, o.hasard);
 
   const seance: Carte[] = [];
-  const oeuvresPrises = new Set<string>();
+  const pris = new Set<string>();
   const ajouter = (c: Carte) => {
-    if (seance.length >= o.maximum || oeuvresPrises.has(c.oeuvreId)) return false;
+    if (seance.length >= o.maximum || pris.has(c.oeuvreId)) return false;
     seance.push(c);
-    oeuvresPrises.add(c.oeuvreId);
+    pris.add(c.oeuvreId);
     return true;
   };
   for (const c of dues) ajouter(c);
-  // QCM de période pour des œuvres déjà connues (identifiées un jour précédent) : 5 au plus par séance.
+  // QCM pour des sujets déjà connus (vus un jour précédent) : 5 au plus par séance.
   let qcm = 0;
   for (const c of nouvellesTriees) {
-    if (c.type !== 'periode' || qcm >= QCM_PAR_SEANCE) continue;
-    const identifiee = parId.get(idCarte(c.oeuvreId, 'identifier'));
-    if (!identifiee || new Date(identifiee.derniereRevision).getTime() >= debutDeJournee(o.maintenant)) continue;
+    if (c.type !== second || qcm >= QCM_PAR_SEANCE) continue;
+    const vu = parId.get(idCarte(c.oeuvreId, premier));
+    if (!vu || new Date(vu.derniereRevision).getTime() >= debutDeJournee(o.maintenant)) continue;
     if (ajouter(c)) qcm++;
   }
-  // Puis les œuvres jamais vues, selon le nombre choisi.
+  // Puis les sujets jamais vus, selon le nombre choisi.
   let n = 0;
   for (const c of nouvellesTriees) {
     if (n >= o.nouvelles) break;
-    if (c.type === 'identifier' && ajouter(c)) n++;
+    if (c.type === premier && ajouter(c)) n++;
   }
   return melanger(seance, o.hasard);
+}
+
+/** Séance sur les œuvres (fiches illustrées), éventuellement limitée à une aire. */
+export function composerSeance(oeuvres: Oeuvre[], etats: EtatCarte[], o: OptionsSeance): Carte[] {
+  const sujets = oeuvres.filter((x) => !o.aireId || x.aireId === o.aireId).map((x) => ({ id: x.id, types: cartesDe(x) }));
+  return composer(sujets, etats, o, 'identifier', 'periode');
 }
 
 /** Bilan pour l'accueil : cartes dues aujourd'hui, nouvelles disponibles, œuvres maîtrisées. */
