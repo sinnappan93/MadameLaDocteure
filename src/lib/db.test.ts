@@ -32,3 +32,34 @@ describe('stockage des œuvres', () => {
     expect(await base.oeuvres.count()).toBe(0);
   });
 });
+
+describe('fiches de référence', () => {
+  it('s’installent une fois, sans revenir après suppression ni écraser une modification', async () => {
+    const { REFERENCES } = await import('../data/references');
+    const { installerReferences, restaurerReferences, modifierOeuvre } = await import('./db');
+    expect(await installerReferences(base)).toBe(REFERENCES.length);
+    expect(await base.oeuvres.count()).toBe(REFERENCES.length);
+
+    const [a, b] = REFERENCES;
+    await supprimerOeuvre(a.id, base);
+    await modifierOeuvre(b.id, { notes: 'mes notes' }, base);
+    expect(await installerReferences(base)).toBe(0);
+    expect(await base.oeuvres.get(a.id)).toBeUndefined();
+    expect((await base.oeuvres.get(b.id))?.notes).toBe('mes notes');
+
+    expect(await restaurerReferences(base)).toBe(1);
+    expect((await base.oeuvres.get(a.id))?.reference).toBe(true);
+    expect((await base.oeuvres.get(b.id))?.notes).toBe('mes notes');
+  });
+
+  it('ont des identifiants uniques et des périodes et aires connues', async () => {
+    const { REFERENCES } = await import('../data/references');
+    const { PERIODES, AIRES } = await import('../domain/catalogue');
+    expect(new Set(REFERENCES.map((r) => r.id)).size).toBe(REFERENCES.length);
+    for (const r of REFERENCES) {
+      if (r.periodeId) expect(PERIODES.some((p) => p.id === r.periodeId), r.id).toBe(true);
+      expect(AIRES.some((x) => x.id === r.aireId), r.id).toBe(true);
+      if (r.debut !== undefined && r.fin !== undefined) expect(r.debut <= r.fin, r.id).toBe(true);
+    }
+  });
+});

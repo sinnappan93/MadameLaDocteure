@@ -39,6 +39,10 @@ export interface Oeuvre {
   notes: string;
   bibliographie: string;
   etiquettes: string[];
+  /** Fiche préparée et livrée avec l'application (à vérifier), par opposition à une fiche créée à la main. */
+  reference?: boolean;
+  /** Mots-clés (souvent en anglais) pour chercher des images sur le net. */
+  requeteImage?: string;
   /** Image affichée en premier. */
   imagePrincipaleId?: string;
   creeeLe: string;

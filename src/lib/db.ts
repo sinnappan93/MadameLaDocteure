@@ -3,7 +3,13 @@
  * pour réviser hors ligne. Les fichiers sont dans une table à part pour garder les listes légères.
  */
 import Dexie, { type EntityTable } from 'dexie';
-import type { ImageOeuvre, ImageSource, NouvelleOeuvre, Oeuvre } from '../domain/types';
+import { REFERENCES } from '../data/references';
+import { type ImageOeuvre, type ImageSource, type NouvelleOeuvre, type Oeuvre, oeuvreVide } from '../domain/types';
+
+export interface Meta {
+  cle: string;
+  valeur: unknown;
+}
 
 export interface Fichier {
   id: string;
@@ -14,6 +20,7 @@ export class Base extends Dexie {
   oeuvres!: EntityTable<Oeuvre, 'id'>;
   images!: EntityTable<ImageOeuvre, 'id'>;
   fichiers!: EntityTable<Fichier, 'id'>;
+  meta!: EntityTable<Meta, 'cle'>;
 
   constructor(nom = 'madameladocteure') {
     super(nom);
@@ -22,6 +29,7 @@ export class Base extends Dexie {
       images: 'id, oeuvreId',
       fichiers: 'id',
     });
+    this.version(2).stores({ meta: 'cle' });
   }
 }
 
@@ -89,4 +97,41 @@ export async function supprimerImage(imageId: string, base: Base = db): Promise<
 export async function imagesDe(oeuvreId: string, base: Base = db): Promise<ImageOeuvre[]> {
   const images = await base.images.where('oeuvreId').equals(oeuvreId).toArray();
   return images.sort((a, b) => a.ajouteeLe.localeCompare(b.ajouteeLe));
+}
+
+const CLE_REFERENCES = 'references-installees';
+
+function ficheDeReference(ref: (typeof REFERENCES)[number], date: string): Oeuvre {
+  return { ...oeuvreVide(), ...ref, reference: true, creeeLe: date, modifieeLe: date };
+}
+
+/**
+ * Installe les fiches de référence qui ne l'ont jamais été. Une fiche supprimée ou modifiée
+ * n'est jamais réinstallée ni écrasée : on retient les identifiants déjà installés.
+ * Retourne le nombre de fiches ajoutées.
+ */
+export async function installerReferences(base: Base = db): Promise<number> {
+  return base.transaction('rw', base.oeuvres, base.meta, async () => {
+    const deja = new Set(((await base.meta.get(CLE_REFERENCES))?.valeur as string[] | undefined) ?? []);
+    const nouvelles = REFERENCES.filter((r) => !deja.has(r.id));
+    if (nouvelles.length === 0) return 0;
+    // Dates décroissantes : l'ordre « dernières fiches » de l'accueil suit l'ordre du catalogue.
+    const t = Date.now();
+    const fiches = nouvelles.map((r, i) => ficheDeReference(r, new Date(t - i * 1000).toISOString()));
+    const existantes = new Set((await base.oeuvres.bulkGet(fiches.map((f) => f.id))).filter(Boolean).map((o) => o!.id));
+    await base.oeuvres.bulkAdd(fiches.filter((f) => !existantes.has(f.id)));
+    await base.meta.put({ cle: CLE_REFERENCES, valeur: [...deja, ...nouvelles.map((r) => r.id)] });
+    return fiches.length - existantes.size;
+  });
+}
+
+/** Réinstalle les fiches de référence supprimées (sans toucher à celles qui existent encore). */
+export async function restaurerReferences(base: Base = db): Promise<number> {
+  return base.transaction('rw', base.oeuvres, async () => {
+    const presentes = await base.oeuvres.bulkGet(REFERENCES.map((r) => r.id));
+    const manquantes = REFERENCES.filter((_, i) => !presentes[i]);
+    const date = new Date().toISOString();
+    await base.oeuvres.bulkAdd(manquantes.map((r) => ficheDeReference(r, date)));
+    return manquantes.length;
+  });
 }

@@ -80,6 +80,12 @@ export function FicheOeuvre({ id, retour, modifier }: { id: string; retour: () =
       </div>
 
       <h2>{oeuvre.titre}</h2>
+      {oeuvre.reference && <p className="badge-reference">Fiche préparée · à vérifier avec tes sources</p>}
+      {!affichee && (
+        <button className="bouton principal trouver-image" onClick={() => setAjout(true)}>
+          Trouver une image
+        </button>
+      )}
       <dl className="proprietes">
         {lignes
           .filter(([, v]) => v)

@@ -201,3 +201,5 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); o
 .resultat { width: 100%; padding: 0; border: 0; border-radius: 12px; overflow: hidden; background: var(--surface-2); cursor: pointer; display: block; text-align: left; }
 .resultat img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
 .credit { display: block; font-size: 0.7rem; color: var(--muted); padding: 4px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.badge-reference { display: inline-block; margin: -4px 0 14px; padding: 3px 12px; border-radius: 999px; background: var(--t1); color: var(--tuile-texte); font-size: 0.8rem; font-weight: 700; }
+.trouver-image { display: block; margin: 0 0 16px; }

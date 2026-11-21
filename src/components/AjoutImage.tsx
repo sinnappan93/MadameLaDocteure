@@ -83,7 +83,7 @@ async function importerPhoto(oeuvreId: string, fichier: File) {
 }
 
 function RechercheNet({ oeuvre, occupe, choisir }: { oeuvre: Oeuvre; occupe: boolean; choisir: (r: ResultatCommons) => void }) {
-  const [requete, setRequete] = useState([oeuvre.titre, oeuvre.site].filter(Boolean).join(' '));
+  const [requete, setRequete] = useState(oeuvre.requeteImage || [oeuvre.titre, oeuvre.site].filter(Boolean).join(' '));
   const [resultats, setResultats] = useState<ResultatCommons[]>([]);
   const [suite, setSuite] = useState<number>();
   const [etat, setEtat] = useState<'repos' | 'chargement' | 'fini' | 'erreur'>('repos');

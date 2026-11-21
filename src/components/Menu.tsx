@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { REFERENCES } from '../data/references';
+import { restaurerReferences } from '../lib/db';
 import type { Reglages, Theme } from '../lib/reglages';
 
 interface Props {
@@ -14,6 +17,11 @@ const THEMES: Array<[Theme, string]> = [
 ];
 
 export function Menu({ reglages, modifier, aller, fermer }: Props) {
+  const [restauration, setRestauration] = useState<string>();
+  const restaurer = async () => {
+    const n = await restaurerReferences();
+    setRestauration(n === 0 ? 'Toutes les fiches préparées sont déjà présentes.' : `${n} fiche${n > 1 ? 's' : ''} restaurée${n > 1 ? 's' : ''}.`);
+  };
   return (
     <div className="feuille-fond tiroir-fond" onClick={fermer}>
       <nav className="tiroir" aria-label="Menu" onClick={(e) => e.stopPropagation()}>
@@ -50,6 +58,13 @@ export function Menu({ reglages, modifier, aller, fermer }: Props) {
                 </button>
               ))}
             </div>
+          </div>
+          <div>
+            <span className="libelle">Fiches préparées ({REFERENCES.length})</span>
+            <button type="button" className="bouton large" onClick={restaurer}>
+              Restaurer les fiches préparées supprimées
+            </button>
+            {restauration && <p className="discret">{restauration}</p>}
           </div>
         </div>
       </nav>

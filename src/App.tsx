@@ -5,7 +5,7 @@ import { FormulaireOeuvre } from './components/FormulaireOeuvre';
 import { ListeOeuvres } from './components/ListeOeuvres';
 import { Logo, Menu } from './components/Menu';
 import { aireParId } from './domain/catalogue';
-import { creerOeuvre, db, modifierOeuvre } from './lib/db';
+import { creerOeuvre, db, installerReferences, modifierOeuvre } from './lib/db';
 import { useReglages } from './lib/reglages';
 import { useLive } from './lib/useLive';
 
@@ -21,6 +21,11 @@ export function App() {
   const [menu, setMenu] = useState(false);
   const [reglages, modifierReglages] = useReglages();
   const enEdition = useLive(async () => (vue.type === 'edition' && vue.id ? db.oeuvres.get(vue.id) : undefined), [vue]);
+
+  // Installe les fiches d'œuvres de référence au premier lancement (et les nouvelles des mises à jour).
+  useEffect(() => {
+    installerReferences().catch(console.error);
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);

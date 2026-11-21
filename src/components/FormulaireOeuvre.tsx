@@ -121,6 +121,11 @@ export function FormulaireOeuvre({ initiale, enregistrer, annuler }: Props) {
         <input value={etiquettes} placeholder="bouddhisme, sculpture, Guimet" onChange={(e) => setEtiquettes(e.target.value)} />
       </label>
 
+      <label>
+        Mots-clés pour chercher des images
+        <input value={o.requeteImage ?? ''} placeholder="Titre et site par défaut (l’anglais donne plus de résultats)" onChange={(e) => maj('requeteImage', e.target.value || undefined)} />
+      </label>
+
       <div className="actions">
         <button type="button" className="bouton" onClick={annuler}>
           Annuler

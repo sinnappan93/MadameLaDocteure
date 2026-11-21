@@ -17,6 +17,14 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 - **Couverture du programme** : nombre de périodes ayant au moins une fiche
 - Thème **clair**, **sombre** ou **automatique** (comme le téléphone), dans le menu
 
+### Fiches préparées
+- **51 fiches d'œuvres de référence** installées au premier lancement, de l'Indus à l'art moderne, de l'Inde à Java
+  (`src/data/references.ts`) : datation, site, matériau, lieu de conservation, iconographie, points à retenir, étiquettes
+- Contenu de départ **à vérifier** avec le programme et les manuels (badge « Fiche préparée » ; datations débattues signalées)
+- Modifiables et supprimables comme les autres ; une fiche supprimée n'est pas réinstallée,
+  mais le menu permet de **restaurer les fiches préparées supprimées**
+- Chaque fiche a des mots-clés de recherche d'images (bouton « Trouver une image »)
+
 ### Fiches œuvres
 - Titre, datation (libre et en années pour le tri), période, aire, site, matériau, lieu de conservation,
   iconographie, style, points à retenir, bibliographie, étiquettes
