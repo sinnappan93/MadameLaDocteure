@@ -18,6 +18,7 @@ import {
   SCHEMA_PLAN,
   SCHEMA_SUJETS,
 } from '../domain/examen';
+import { type BilanOral, decrireDossier, lireBilanOral, lireQuestionsJury, NOMS_CATEGORIES, type Oral, type QuestionJury, SCHEMA_BILAN_ORAL, SCHEMA_QUESTIONS_JURY } from '../domain/oral';
 
 export const MODELE_IA = 'claude-opus-5-5';
 const CLE = 'madameladocteure:ia';
@@ -171,6 +172,60 @@ export async function genererSujets(type: TypeEpreuve, theme: string, nombre = 5
     },
   ];
   return lireSujetsGeneres(await structure({ system: SYSTEME_JURY, contenu, schema: SCHEMA_SUJETS, effort: 'medium' }));
+}
+
+const SYSTEME_JURY_ORAL =
+  'Tu joues le jury de l’épreuve orale d’admission du concours de conservateur du patrimoine (État, spécialité archéologie, option « archéologie, ' +
+  'histoire de l’art et des civilisations de l’Inde et du monde indianisé ») : exposé sur un dossier après préparation, puis entretien. Tu poses ' +
+  'des questions en français, courtes et précises, comme un vrai jury : exigeant, courtois, qui cherche à vérifier les connaissances, le recul ' +
+  'critique et l’aptitude au métier (gestion et étude des collections, prêts, acquisitions et provenance, restauration et conservation préventive, ' +
+  'publics, management, déontologie). Tu n’inventes pas de faits sur les œuvres : si tu n’es pas sûr, tu poses une question ouverte.';
+
+/** Questions du jury après l'exposé : relances sur le dossier, motivation, mises en situation professionnelle. */
+export async function questionsJury(oral: Oral): Promise<QuestionJury[]> {
+  const contenu: Contenu = [
+    {
+      type: 'text',
+      text:
+        `${decrireDossier(oral.dossier)}\n\n` +
+        `Notes de préparation de la candidate :\n"""\n${oral.notes.trim() || '(aucune note)'}\n"""\n\n` +
+        `Exposé (transcription automatique ou résumé, peut être approximatif ou incomplet) :\n"""\n${oral.exposeTexte.trim() || '(non transcrit : appuie-toi sur les notes)'}\n"""\n\n` +
+        'Prépare les questions de l’entretien, dans l’ordre où tu les poserais : ' +
+        '3 ou 4 relances sur l’exposé (préciser une datation, une identification, une comparaison, combler un oubli, corriger une erreur, élargir), ' +
+        '1 ou 2 questions de motivation (projet professionnel, parcours), ' +
+        'puis 3 mises en situation professionnelle concrètes, rattachées si possible aux œuvres du dossier (prêt, restauration, acquisition et provenance, ' +
+        'récolement, exposition, publics, gestion d’équipe). Pour chaque question, « attendu » donne en 2 ou 3 phrases les éléments qu’un jury attend ' +
+        '(montrés à la candidate après sa réponse).',
+    },
+  ];
+  return lireQuestionsJury(await structure({ system: SYSTEME_JURY_ORAL, contenu, schema: SCHEMA_QUESTIONS_JURY, effort: 'medium' }));
+}
+
+/** Bilan de l'oral, à partir de ce qui est écrit (notes, transcriptions, résumés) : l'IA n'écoute pas l'audio. */
+export async function bilanOral(oral: Oral): Promise<BilanOral> {
+  const reponses = oral.questions
+    .map(
+      (q, i) =>
+        `Question ${i + 1} (${NOMS_CATEGORIES[q.categorie]}) : ${q.question}\n` +
+        `Réponse${q.dureeSec ? ` (${Math.round(q.dureeSec)} s)` : ''} : ${q.texte?.trim() || (q.audio ? '(réponse orale non transcrite)' : '(pas de réponse)')}`,
+    )
+    .join('\n\n');
+  const contenu: Contenu = [
+    {
+      type: 'text',
+      text:
+        `${decrireDossier(oral.dossier)}\n\n` +
+        `Format : ${oral.dureePrepMin} min de préparation, ${oral.dureeEpreuveMin} min d’épreuve dont environ ${oral.dureeExposeMin} min d’exposé.\n` +
+        (oral.exposeDureeSec ? `Durée réelle de l’exposé : ${Math.round(oral.exposeDureeSec / 60)} min.\n` : '') +
+        `\nNotes de préparation :\n"""\n${oral.notes.trim() || '(aucune)'}\n"""\n\n` +
+        `Exposé (transcription automatique ou résumé, peut contenir des erreurs de reconnaissance vocale) :\n"""\n${oral.exposeTexte.trim() || '(non transcrit)'}\n"""\n\n` +
+        `Entretien :\n${reponses || '(aucune question)'}\n\n` +
+        'Fais le bilan de cet oral blanc comme un jury : appréciation générale (3 à 5 phrases), note indicative sur 20, points forts, ce qu’il faut ' +
+        'améliorer (fond, construction de l’exposé, gestion du temps, réponses), 3 à 5 conseils concrets, et un commentaire par question répondue ' +
+        '(reprends le texte de la question). Ne juge pas l’orthographe des transcriptions ; ce qui n’a pas été transcrit ne peut pas être évalué : dis-le.',
+    },
+  ];
+  return lireBilanOral(await structure({ system: SYSTEME_JURY_ORAL, contenu, schema: SCHEMA_BILAN_ORAL, effort: 'high' }));
 }
 
 export const typeEpreuve = (t: TypeEpreuve) => TYPES_EPREUVE.find((x) => x.id === t)!;

@@ -15,7 +15,7 @@ export function useChrono(debut: string, dureeMin: number, arrete = false): numb
 }
 
 /** Bandeau du chronomètre, fixé en haut pendant l'épreuve. */
-export function BandeauChrono({ restant, dureeMin }: { restant: number; dureeMin: number }) {
+export function BandeauChrono({ restant, dureeMin, libelle = 'restant' }: { restant: number; dureeMin: number; libelle?: string }) {
   const ecoule = 1 - Math.max(0, restant) / (dureeMin * 60);
   const etat = restant < 0 ? 'depasse' : restant < 15 * 60 && dureeMin > 30 ? 'fin-proche' : restant < 3 * 60 ? 'fin-proche' : '';
   return (
@@ -24,7 +24,7 @@ export function BandeauChrono({ restant, dureeMin }: { restant: number; dureeMin
       <span className="barre">
         <span style={{ width: `${Math.min(100, ecoule * 100)}%` }} />
       </span>
-      <span className="chrono-etat">{restant < 0 ? 'Temps dépassé' : 'restant'}</span>
+      <span className="chrono-etat">{restant < 0 ? 'Temps dépassé' : libelle}</span>
     </div>
   );
 }

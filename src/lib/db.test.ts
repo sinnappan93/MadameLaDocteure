@@ -137,3 +137,23 @@ describe('mode examen', () => {
     expect(await base.fichiers.count()).toBe(0);
   });
 });
+
+describe('oraux', () => {
+  it('crée un oral, stocke ses enregistrements et les supprime avec lui', async () => {
+    const { creerOral, enregistrerAudio, modifierOral, supprimerOral } = await import('./db');
+    const { creerDossier } = await import('../domain/oral');
+    const base = new Base(`test-oral-${Math.random()}`);
+    const o = await creerOral({ dossier: creerDossier('theme', [], false, 'Angkor'), dureePrepMin: 30, dureeEpreuveMin: 30, dureeExposeMin: 10 }, base);
+    expect(o).toMatchObject({ phase: 'preparation', notes: '', questions: [] });
+    const expose = await enregistrerAudio(new Blob(['a']), undefined, base);
+    // Sauvegarde partielle puis finale : même fichier, remplacé.
+    await enregistrerAudio(new Blob(['ab']), expose, base);
+    const reponse = await enregistrerAudio(new Blob(['c']), undefined, base);
+    await modifierOral(o.id, { exposeAudio: expose, questions: [{ id: 'q', categorie: 'motivation', question: 'Q', attendu: '', audio: reponse }] }, base);
+    expect(await base.fichiers.count()).toBe(2);
+    expect((await base.fichiers.get(expose))?.blob.size).toBe(2);
+    await supprimerOral(o.id, base);
+    expect(await base.oraux.count()).toBe(0);
+    expect(await base.fichiers.count()).toBe(0);
+  });
+});

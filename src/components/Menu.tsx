@@ -16,6 +16,7 @@ export type EcranMenu =
   | 'examen-plan'
   | 'examen-copies'
   | 'examen-banque'
+  | 'oral'
   | 'frise'
   | 'carte'
   | 'oeuvres'
@@ -58,6 +59,7 @@ const SECTIONS: Array<{ titre: string; icone: string; entrees: Array<[EcranMenu,
       ['examen-plan', 'Plan en 15 minutes', 'Problématique et plan, commentés par l’IA'],
       ['examen-copies', 'Mes copies et corrections', 'Correction par l’IA, grille de critères'],
       ['examen-banque', 'Banque de sujets', 'Rapports de jury, sujets proposés ou générés'],
+      ['oral', 'Simulateur d’oral', 'Dossier, préparation, exposé enregistré, jury'],
       ['revision-anglais', 'Vocabulaire anglais', 'Fiches mémo pour l’épreuve de langue'],
     ],
   },
@@ -74,7 +76,7 @@ const SECTIONS: Array<{ titre: string; icone: string; entrees: Array<[EcranMenu,
   },
 ];
 
-const BIENTOT = ['Démarches et plan de préparation', 'Bibliographie', 'Simulateur d’oral'];
+const BIENTOT = ['Démarches et plan de préparation', 'Bibliographie', 'Projection'];
 
 export function Menu({ reglages, modifier, aller, fermer, actuel }: Props) {
   const [restauration, setRestauration] = useState<string>();

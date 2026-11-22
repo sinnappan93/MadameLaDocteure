@@ -11,7 +11,7 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 
 ### Menu
 Organisé en sections dépliables : **Exercices** (identifier les œuvres, comparer, glossaire en cartes, quiz libre, quiz de repères),
-**Mode examen** (sujets blancs, plan en 15 minutes, copies et corrections, banque de sujets, vocabulaire anglais),
+**Mode examen** (sujets blancs, plan en 15 minutes, copies et corrections, banque de sujets, simulateur d'oral, vocabulaire anglais),
 **Ressources** (œuvres de référence, comparaisons, glossaire, frise chronologique, carte des sites), **Aide**, **Réglages**, **Bientôt** ; l'écran affiché est mis en évidence.
 
 ### Accueil
@@ -61,6 +61,12 @@ Organisé en sections dépliables : **Exercices** (identifier les œuvres, compa
   à améliorer, conseils ; copies tapées ou photographiées ; complète la correction par un pair, sans la remplacer
 - **Banque de sujets** : 27 sujets d'entraînement proposés (`src/data/sujets.ts`, pas des sujets tombés), sujets des
   rapports de jury ajoutés à la main, sujets générés par l'IA
+- **Simulateur d'oral** (`src/domain/oral.ts`, `src/components/oral/`) : dossier tiré de tes fiches (même aire, époques
+  proches, cartels masquables) ou thème (`src/data/oral.ts`) ; format de 2015 (30 min de préparation, 30 min d'épreuve
+  dont 10 min d'exposé, réglable) ; notes de préparation enregistrées ; exposé et réponses enregistrés au micro
+  (`src/lib/audio.ts`, sauvegarde partielle toutes les 15 s, écran maintenu allumé) ; transcription facultative par la
+  dictée du navigateur ; questions du jury par l'IA (relances, motivation, mises en situation) ou par la banque, avec
+  les pistes attendues ; bilan de l'IA à partir de l'écrit (elle n'écoute pas l'audio)
 - **Vocabulaire anglais** (`src/data/anglais.ts`) : 77 mots d’histoire de l’art, de musée et de patrimoine, faux amis
   compris, révisés comme le glossaire
 - **IA** : API Claude (Claude Opus 5.5, sorties structurées vérifiées, repli automatique en cas de refus), avec la clé
@@ -102,8 +108,7 @@ Organisé en sections dépliables : **Exercices** (identifier les œuvres, compa
 ## Feuille de route
 1. Démarches et plan de préparation (inscriptions, Prépa Talents, lectures) avec rappels
 2. Suivi de bibliographie
-3. Simulateur d'oral (30 min de préparation et 30 min d'épreuve, jury joué par l'IA)
-4. Projection : couverture, mémorisation, notes des sujets blancs, rythme
+3. Projection : couverture, mémorisation, notes des sujets blancs, rythme
 
 ## Démarrer
 

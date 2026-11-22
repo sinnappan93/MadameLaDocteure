@@ -6,6 +6,7 @@ import Dexie, { type EntityTable } from 'dexie';
 import { type FicheReference, REFERENCES } from '../data/references';
 import type { NoticeMusee } from '../domain/musees';
 import type { Copie, Sujet } from '../domain/examen';
+import type { DossierOral, Oral } from '../domain/oral';
 import { type Carte, type EtatCarte, type Note, noter } from '../domain/revision';
 import { type ImageOeuvre, type ImageSource, type NouvelleOeuvre, type Oeuvre, oeuvreVide } from '../domain/types';
 
@@ -27,6 +28,7 @@ export class Base extends Dexie {
   revisions!: EntityTable<EtatCarte, 'id'>;
   sujets!: EntityTable<Sujet, 'id'>;
   copies!: EntityTable<Copie, 'id'>;
+  oraux!: EntityTable<Oral, 'id'>;
 
   constructor(nom = 'madameladocteure') {
     super(nom);
@@ -38,6 +40,7 @@ export class Base extends Dexie {
     this.version(2).stores({ meta: 'cle' });
     this.version(3).stores({ revisions: 'id, oeuvreId, echeance' });
     this.version(4).stores({ sujets: 'id, type', copies: 'id, type, debut' });
+    this.version(5).stores({ oraux: 'id, debut' });
   }
 }
 
@@ -239,5 +242,37 @@ export async function supprimerCopie(id: string, base: Base = db): Promise<void>
     const copie = await base.copies.get(id);
     if (copie) await base.fichiers.bulkDelete(copie.photos);
     await base.copies.delete(id);
+  });
+}
+
+// ——— Simulateur d'oral ———
+
+export async function creerOral(
+  o: { dossier: DossierOral; dureePrepMin: number; dureeEpreuveMin: number; dureeExposeMin: number },
+  base: Base = db,
+): Promise<Oral> {
+  const oral: Oral = { ...o, id: nouvelId(), phase: 'preparation', debut: maintenant(), notes: '', exposeTexte: '', questions: [], modifieLe: maintenant() };
+  await base.oraux.add(oral);
+  return oral;
+}
+
+export async function modifierOral(id: string, changements: Partial<Oral>, base: Base = db): Promise<void> {
+  await base.oraux.update(id, { ...changements, modifieLe: maintenant() });
+}
+
+/** Enregistre (ou remplace) un fichier audio ; renvoie son identifiant. */
+export async function enregistrerAudio(blob: Blob, fichierId: string = nouvelId(), base: Base = db): Promise<string> {
+  await base.fichiers.put({ id: fichierId, blob });
+  return fichierId;
+}
+
+/** Fichiers audio d'un oral (exposé et réponses). */
+export const audiosDe = (o: Oral) => [o.exposeAudio, ...o.questions.map((q) => q.audio)].filter((x): x is string => !!x);
+
+export async function supprimerOral(id: string, base: Base = db): Promise<void> {
+  await base.transaction('rw', base.oraux, base.fichiers, async () => {
+    const oral = await base.oraux.get(id);
+    if (oral) await base.fichiers.bulkDelete(audiosDe(oral));
+    await base.oraux.delete(id);
   });
 }

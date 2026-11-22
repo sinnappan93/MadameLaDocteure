@@ -429,6 +429,44 @@ ul.sous-menu.bientot { margin: 0; padding: 0 4px 8px 28px; gap: 4px; color: var(
 .reglages-ia p { margin: 0; }
 .champ-cle { display: flex; gap: 8px; align-items: center; }
 .case { display: flex !important; gap: 8px; align-items: flex-start; font-weight: 500 !important; }
-.case input { width: auto; margin-top: 4px; }
+.case input { width: auto; margin-top: 4px; flex: none; }
 .etat-ia { font-size: 0.85rem; font-weight: 700; color: var(--muted); }
 .etat-ia.ok { color: #3f9e6e; }
+
+/* ——— Simulateur d'oral ——— */
+.oral .formulaire { margin-bottom: 8px; }
+.titre-oral { font-size: 1.05rem; margin: 22px 0 8px; }
+.format-oral { display: grid; gap: 2px; }
+.format-oral .puces { margin: 4px 0 8px; }
+.dossier-oral { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin: 10px 0 14px; }
+.doc-oral { margin: 0; background: var(--surface-2); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+.doc-oral.agrandie { grid-column: 1 / -1; }
+.doc-image { border: 0; padding: 0; background: #0000; cursor: zoom-in; display: block; width: 100%; }
+.doc-oral.agrandie .doc-image { cursor: zoom-out; }
+.doc-image .vignette { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+.doc-oral.agrandie .doc-image .vignette { aspect-ratio: auto; max-height: 70vh; object-fit: contain; background: #000; }
+.doc-sans-image { display: grid; place-items: center; aspect-ratio: 1; padding: 10px; color: var(--muted); font-size: 0.85rem; text-align: center; }
+.doc-oral figcaption { padding: 8px 10px 10px; display: grid; gap: 2px; font-size: 0.85rem; }
+.doc-oral figcaption .lien { justify-self: start; }
+.notes-oral { width: 100%; font: inherit; min-height: 180px; }
+.alerte-oral { background: var(--primary-soft); border-radius: 12px; padding: 10px 12px; font-weight: 700; }
+.sous-chrono { font-weight: 700; margin: 4px 0 8px; }
+.sous-chrono.fin-proche { color: #e59a3a; }
+.sous-chrono.depasse { color: var(--danger); }
+.enregistrement-en-cours { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--danger); margin: 8px 0; }
+.point-rec { width: 12px; height: 12px; border-radius: 50%; background: var(--danger); animation: clignote 1.2s ease-in-out infinite; }
+@keyframes clignote { 50% { opacity: 0.25; } }
+@media (prefers-reduced-motion: reduce) { .point-rec { animation: none; } }
+.transcription-direct { background: var(--surface-2); border-radius: 12px; padding: 10px 12px; font-size: 0.9rem; max-height: 9em; overflow-y: auto; color: var(--muted); }
+.question-jury { background: linear-gradient(135deg, var(--t3), var(--t6)); color: var(--tuile-texte); border-radius: var(--radius); padding: 18px; margin: 10px 0; display: grid; gap: 8px; }
+.question-jury .lien { color: inherit; justify-self: start; }
+.question-texte { font-size: 1.1rem; font-weight: 800; line-height: 1.35; margin: 0; }
+.question-revue .question-texte { font-size: 1rem; margin: 4px 0 8px; }
+.oral textarea { width: 100%; font: inherit; margin: 8px 0; }
+.lecteur-audio { width: 100%; margin: 6px 0; }
+.attendu summary { cursor: pointer; font-weight: 700; }
+.attendu p { margin: 6px 0 0; }
+.commentaire-question { margin-top: 10px; }
+.commentaire-question p { margin: 0; }
+.oral .actions { margin-top: 12px; }
+.oral > .bouton.large { margin-top: 10px; }

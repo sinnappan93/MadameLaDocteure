@@ -106,6 +106,41 @@ export function Aide() {
         </ul>
       </Rubrique>
 
+      <Rubrique titre="Simulateur d’oral">
+        <ul>
+          <li>
+            Menu › <em>Mode examen</em> › <em>Simulateur d’oral</em>. Choisis un <strong>dossier</strong> : des œuvres tirées de tes fiches (de la même aire et
+            d’époques proches si possible, cartels masqués si tu veux t’entraîner à identifier), ou un <strong>thème</strong>, avec des œuvres de tes fiches liées
+            au thème.
+          </li>
+          <li>
+            <strong>Format</strong> : 30 min de préparation puis 30 min d’épreuve (fiche de 2015), dont 10 min d’exposé. Tout est réglable : la répartition
+            exposé/questions est une hypothèse à vérifier dans l’arrêté et les rapports de jury.
+          </li>
+          <li>
+            <strong>Préparation</strong> : le dossier, le chronomètre et une zone de notes (brouillon) enregistrée automatiquement. Si tu fermes l’appli, reprends
+            l’oral depuis la liste « Mes oraux ».
+          </li>
+          <li>
+            <strong>Exposé</strong> : <em>Commencer l’exposé</em> lance l’enregistrement audio (autorise le micro) et le chronomètre de l’épreuve. Un second
+            compteur indique le temps d’exposé restant. Garde l’écran allumé.
+          </li>
+          <li>
+            <strong>Questions du jury</strong> : avec l’IA, des relances sur ton exposé (à partir de tes notes, et de la transcription ou de ton résumé), puis des
+            questions de motivation et des mises en situation professionnelle (prêt, restauration, acquisition, récolement…). Sans IA, des questions de la
+            banque. Chaque réponse est enregistrée ; « Ce qu’attendait le jury » donne les pistes ensuite. 🔊 lit la question à voix haute.
+          </li>
+          <li>
+            <strong>Après l’oral</strong> : réécoute ton exposé et tes réponses, corrige les transcriptions ou écris un résumé, puis demande le{' '}
+            <strong>bilan du jury</strong> (note indicative, conseils). L’IA ne peut pas écouter l’audio : elle lit seulement l’écrit.
+          </li>
+          <li>
+            <strong>Transcription</strong> (facultative, Chrome et Safari) : la dictée du navigateur écrit ce que tu dis. Dans Chrome, le son passe par le service de
+            Google ; sur certains téléphones, elle ne marche pas pendant l’enregistrement.
+          </li>
+        </ul>
+      </Rubrique>
+
       <Rubrique titre="Repères : frise, carte et quiz">
         <ul>
           <li>
@@ -236,7 +271,7 @@ export function Aide() {
             <strong>Exercices</strong> : identifier les œuvres, comparer deux œuvres, glossaire en cartes, quiz libre, quiz de repères.
           </li>
           <li>
-            <strong>Mode examen</strong> : sujets blancs, plan en 15 minutes, copies et corrections, banque de sujets, vocabulaire anglais.
+            <strong>Mode examen</strong> : sujets blancs, plan en 15 minutes, copies et corrections, banque de sujets, simulateur d’oral, vocabulaire anglais.
           </li>
           <li>
             <strong>Ressources</strong> : œuvres de référence, comparaisons, glossaire, frise chronologique, carte des sites.
@@ -288,7 +323,7 @@ export function Aide() {
       </Rubrique>
 
       <Rubrique titre="Bientôt">
-        <p>Démarches et plan de préparation, bibliographie, simulateur d’oral.</p>
+        <p>Démarches et plan de préparation, bibliographie, projection.</p>
       </Rubrique>
     </section>
   );

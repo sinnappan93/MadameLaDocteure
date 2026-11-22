@@ -13,6 +13,9 @@ import { CopieDetail } from './components/examen/CopieDetail';
 import { Copies } from './components/examen/Copies';
 import { Ecriture } from './components/examen/Ecriture';
 import { SujetBlanc } from './components/examen/SujetBlanc';
+import { EpreuveOrale } from './components/oral/EpreuveOrale';
+import { OralDetail } from './components/oral/OralDetail';
+import { Simulateur } from './components/oral/Simulateur';
 
 const CarteSites = lazy(() => import('./components/carte/CarteSites'));
 import { type EcranMenu, Logo, Menu } from './components/Menu';
@@ -33,6 +36,9 @@ type Vue =
   | { type: 'examen-banque' }
   | { type: 'ecriture'; id: string }
   | { type: 'copie'; id: string }
+  | { type: 'oral' }
+  | { type: 'oral-epreuve'; id: string }
+  | { type: 'oral-detail'; id: string }
   | { type: 'carte' }
   | { type: 'glossaire' }
   | { type: 'comparaisons' }
@@ -87,6 +93,12 @@ export function App() {
                 ? 'Épreuve en cours'
                 : vue.type === 'copie'
                   ? 'Copie'
+                  : vue.type === 'oral'
+                  ? 'Simulateur d’oral'
+                  : vue.type === 'oral-epreuve'
+                  ? 'Oral en cours'
+                  : vue.type === 'oral-detail'
+                  ? 'Oral blanc'
                   : vue.type === 'frise'
         ? 'Frise chronologique'
         : vue.type === 'carte'
@@ -142,6 +154,11 @@ export function App() {
         {vue.type === 'examen-copies' && <Copies ouvrir={(id) => aller({ type: 'copie', id })} reprendre={(id) => aller({ type: 'ecriture', id })} />}
         {vue.type === 'ecriture' && <Ecriture id={vue.id} rendue={(id) => remplacer({ type: 'copie', id })} />}
         {vue.type === 'copie' && <CopieDetail id={vue.id} retour={retour} />}
+        {vue.type === 'oral' && (
+          <Simulateur commencer={(id) => aller({ type: 'oral-epreuve', id })} ouvrir={(o) => aller(o.phase === 'termine' ? { type: 'oral-detail', id: o.id } : { type: 'oral-epreuve', id: o.id })} />
+        )}
+        {vue.type === 'oral-epreuve' && <EpreuveOrale id={vue.id} terminee={(id) => remplacer({ type: 'oral-detail', id })} />}
+        {vue.type === 'oral-detail' && <OralDetail id={vue.id} retour={retour} ouvrirFiche={(id) => aller({ type: 'fiche', id })} />}
         {vue.type === 'frise' && <Frise ouvrirFiche={(id) => aller({ type: 'fiche', id })} />}
         {vue.type === 'carte' && (
           <Suspense fallback={<section className="panneau"><p className="discret">Chargement de la carte…</p></section>}>
@@ -213,7 +230,11 @@ function ecranDuMenu(vue: Vue): EcranMenu | undefined {
     case 'examen-plan':
     case 'examen-copies':
     case 'examen-banque':
+    case 'oral':
       return vue.type;
+    case 'oral-epreuve':
+    case 'oral-detail':
+      return 'oral';
     case 'ecriture':
     case 'copie':
       return 'examen-copies';
