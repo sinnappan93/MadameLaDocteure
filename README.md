@@ -10,8 +10,8 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 ## Fonctionnalités (version actuelle)
 
 ### Menu
-Organisé en sections dépliables : **Réviser** (identifier les œuvres, comparer, glossaire en cartes, quiz libre),
-**Consulter** (œuvres de référence, comparaisons, glossaire), **Aide**, **Réglages**, **Bientôt** ; l'écran affiché est mis en évidence.
+Organisé en sections dépliables : **Exercices** (identifier les œuvres, comparer, glossaire en cartes, quiz libre, quiz de repères),
+**Ressources** (œuvres de référence, comparaisons, glossaire, frise chronologique, carte des sites), **Aide**, **Réglages**, **Bientôt** ; l'écran affiché est mis en évidence.
 
 ### Accueil
 - « Bonjour … » avec le prénom choisi, et un compte à rebours jusqu'aux écrits (date réglable, estimée au 1er juillet 2027)

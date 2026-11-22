@@ -33,7 +33,7 @@ export function Aide() {
       <Rubrique titre="La révision « identifie cette œuvre »">
         <ul>
           <li>
-            Depuis l’accueil (<em>Révision du jour</em>) ou Menu › <em>Réviser</em> › <em>Identifier les œuvres</em>. Seules les fiches avec une image sont révisées.
+            Depuis l’accueil (<em>Révision du jour</em>) ou Menu › <em>Exercices</em> › <em>Identifier les œuvres</em>. Seules les fiches avec une image sont révisées.
           </li>
           <li>
             <strong>Identifier</strong> : l’appli montre la photo. Cherche le titre, la datation, le lieu et le style, puis touche <em>Voir la réponse</em> et
@@ -46,7 +46,7 @@ export function Aide() {
           </li>
           <li>
             <strong>Comparer</strong> (onglet de la révision) : deux œuvres côte à côte, à identifier et à distinguer, puis le tableau des critères. Toutes les
-            comparaisons sont aussi consultables dans Menu › <em>Consulter</em> › <em>Comparaisons</em>, et chaque fiche concernée affiche <em>À comparer avec</em>.
+            comparaisons sont aussi consultables dans Menu › <em>Ressources</em> › <em>Comparaisons</em>, et chaque fiche concernée affiche <em>À comparer avec</em>.
           </li>
           <li>
             <strong>Répétition espacée</strong> : une carte réussie revient de plus en plus tard (1 jour, 3 jours, une semaine, un mois…) ; une carte ratée
@@ -62,7 +62,7 @@ export function Aide() {
       <Rubrique titre="Le quiz libre">
         <ul>
           <li>
-            Menu › <em>Réviser</em> › <em>Quiz libre</em> (ou l’onglet <em>Quiz</em> de la révision) : une série de QCM corrigés tout de suite, sans attendre le
+            Menu › <em>Exercices</em> › <em>Quiz libre</em> (ou l’onglet <em>Quiz</em> de la révision) : une série de QCM corrigés tout de suite, sans attendre le
             calendrier de la répétition espacée, et sans le modifier.
           </li>
           <li>
@@ -77,16 +77,16 @@ export function Aide() {
       <Rubrique titre="Repères : frise, carte et quiz">
         <ul>
           <li>
-            Menu › <em>Repères</em> › <em>Frise chronologique</em> : une ligne par aire, les périodes en barres et tes fiches en points. Fais défiler de côté,
+            Menu › <em>Ressources</em> › <em>Frise chronologique</em> : une ligne par aire, les périodes en barres et tes fiches en points. Fais défiler de côté,
             zoome avec − et +, ou choisis <em>Antiquité</em>, <em>Médiéval</em>, <em>Moderne</em>. Touche une période pour voir ses fiches et ce qui se passe au
             même moment ailleurs ; touche un point pour ouvrir la fiche.
           </li>
           <li>
-            Menu › <em>Repères</em> › <em>Carte des sites</em> : un point par lieu, coloré selon l’aire ; touche-le pour ouvrir la fiche. Pour placer une fiche à
+            Menu › <em>Ressources</em> › <em>Carte des sites</em> : un point par lieu, coloré selon l’aire ; touche-le pour ouvrir la fiche. Pour placer une fiche à
             toi, ajoute ses coordonnées (latitude, longitude) dans <em>Modifier</em>. La carte demande une connexion Internet.
           </li>
           <li>
-            Menu › <em>Réviser</em> › <em>Quiz de repères</em> : « Quelle période au IXe siècle au Cambodge ? » (seulement des siècles où une période domine
+            Menu › <em>Exercices</em> › <em>Quiz de repères</em> : « Quelle période au IXe siècle au Cambodge ? » (seulement des siècles où une période domine
             nettement) et « Place Ellora sur la carte » (carte sans noms ; réussi à moins de 200 km). Aussi disponibles dans le quiz libre (<em>Dynasties</em>,{' '}
             <em>Carte</em>).
           </li>
@@ -96,14 +96,14 @@ export function Aide() {
       <Rubrique titre="Le glossaire">
         <ul>
           <li>
-            Menu › <em>Consulter</em> › <em>Glossaire</em> : {GLOSSAIRE.length} termes d’iconographie et d’architecture (gestes, postures, attributs, divinités, montures,
+            Menu › <em>Ressources</em> › <em>Glossaire</em> : {GLOSSAIRE.length} termes d’iconographie et d’architecture (gestes, postures, attributs, divinités, montures,
             architecture, notions), avec recherche sans accents et filtre par catégorie. Chaque terme renvoie aux fiches où on le voit.
           </li>
           <li>
             Sur chaque fiche, <em>Vocabulaire à connaître</em> rappelle les termes utiles pour la décrire.
           </li>
           <li>
-            <strong>Réviser</strong> : Menu › <em>Réviser</em> › <em>Glossaire en cartes</em>. D’abord le terme, dont tu retrouves la définition (auto-évaluation) ;
+            <strong>Réviser</strong> : Menu › <em>Exercices</em> › <em>Glossaire en cartes</em>. D’abord le terme, dont tu retrouves la définition (auto-évaluation) ;
             les jours suivants, la définition, dont tu retrouves le terme parmi quatre (QCM). Même répétition espacée que pour les œuvres.
           </li>
         </ul>
@@ -123,7 +123,7 @@ export function Aide() {
       <Rubrique titre="Les fiches d’œuvres">
         <ul>
           <li>
-            <strong>Consulter</strong> : depuis l’accueil ou Menu › <em>Consulter</em> › <em>Œuvres de référence</em>. La recherche fonctionne sans accents (titre, site, dynastie,
+            <strong>Consulter</strong> : depuis l’accueil ou Menu › <em>Ressources</em> › <em>Œuvres de référence</em>. La recherche fonctionne sans accents (titre, site, dynastie,
             étiquette…) et le menu déroulant filtre par aire.
           </li>
           <li>
@@ -201,13 +201,10 @@ export function Aide() {
       <Rubrique titre="Le menu">
         <ul>
           <li>
-            <strong>Réviser</strong> : identifier les œuvres, comparer deux œuvres, glossaire en cartes, quiz libre, quiz de repères.
+            <strong>Exercices</strong> : identifier les œuvres, comparer deux œuvres, glossaire en cartes, quiz libre, quiz de repères.
           </li>
           <li>
-            <strong>Consulter</strong> : œuvres de référence, comparaisons, glossaire.
-          </li>
-          <li>
-            <strong>Repères</strong> : frise chronologique, carte des sites.
+            <strong>Ressources</strong> : œuvres de référence, comparaisons, glossaire, frise chronologique, carte des sites.
           </li>
           <li>
             <strong>Aide</strong>, <strong>Réglages</strong> et <strong>Bientôt</strong> (fonctions prévues) : touche le titre d’une section pour la déplier.

@@ -116,7 +116,7 @@ export function FicheOeuvre({ id, retour, modifier, ouvrirFiche }: { id: string;
           {aComparer.map(({ comparaison, oeuvre: autre }) => (
             <button key={comparaison.id} className="lien-comparaison" onClick={() => ouvrirFiche?.(autre.id)}>
               <span className="carte-revision-titre">{autre.titre}</span>
-              <span className="discret">{comparaison.titre} · critères dans Menu › Consulter › Comparaisons</span>
+              <span className="discret">{comparaison.titre} · critères dans Menu › Ressources › Comparaisons</span>
             </button>
           ))}
         </section>

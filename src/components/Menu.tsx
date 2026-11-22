@@ -34,7 +34,7 @@ const THEMES: Array<[Theme, string]> = [
 
 const SECTIONS: Array<{ titre: string; icone: string; entrees: Array<[EcranMenu, string, string]> }> = [
   {
-    titre: 'Réviser',
+    titre: 'Exercices',
     icone: '✦',
     entrees: [
       ['revision-oeuvres', 'Identifier les œuvres', 'Photo, puis datation, site, musée, iconographie'],
@@ -45,18 +45,12 @@ const SECTIONS: Array<{ titre: string; icone: string; entrees: Array<[EcranMenu,
     ],
   },
   {
-    titre: 'Consulter',
+    titre: 'Ressources',
     icone: '❖',
     entrees: [
       ['oeuvres', 'Œuvres de référence', 'Fiches, images, notices de musées'],
       ['comparaisons', 'Comparaisons', 'Paires d’œuvres et critères'],
       ['glossaire', 'Glossaire', 'Vocabulaire iconographique'],
-    ],
-  },
-  {
-    titre: 'Repères',
-    icone: '◷',
-    entrees: [
       ['frise', 'Frise chronologique', 'Périodes et œuvres, par aire'],
       ['carte', 'Carte des sites', 'Sites et centres artistiques'],
     ],
