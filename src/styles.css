@@ -470,3 +470,68 @@ ul.sous-menu.bientot { margin: 0; padding: 0 4px 8px 28px; gap: 4px; color: var(
 .commentaire-question p { margin: 0; }
 .oral .actions { margin-top: 12px; }
 .oral > .bouton.large { margin-top: 10px; }
+
+/* ——— Préparation : plan, bibliographie, visites ——— */
+.t-fond0 { --c: var(--t0); } .t-fond1 { --c: var(--t1); } .t-fond2 { --c: var(--t2); } .t-fond3 { --c: var(--t3); } .t-fond4 { --c: var(--t4); }
+.t-fond5 { --c: var(--t5); } .t-fond6 { --c: var(--t6); } .t-fond7 { --c: var(--t7); } .t-fond8 { --c: var(--t8); } .t-fond9 { --c: var(--t9); }
+.bouton.petit { padding: 6px 12px; font-size: 0.85rem; min-height: 0; }
+.seance { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border-left: 6px solid var(--c); border-radius: 12px; padding: 10px 12px; margin: 6px 0; }
+.seance input[type='checkbox'] { width: 22px; height: 22px; flex: none; accent-color: var(--primary); margin: 0; }
+.seance-icone { width: 22px; flex: none; text-align: center; color: var(--muted); }
+.seance-texte { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.seance-titre { font-weight: 700; }
+.seance-detail { font-size: 0.8rem; color: var(--muted); }
+.seance-description { font-size: 0.85rem; color: var(--muted); }
+.seance.faite .seance-titre { text-decoration: line-through; color: var(--muted); }
+.seance.jalon { background: var(--primary-soft); border-left-color: var(--primary); }
+.seance .bouton.petit { flex: none; }
+.jour-plan { margin: 14px 0; }
+.jour-plan h3 { font-size: 0.95rem; margin: 0 0 4px; text-transform: capitalize; display: flex; align-items: center; gap: 8px; }
+.jour-plan.aujourdhui h3 { color: var(--primary); }
+.pastille { font-size: 0.7rem; text-transform: none; background: var(--primary); color: var(--primary-ink); border-radius: 999px; padding: 2px 8px; }
+.nav-calendrier { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 12px 0 6px; font-weight: 700; }
+.mois-nom { text-transform: capitalize; }
+.bilan-semaine { display: grid; gap: 4px; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+.grille-mois { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.entete-jour { text-align: center; font-size: 0.75rem; font-weight: 700; color: var(--muted); }
+.case-jour { min-height: 50px; border: 1px solid var(--border); background: var(--surface-2); border-radius: 10px; padding: 3px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; color: var(--text); font: inherit; min-width: 0; }
+.case-jour .numero { font-size: 0.8rem; font-weight: 700; }
+.case-jour.hors-mois { opacity: 0.4; }
+.case-jour.aujourdhui { border-color: var(--primary); }
+.case-jour.choisi { background: var(--primary-soft); border-color: var(--primary); border-width: 2px; }
+.case-jour.avec-jalon .numero::after { content: ' ★'; color: var(--primary); }
+.points-jour { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; }
+.point { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.point.fait { opacity: 0.35; }
+.legende-plan { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.75rem; color: var(--muted); margin: 8px 0; }
+.legende-plan .point { margin-right: 2px; }
+.dates-plan { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.puces.jours button { min-width: 40px; }
+.jalon-ligne { display: flex; justify-content: space-between; gap: 8px; align-items: center; font-size: 0.9rem; }
+.jalon-ajout { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 6px; }
+.jalon-ajout input { flex: 1 1 160px; }
+.constats { margin: 4px 0; }
+.discret-clair { font-size: 0.85rem; opacity: 0.85; }
+.supprimer-plan { display: block; margin: 16px auto 0; }
+.bloc-aujourdhui { margin-bottom: 20px; }
+.prochain-jalon { margin-top: 6px; }
+.liste-lectures { list-style: none; padding: 0; margin: 12px 0; }
+.lecture-ligne { width: 100%; }
+.suggestion { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 1px solid var(--border); }
+.suggestion > div { display: grid; gap: 2px; font-size: 0.9rem; }
+.suggestions summary, .liens-preparation summary { cursor: pointer; font-weight: 700; }
+.saisie-pages { display: flex; gap: 8px; align-items: flex-end; margin-top: 10px; }
+.saisie-pages label { flex: 1; display: grid; gap: 4px; font-size: 0.85rem; font-weight: 700; }
+.historique-lecture { margin: 10px 0 0; padding-left: 18px; font-size: 0.85rem; color: var(--muted); }
+.biblio textarea, .visites textarea { width: 100%; font: inherit; }
+.oeuvre-liee { display: flex; align-items: center; gap: 8px; }
+.oeuvre-liee-bouton { display: flex; align-items: center; gap: 10px; flex: 1; border: 0; background: none; padding: 6px 0; text-align: left; cursor: pointer; color: var(--text); font: inherit; width: 100%; }
+.oeuvre-liee-bouton .vignette { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; flex: none; }
+.resultat-fiche { display: block; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--border); background: none; padding: 8px 4px; cursor: pointer; color: var(--text); font: inherit; }
+.bloc input[aria-label='Chercher une fiche à relier'] { width: 100%; margin-top: 8px; }
+.lien-clair { color: inherit; font-weight: 700; }
+.photo-fiche { margin-top: 10px; }
+.apercus-photo { display: flex; gap: 8px; align-items: center; }
+.apercus-photo img { width: 45%; max-height: 220px; object-fit: contain; border-radius: 10px; background: #000; }
+.liens-preparation p { margin: 4px 0; }
+.visites .depot-photo { margin-top: 8px; }

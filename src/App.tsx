@@ -16,11 +16,17 @@ import { SujetBlanc } from './components/examen/SujetBlanc';
 import { EpreuveOrale } from './components/oral/EpreuveOrale';
 import { OralDetail } from './components/oral/OralDetail';
 import { Simulateur } from './components/oral/Simulateur';
+import { Bibliographie } from './components/preparation/Bibliographie';
+import { LectureDetail } from './components/preparation/LectureDetail';
+import { PlanRevision } from './components/preparation/PlanRevision';
+import { nouvelleVisite, VisiteDetail, Visites } from './components/preparation/Visites';
+import type { TypeEpreuve } from './data/sujets';
+import type { Seance } from './domain/plan';
 
 const CarteSites = lazy(() => import('./components/carte/CarteSites'));
 import { type EcranMenu, Logo, Menu } from './components/Menu';
 import { aireParId } from './domain/catalogue';
-import { creerOeuvre, db, installerReferences, mettreAJourReferences, modifierOeuvre } from './lib/db';
+import { creerOeuvre, creerVisite, db, installerReferences, mettreAJourReferences, modifierOeuvre } from './lib/db';
 import { telechargerImagesReferences } from './lib/imagesReferences';
 import { useReglages } from './lib/reglages';
 import { useLive } from './lib/useLive';
@@ -28,9 +34,14 @@ import { useLive } from './lib/useLive';
 type Vue =
   | { type: 'accueil' }
   | { type: 'aide' }
-  | { type: 'revision'; mode?: ModeRevision; quiz?: ChoixQuiz }
+  | { type: 'revision'; mode?: ModeRevision; quiz?: ChoixQuiz; aireId?: string }
+  | { type: 'plan' }
+  | { type: 'biblio' }
+  | { type: 'lecture'; id: string }
+  | { type: 'visites' }
+  | { type: 'visite'; id: string }
   | { type: 'frise' }
-  | { type: 'examen-blanc'; sujetId?: string }
+  | { type: 'examen-blanc'; sujetId?: string; epreuve?: TypeEpreuve }
   | { type: 'examen-plan' }
   | { type: 'examen-copies' }
   | { type: 'examen-banque' }
@@ -78,6 +89,37 @@ export function App() {
   /** Remplace l'écran courant sans l'ajouter à l'historique (après un enregistrement ou une suppression). */
   const remplacer = (v: Vue) => setVue(v);
 
+  /** Ouvre l'écran qui correspond à une séance du plan. */
+  const lancerSeance = async (s: Seance) => {
+    switch (s.type) {
+      case 'identifier':
+        return aller({ type: 'revision', mode: 'oeuvres', aireId: s.aireId });
+      case 'glossaire':
+        return aller({ type: 'revision', mode: 'glossaire' });
+      case 'anglais':
+        return aller({ type: 'revision', mode: 'anglais' });
+      case 'comparer':
+        return aller({ type: 'revision', mode: 'comparaisons' });
+      case 'reperes':
+        return aller({ type: 'revision', mode: 'quiz', quiz: 'reperes' });
+      case 'lecture':
+        return aller(s.lectureId ? { type: 'lecture', id: s.lectureId } : { type: 'biblio' });
+      case 'fiches':
+        return aller({ type: 'liste', aireId: s.aireId });
+      case 'plan15':
+        return aller({ type: 'examen-plan' });
+      case 'sujet-blanc':
+        return aller({ type: 'examen-blanc', epreuve: s.epreuve });
+      case 'oral':
+      case 'situations':
+        return aller({ type: 'oral' });
+      case 'visite': {
+        const v = await creerVisite(nouvelleVisite(s.sections, s.id));
+        return aller({ type: 'visite', id: v.id });
+      }
+    }
+  };
+
   const titre =
     vue.type === 'liste'
       ? aireParId(vue.aireId)?.nom ?? 'Œuvres de référence'
@@ -93,6 +135,16 @@ export function App() {
                 ? 'Épreuve en cours'
                 : vue.type === 'copie'
                   ? 'Copie'
+                  : vue.type === 'plan'
+                  ? 'Plan de révision'
+                  : vue.type === 'biblio'
+                  ? 'Bibliographie'
+                  : vue.type === 'lecture'
+                  ? 'Lecture'
+                  : vue.type === 'visites'
+                  ? 'Journal de visites'
+                  : vue.type === 'visite'
+                  ? 'Visite'
                   : vue.type === 'oral'
                   ? 'Simulateur d’oral'
                   : vue.type === 'oral-epreuve'
@@ -144,16 +196,31 @@ export function App() {
             ouvrirAire={(aireId) => aller({ type: 'liste', aireId })}
             ouvrirOeuvre={(id) => aller({ type: 'fiche', id })}
             ouvrirRevision={() => aller({ type: 'revision' })}
+            ouvrirPlan={() => aller({ type: 'plan' })}
+            lancerSeance={lancerSeance}
             creer={() => aller({ type: 'edition' })}
           />
         )}
         {vue.type === 'aide' && <Aide />}
-        {vue.type === 'examen-blanc' && <SujetBlanc key={vue.sujetId ?? 'hasard'} sujetInitial={vue.sujetId} commencer={(id) => remplacer({ type: 'ecriture', id })} />}
+        {vue.type === 'examen-blanc' && <SujetBlanc key={vue.sujetId ?? vue.epreuve ?? 'hasard'} sujetInitial={vue.sujetId} typeInitial={vue.epreuve} commencer={(id) => remplacer({ type: 'ecriture', id })} />}
         {vue.type === 'examen-plan' && <SujetBlanc plan commencer={(id) => remplacer({ type: 'ecriture', id })} />}
         {vue.type === 'examen-banque' && <Banque sEntrainer={(sujetId) => aller({ type: 'examen-blanc', sujetId })} />}
         {vue.type === 'examen-copies' && <Copies ouvrir={(id) => aller({ type: 'copie', id })} reprendre={(id) => aller({ type: 'ecriture', id })} />}
         {vue.type === 'ecriture' && <Ecriture id={vue.id} rendue={(id) => remplacer({ type: 'copie', id })} />}
         {vue.type === 'copie' && <CopieDetail id={vue.id} retour={retour} />}
+        {vue.type === 'plan' && <PlanRevision reglages={reglages} modifierReglages={modifierReglages} lancer={lancerSeance} />}
+        {vue.type === 'biblio' && <Bibliographie ouvrir={(id) => aller({ type: 'lecture', id })} />}
+        {vue.type === 'lecture' && <LectureDetail key={vue.id} id={vue.id} retour={retour} ouvrirFiche={(id) => aller({ type: 'fiche', id })} />}
+        {vue.type === 'visites' && (
+          <Visites
+            ouvrir={(id) => aller({ type: 'visite', id })}
+            nouvelle={async (sections, seanceId) => {
+              const v = await creerVisite(nouvelleVisite(sections, seanceId));
+              aller({ type: 'visite', id: v.id });
+            }}
+          />
+        )}
+        {vue.type === 'visite' && <VisiteDetail key={vue.id} id={vue.id} retour={retour} ouvrirFiche={(id) => aller({ type: 'fiche', id })} />}
         {vue.type === 'oral' && (
           <Simulateur commencer={(id) => aller({ type: 'oral-epreuve', id })} ouvrir={(o) => aller(o.phase === 'termine' ? { type: 'oral-detail', id: o.id } : { type: 'oral-epreuve', id: o.id })} />
         )}
@@ -169,9 +236,10 @@ export function App() {
         {vue.type === 'glossaire' && <Glossaire ouvrirFiche={(id) => aller({ type: 'fiche', id })} reviser={() => aller({ type: 'revision', mode: 'glossaire' })} />}
         {vue.type === 'revision' && (
           <Revision
-            key={`${vue.mode ?? 'oeuvres'}-${vue.quiz ?? ''}`}
+            key={`${vue.mode ?? 'oeuvres'}-${vue.quiz ?? ''}-${vue.aireId ?? ''}`}
             modeInitial={vue.mode}
             quizInitial={vue.quiz}
+            aireInitiale={vue.aireId}
             retourAccueil={() => {
               setHistorique([]);
               setVue({ type: 'accueil' });
@@ -181,7 +249,15 @@ export function App() {
         {vue.type === 'liste' && (
           <ListeOeuvres key={vue.aireId ?? 'toutes'} aireInitiale={vue.aireId} ouvrir={(id) => aller({ type: 'fiche', id })} creer={() => aller({ type: 'edition' })} />
         )}
-        {vue.type === 'fiche' && <FicheOeuvre key={vue.id} id={vue.id} retour={retour} modifier={() => aller({ type: 'edition', id: vue.id })} ouvrirFiche={(id) => aller({ type: 'fiche', id })} />}
+        {vue.type === 'fiche' && <FicheOeuvre
+            key={vue.id}
+            id={vue.id}
+            retour={retour}
+            modifier={() => aller({ type: 'edition', id: vue.id })}
+            ouvrirFiche={(id) => aller({ type: 'fiche', id })}
+            ouvrirLecture={(id) => aller({ type: 'lecture', id })}
+            ouvrirVisite={(id) => aller({ type: 'visite', id })}
+          />}
         {vue.type === 'edition' && (!vue.id || enEdition) && (
           <FormulaireOeuvre
             key={vue.id ?? 'nouvelle'}
@@ -231,7 +307,14 @@ function ecranDuMenu(vue: Vue): EcranMenu | undefined {
     case 'examen-copies':
     case 'examen-banque':
     case 'oral':
+    case 'plan':
+    case 'biblio':
+    case 'visites':
       return vue.type;
+    case 'lecture':
+      return 'biblio';
+    case 'visite':
+      return 'visites';
     case 'oral-epreuve':
     case 'oral-detail':
       return 'oral';

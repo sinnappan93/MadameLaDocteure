@@ -10,7 +10,7 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 ## Fonctionnalités (version actuelle)
 
 ### Menu
-Organisé en sections dépliables : **Exercices** (identifier les œuvres, comparer, glossaire en cartes, quiz libre, quiz de repères),
+Organisé en sections dépliables : **Préparation** (plan de révision, bibliographie, journal de visites), **Exercices** (identifier les œuvres, comparer, glossaire en cartes, quiz libre, quiz de repères),
 **Mode examen** (sujets blancs, plan en 15 minutes, copies et corrections, banque de sujets, simulateur d'oral, vocabulaire anglais),
 **Ressources** (œuvres de référence, comparaisons, glossaire, frise chronologique, carte des sites), **Aide**, **Réglages**, **Bientôt** ; l'écran affiché est mis en évidence.
 
@@ -51,6 +51,18 @@ Organisé en sections dépliables : **Exercices** (identifier les œuvres, compa
   un point par lieu coloré selon l'aire, bulle avec liens vers les fiches ; coordonnées modifiables dans le formulaire
 - **Quiz de repères** : 28 questions de dynasties choisies à la main (« Quelle période au Xe siècle au Cambodge ? »)
   et « Place … sur la carte » sur un fond sans noms (réussi à moins de 200 km)
+
+### Préparation
+- **Plan de révision** (`src/domain/plan.ts`) : calendrier jusqu'aux oraux généré à partir des dates (écrits,
+  admissibilité, oraux), des jours et du temps disponibles, sur la logique du générateur de JeSuisCoach (charge
+  progressive, semaine allégée toutes les 4 semaines, affûtage de 5 semaines avant les écrits, pause, bascule sur l'oral) ;
+  séances pondérées par les lacunes mesurées (révisions, erreurs, couverture, glossaire, notes des copies et oraux) ;
+  démarches en jalons ; vues semaine et mois ; séances du jour sur l'accueil ; cochées automatiquement quand l'appli voit
+  l'activité ; recalcul qui garde le passé et ce qui est fait
+- **Bibliographie** (`src/domain/preparation.ts`) : livres et articles, pages lues, notes, œuvres citées reliées aux
+  fiches, suggestions à compléter (`src/data/preparation.ts`)
+- **Journal de visites** : date, salles du Guimet, notes, photos d'œuvres (et du cartel) transformées en fiches ; visites
+  proposées par le plan sur les sections des aires faibles
 
 ### Mode examen
 - **Sujets blancs chronométrés** : dissertation de spécialité, culture générale, note de synthèse ; écriture dans l'appli
@@ -106,9 +118,8 @@ Organisé en sections dépliables : **Exercices** (identifier les œuvres, compa
 - Images réduites à 1 600 px de côté au maximum ; choix de l'image de couverture
 
 ## Feuille de route
-1. Démarches et plan de préparation (inscriptions, Prépa Talents, lectures) avec rappels
-2. Suivi de bibliographie
-3. Projection : couverture, mémorisation, notes des sujets blancs, rythme
+1. Projection : couverture, mémorisation, notes des sujets blancs, rythme
+2. Rappels (notifications) des séances du plan : couverture, mémorisation, notes des sujets blancs, rythme
 
 ## Démarrer
 

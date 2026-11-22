@@ -7,6 +7,8 @@ import { db } from '../lib/db';
 import type { Reglages } from '../lib/reglages';
 import { useLive } from '../lib/useLive';
 import { Illustration } from './Illustration';
+import type { Seance } from '../domain/plan';
+import { Aujourdhui } from './preparation/Aujourdhui';
 import { Vignette } from './Vignette';
 
 interface Props {
@@ -15,9 +17,11 @@ interface Props {
   ouvrirOeuvre: (id: string) => void;
   creer: () => void;
   ouvrirRevision: () => void;
+  ouvrirPlan: () => void;
+  lancerSeance: (s: Seance) => void;
 }
 
-export function Accueil({ reglages, ouvrirAire, ouvrirOeuvre, creer, ouvrirRevision }: Props) {
+export function Accueil({ reglages, ouvrirAire, ouvrirOeuvre, creer, ouvrirRevision, ouvrirPlan, lancerSeance }: Props) {
   const oeuvres = useLive(() => db.oeuvres.toArray(), []);
   const etats = useLive(() => db.revisions.toArray(), []);
   const revision = oeuvres && etats ? bilan(oeuvres, etats, new Date()) : undefined;
@@ -41,6 +45,7 @@ export function Accueil({ reglages, ouvrirAire, ouvrirOeuvre, creer, ouvrirRevis
       </section>
 
       <section className="panneau">
+        <Aujourdhui ouvrirPlan={ouvrirPlan} lancer={lancerSeance} />
         {revision && dues + revision.nouvelles + (glossaire?.nouveaux ?? 0) > 0 && (
           <button className="carte-du-jour" onClick={ouvrirRevision}>
             <span>

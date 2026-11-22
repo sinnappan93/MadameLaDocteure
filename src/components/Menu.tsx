@@ -17,6 +17,9 @@ export type EcranMenu =
   | 'examen-copies'
   | 'examen-banque'
   | 'oral'
+  | 'plan'
+  | 'biblio'
+  | 'visites'
   | 'frise'
   | 'carte'
   | 'oeuvres'
@@ -40,6 +43,15 @@ const THEMES: Array<[Theme, string]> = [
 ];
 
 const SECTIONS: Array<{ titre: string; icone: string; entrees: Array<[EcranMenu, string, string]> }> = [
+  {
+    titre: 'Préparation',
+    icone: '◷',
+    entrees: [
+      ['plan', 'Plan de révision', 'Calendrier jusqu’aux oraux, séances du jour'],
+      ['biblio', 'Bibliographie', 'Livres et articles, pages lues, notes'],
+      ['visites', 'Journal de visites', 'Guimet : salles vues, photos transformées en fiches'],
+    ],
+  },
   {
     titre: 'Exercices',
     icone: '✦',
@@ -76,7 +88,7 @@ const SECTIONS: Array<{ titre: string; icone: string; entrees: Array<[EcranMenu,
   },
 ];
 
-const BIENTOT = ['Démarches et plan de préparation', 'Bibliographie', 'Projection'];
+const BIENTOT = ['Projection : couverture, mémorisation, notes, rythme'];
 
 export function Menu({ reglages, modifier, aller, fermer, actuel }: Props) {
   const [restauration, setRestauration] = useState<string>();

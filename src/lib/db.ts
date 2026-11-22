@@ -7,6 +7,8 @@ import { type FicheReference, REFERENCES } from '../data/references';
 import type { NoticeMusee } from '../domain/musees';
 import type { Copie, Sujet } from '../domain/examen';
 import type { DossierOral, Oral } from '../domain/oral';
+import type { DemandePlan, Seance } from '../domain/plan';
+import type { Lecture, NouvelleLecture, Visite } from '../domain/preparation';
 import { type Carte, type EtatCarte, type Note, noter } from '../domain/revision';
 import { type ImageOeuvre, type ImageSource, type NouvelleOeuvre, type Oeuvre, oeuvreVide } from '../domain/types';
 
@@ -29,6 +31,9 @@ export class Base extends Dexie {
   sujets!: EntityTable<Sujet, 'id'>;
   copies!: EntityTable<Copie, 'id'>;
   oraux!: EntityTable<Oral, 'id'>;
+  seances!: EntityTable<Seance, 'id'>;
+  lectures!: EntityTable<Lecture, 'id'>;
+  visites!: EntityTable<Visite, 'id'>;
 
   constructor(nom = 'madameladocteure') {
     super(nom);
@@ -41,6 +46,7 @@ export class Base extends Dexie {
     this.version(3).stores({ revisions: 'id, oeuvreId, echeance' });
     this.version(4).stores({ sujets: 'id, type', copies: 'id, type, debut' });
     this.version(5).stores({ oraux: 'id, debut' });
+    this.version(6).stores({ seances: 'id, date', lectures: 'id, statut', visites: 'id, date' });
   }
 }
 
@@ -275,4 +281,81 @@ export async function supprimerOral(id: string, base: Base = db): Promise<void> 
     if (oral) await base.fichiers.bulkDelete(audiosDe(oral));
     await base.oraux.delete(id);
   });
+}
+
+// ——— Plan de révision ———
+
+const CLE_PLAN = 'plan-demande';
+
+export async function lireDemandePlan(base: Base = db): Promise<DemandePlan | undefined> {
+  return (await base.meta.get(CLE_PLAN))?.valeur as DemandePlan | undefined;
+}
+
+/** Remplace tout le plan (séances et paramètres). */
+export async function enregistrerPlan(demande: DemandePlan, seances: Seance[], base: Base = db): Promise<void> {
+  await base.transaction('rw', base.seances, base.meta, async () => {
+    await base.seances.clear();
+    await base.seances.bulkAdd(seances);
+    await base.meta.put({ cle: CLE_PLAN, valeur: demande });
+  });
+}
+
+export async function supprimerPlan(base: Base = db): Promise<void> {
+  await base.transaction('rw', base.seances, base.meta, async () => {
+    await base.seances.clear();
+    await base.meta.delete(CLE_PLAN);
+  });
+}
+
+export async function marquerSeance(id: string, faite: boolean, base: Base = db): Promise<void> {
+  await base.seances.update(id, { faite, faiteLe: faite ? maintenant() : undefined });
+}
+
+// ——— Bibliographie ———
+
+export async function creerLecture(n: NouvelleLecture, base: Base = db): Promise<Lecture> {
+  const lecture: Lecture = { pageActuelle: 0, statut: 'a-lire', notes: '', oeuvreIds: [], ...n, historique: [], id: nouvelId(), creeeLe: maintenant(), modifieeLe: maintenant() };
+  await base.lectures.add(lecture);
+  return lecture;
+}
+
+export async function modifierLecture(id: string, changements: Partial<Lecture>, base: Base = db): Promise<void> {
+  await base.lectures.update(id, { ...changements, modifieeLe: maintenant() });
+}
+
+export async function supprimerLecture(id: string, base: Base = db): Promise<void> {
+  await base.lectures.delete(id);
+}
+
+// ——— Visites ———
+
+export async function creerVisite(v: Omit<Visite, 'id' | 'creeeLe' | 'oeuvreIds' | 'notes'> & Partial<Pick<Visite, 'notes'>>, base: Base = db): Promise<Visite> {
+  const visite: Visite = { notes: '', ...v, oeuvreIds: [], id: nouvelId(), creeeLe: maintenant() };
+  await base.visites.add(visite);
+  return visite;
+}
+
+export async function modifierVisite(id: string, changements: Partial<Visite>, base: Base = db): Promise<void> {
+  await base.visites.update(id, changements);
+}
+
+/** Supprime l'entrée du journal ; les fiches créées pendant la visite sont gardées. */
+export async function supprimerVisite(id: string, base: Base = db): Promise<void> {
+  await base.visites.delete(id);
+}
+
+/** Transforme une photo prise pendant une visite en fiche d'œuvre (photo de l'œuvre, et du cartel si fournie). */
+export async function ficheDepuisPhoto(
+  visiteId: string,
+  donnees: NouvelleOeuvre,
+  photo: Blob,
+  cartel?: Blob,
+  base: Base = db,
+): Promise<Oeuvre> {
+  const oeuvre = await creerOeuvre(donnees, base);
+  await ajouterImage(oeuvre.id, photo, { source: 'photo', titre: 'Photo prise pendant la visite' }, base);
+  if (cartel) await ajouterImage(oeuvre.id, cartel, { source: 'photo', titre: 'Cartel' }, base);
+  const visite = await base.visites.get(visiteId);
+  if (visite) await base.visites.update(visiteId, { oeuvreIds: [...visite.oeuvreIds, oeuvre.id] });
+  return oeuvre;
 }

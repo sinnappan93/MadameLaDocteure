@@ -3,6 +3,7 @@ import { aireParId, periodeParId } from '../domain/catalogue';
 import { comparaisonsDe } from '../domain/comparaisons';
 import { termesDeFiche } from '../domain/glossaire';
 import { MUSEES } from '../domain/musees';
+import { referenceCourte } from '../domain/preparation';
 import { db, imagesDe, modifierOeuvre, retirerNotice, supprimerImage, supprimerOeuvre } from '../lib/db';
 import { useLive } from '../lib/useLive';
 import { AjoutImage } from './AjoutImage';
@@ -10,7 +11,25 @@ import { Bloc } from './Bloc';
 import { NoticeDetaillee, RechercheMusees } from './RechercheMusees';
 import { Vignette } from './Vignette';
 
-export function FicheOeuvre({ id, retour, modifier, ouvrirFiche }: { id: string; retour: () => void; modifier: () => void; ouvrirFiche?: (id: string) => void }) {
+export function FicheOeuvre({
+  id,
+  retour,
+  modifier,
+  ouvrirFiche,
+  ouvrirLecture,
+  ouvrirVisite,
+}: {
+  id: string;
+  retour: () => void;
+  modifier: () => void;
+  ouvrirFiche?: (id: string) => void;
+  ouvrirLecture?: (id: string) => void;
+  ouvrirVisite?: (id: string) => void;
+}) {
+  const liens = useLive(async () => ({
+    lectures: (await db.lectures.toArray()).filter((l) => l.oeuvreIds.includes(id)),
+    visites: (await db.visites.toArray()).filter((v) => v.oeuvreIds.includes(id)),
+  }), [id]);
   const oeuvre = useLive(() => db.oeuvres.get(id), [id]);
   const images = useLive(() => imagesDe(id), [id]);
   const aComparer = useLive(async () => {
@@ -133,6 +152,32 @@ export function FicheOeuvre({ id, retour, modifier, ouvrirFiche }: { id: string;
             ))}
           </dl>
         </details>
+      )}
+
+      {liens && liens.lectures.length + liens.visites.length > 0 && (
+        <div className="bloc liens-preparation">
+          {liens.lectures.length > 0 && (
+            <p>
+              <strong>Citée dans :</strong>{' '}
+              {liens.lectures.map((l, i) => (
+                <span key={l.id}>
+                  {i > 0 && ', '}
+                  <button className="lien" onClick={() => ouvrirLecture?.(l.id)}>
+                    {referenceCourte(l)}
+                  </button>
+                </span>
+              ))}
+            </p>
+          )}
+          {liens.visites.map((v) => (
+            <p key={v.id}>
+              <strong>Photographiée</strong> lors de la{' '}
+              <button className="lien" onClick={() => ouvrirVisite?.(v.id)}>
+                visite du {new Date(`${v.date}T00:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </button>
+            </p>
+          ))}
+        </div>
       )}
 
       <section className="section-musees">

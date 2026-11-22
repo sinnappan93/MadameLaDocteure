@@ -74,6 +74,61 @@ export function Aide() {
         </ul>
       </Rubrique>
 
+      <Rubrique titre="Plan de révision et calendrier">
+        <ul>
+          <li>
+            Menu › <em>Préparation</em> › <em>Plan de révision</em>. Indique tes dates (écrits, résultats d’admissibilité, oraux : des estimations à corriger
+            quand le calendrier officiel sort), tes jours de travail, ton temps par jour et les jours où tu as une longue plage. Ajoute tes démarches (inscription,
+            Prépa Talents…) : elles apparaissent comme jalons ★.
+          </li>
+          <li>
+            Le plan suit la logique de JeSuisCoach : <strong>travail de fond</strong> avec une charge qui augmente et une semaine plus légère toutes les 4 semaines,
+            <strong> affûtage</strong> les 5 dernières semaines avant les écrits (un sujet blanc par semaine longue, plus de nouvelles lectures, repos la veille),
+            une semaine de pause, puis <strong>bascule sur l’oral</strong> (oraux blancs, mises en situation, anglais) après l’admissibilité.
+          </li>
+          <li>
+            Chaque jour commence par la révision espacée, centrée sur tes aires les plus faibles. Les autres séances (lecture, fiches, glossaire, comparaisons,
+            repères, plans en 15 minutes, anglais) sont dosées selon les <strong>lacunes mesurées</strong> : œuvres jamais révisées, erreurs, périodes sans fiche,
+            glossaire, notes des copies et des oraux. Le détail est dans « Ce que l’appli a mesuré ».
+          </li>
+          <li>
+            <strong>Commencer</strong> ouvre le bon écran (avec l’aire ou l’épreuve choisie). Coche les séances faites ; l’appli coche aussi d’elle-même celles
+            qu’elle voit (révisions du jour, copie rendue, oral, visite, pages notées).
+          </li>
+          <li>
+            Vue <em>Semaine</em> ou <em>Mois</em>. <em>Recalculer avec mes lacunes</em> refait les séances à venir en gardant le passé et ce qui est fait. Les séances
+            du jour sont aussi sur l’accueil.
+          </li>
+        </ul>
+      </Rubrique>
+
+      <Rubrique titre="Bibliographie">
+        <ul>
+          <li>
+            Menu › <em>Préparation</em> › <em>Bibliographie</em> : livres, catalogues, articles, rapports de jury. Pars des suggestions (à compléter et vérifier :
+            édition, pages) ou ajoute les tiens.
+          </li>
+          <li>
+            Dans une lecture : <em>J’ai lu jusqu’à la page…</em> suit l’avancement, les notes sont enregistrées automatiquement, et tu relies les œuvres citées à tes
+            fiches (la fiche affiche alors « Citée dans »). Les lectures en cours sont reprises dans le plan.
+          </li>
+        </ul>
+      </Rubrique>
+
+      <Rubrique titre="Journal de visites">
+        <ul>
+          <li>
+            Menu › <em>Préparation</em> › <em>Journal de visites</em>, ou <em>Commencer</em> sur une visite du plan (les sections proposées correspondent à tes aires
+            faibles). Note la date, les salles vues et tes impressions.
+          </li>
+          <li>
+            <strong>📷 Photographier une œuvre</strong> : la photo, celle du cartel si tu veux, le titre, la datation et le n° d’inventaire suffisent à créer une
+            fiche (conservation : le musée), à compléter ensuite. Elle entre dans tes révisions.
+          </li>
+          <li>« À revoir sur place » liste tes fiches conservées au Guimet dans les salles cochées.</li>
+        </ul>
+      </Rubrique>
+
       <Rubrique titre="Mode examen">
         <ul>
           <li>
@@ -271,6 +326,9 @@ export function Aide() {
             <strong>Exercices</strong> : identifier les œuvres, comparer deux œuvres, glossaire en cartes, quiz libre, quiz de repères.
           </li>
           <li>
+            <strong>Préparation</strong> : plan de révision, bibliographie, journal de visites.
+          </li>
+          <li>
             <strong>Mode examen</strong> : sujets blancs, plan en 15 minutes, copies et corrections, banque de sujets, simulateur d’oral, vocabulaire anglais.
           </li>
           <li>
@@ -323,7 +381,7 @@ export function Aide() {
       </Rubrique>
 
       <Rubrique titre="Bientôt">
-        <p>Démarches et plan de préparation, bibliographie, projection.</p>
+        <p>Projection : couverture du programme, mémorisation, notes des sujets blancs, rythme.</p>
       </Rubrique>
     </section>
   );

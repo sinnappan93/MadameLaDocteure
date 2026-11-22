@@ -157,3 +157,42 @@ describe('oraux', () => {
     expect(await base.fichiers.count()).toBe(0);
   });
 });
+
+describe('préparation', () => {
+  it('enregistre le plan, coche une séance et le supprime', async () => {
+    const { enregistrerPlan, lireDemandePlan, marquerSeance, supprimerPlan } = await import('./db');
+    const { demandeParDefaut } = await import('../domain/plan');
+    const d = demandeParDefaut('2027-07-01', '2026-11-23');
+    await enregistrerPlan(d, [{ id: 's1', date: '2026-11-23', type: 'lecture', phase: 'fond', titre: 'Lecture', description: '', dureeMin: 30 }], base);
+    await marquerSeance('s1', true, base);
+    expect((await base.seances.get('s1'))?.faite).toBe(true);
+    expect((await lireDemandePlan(base))?.dateEcrits).toBe('2027-07-01');
+    await supprimerPlan(base);
+    expect(await base.seances.count()).toBe(0);
+    expect(await lireDemandePlan(base)).toBeUndefined();
+  });
+
+  it('transforme une photo de visite en fiche reliée à la visite', async () => {
+    const { creerVisite, ficheDepuisPhoto, supprimerVisite } = await import('./db');
+    const v = await creerVisite({ date: '2026-11-23', musee: 'Musée Guimet', salles: ['cambodge'] }, base);
+    const o = await ficheDepuisPhoto(v.id, { ...oeuvreVide(), titre: 'Linteau', conservation: 'Musée Guimet (MG 1)' }, image(), image(), base);
+    expect((await base.visites.get(v.id))?.oeuvreIds).toEqual([o.id]);
+    const imgs = await imagesDe(o.id, base);
+    expect(imgs.map((i) => i.titre)).toEqual(['Photo prise pendant la visite', 'Cartel']);
+    expect((await base.oeuvres.get(o.id))?.imagePrincipaleId).toBe(imgs[0].id);
+    await supprimerVisite(v.id, base);
+    expect(await base.oeuvres.get(o.id)).toBeDefined();
+  });
+
+  it('suit les pages lues', async () => {
+    const { creerLecture, modifierLecture } = await import('./db');
+    const { lirePages, avancement } = await import('../domain/preparation');
+    const l = await creerLecture({ type: 'livre', titre: 'Huntington', auteurs: 'Susan L. Huntington', editeur: '', lien: '', aires: [], pagesTotal: 100 }, base);
+    await modifierLecture(l.id, lirePages(l, 40, new Date('2026-11-23T10:00:00')), base);
+    const l2 = (await base.lectures.get(l.id))!;
+    expect(l2).toMatchObject({ pageActuelle: 40, statut: 'en-cours' });
+    expect(l2.historique).toEqual([{ date: new Date('2026-11-23T10:00:00').toISOString(), jusqua: 40, pages: 40 }]);
+    expect(lirePages(l2, 150)).toMatchObject({ pageActuelle: 100, statut: 'lu' });
+    expect(avancement(l2)).toBe(0.4);
+  });
+});

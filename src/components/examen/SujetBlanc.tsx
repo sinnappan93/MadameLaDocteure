@@ -8,10 +8,20 @@ import { ChoixType, useSujets } from './communs';
 /**
  * Préparation d'un sujet blanc (ou d'un « plan en 15 minutes ») : épreuve, sujet, mode d'écriture, durée.
  */
-export function SujetBlanc({ plan, sujetInitial, commencer }: { plan?: boolean; sujetInitial?: string; commencer: (copieId: string) => void }) {
+export function SujetBlanc({
+  plan,
+  sujetInitial,
+  typeInitial = 'specialite',
+  commencer,
+}: {
+  plan?: boolean;
+  sujetInitial?: string;
+  typeInitial?: TypeEpreuve;
+  commencer: (copieId: string) => void;
+}) {
   const sujets = useSujets();
   const faits = useLive(async () => (await db.copies.toArray()).map((c) => c.sujetId), []);
-  const [type, setType] = useState<TypeEpreuve>('specialite');
+  const [type, setType] = useState<TypeEpreuve>(typeInitial);
   const [sujet, setSujet] = useState<Sujet>();
   const [mode, setMode] = useState<'texte' | 'manuscrit'>('texte');
   const [duree, setDuree] = useState(DUREE_PAR_DEFAUT);

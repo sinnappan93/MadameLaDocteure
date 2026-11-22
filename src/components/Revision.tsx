@@ -43,11 +43,21 @@ const MAXIMUM = 30;
 
 export type ModeRevision = 'oeuvres' | 'comparaisons' | 'glossaire' | 'anglais' | 'quiz';
 
-export function Revision({ retourAccueil, modeInitial = 'oeuvres', quizInitial = 'melange' }: { retourAccueil: () => void; modeInitial?: ModeRevision; quizInitial?: ChoixQuiz }) {
+export function Revision({
+  retourAccueil,
+  modeInitial = 'oeuvres',
+  quizInitial = 'melange',
+  aireInitiale = '',
+}: {
+  retourAccueil: () => void;
+  modeInitial?: ModeRevision;
+  quizInitial?: ChoixQuiz;
+  aireInitiale?: string;
+}) {
   const oeuvres = useLive(() => db.oeuvres.toArray(), []);
   const etats = useLive(() => db.revisions.toArray(), []);
   const [etape, setEtape] = useState<Etape>({ nom: 'depart' });
-  const [aire, setAire] = useState('');
+  const [aire, setAire] = useState(aireInitiale);
   const [nouvelles, setNouvelles] = useState(10);
   const [mode, setMode] = useState<ModeRevision>(modeInitial);
   const [categorie, setCategorie] = useState<CategorieGlossaire | string>('');
