@@ -4,13 +4,14 @@
  * Logique pure, sans stockage : le temps et le hasard sont passés en paramètres pour les tests.
  */
 import { PERIODES, periodeParId } from './catalogue';
+import { questionsDynastie } from './reperes';
 import type { Oeuvre } from './types';
 
 /**
  * Œuvres : « identifier » (photo puis auto-évaluation) et « periode » (QCM).
  * Glossaire : « terme » (terme puis définition, auto-évaluation) et « definition » (définition, QCM du terme).
  */
-export type TypeCarte = 'identifier' | 'periode' | 'site' | 'musee' | 'iconographie' | 'terme' | 'definition' | 'comparaison';
+export type TypeCarte = 'identifier' | 'periode' | 'site' | 'musee' | 'iconographie' | 'terme' | 'definition' | 'comparaison' | 'dynastie' | 'carte';
 
 /** Variantes proposées après la première identification d'une œuvre. */
 export const VARIANTES_OEUVRE: TypeCarte[] = ['periode', 'site', 'musee', 'iconographie'];
@@ -296,7 +297,7 @@ export function optionsMusee(oeuvre: Oeuvre, toutes: Oeuvre[], hasard: () => num
 }
 
 /** Types de questions du quiz libre (QCM uniquement). */
-export type TypeQuiz = 'periode' | 'site' | 'musee' | 'definition';
+export type TypeQuiz = 'periode' | 'site' | 'musee' | 'definition' | 'dynastie' | 'carte';
 
 export interface OptionsQuiz {
   types: TypeQuiz[];
@@ -309,6 +310,7 @@ export interface OptionsQuiz {
  * Quiz libre : une série de QCM tirés au hasard, sans tenir compte du calendrier de révision
  * (et sans le modifier). Une seule question par œuvre ou par terme.
  */
+/* Les questions de repères viennent de ./reperes (import tardif pour éviter une dépendance circulaire). */
 export function composerQuiz(oeuvres: Oeuvre[], termes: Array<{ id: string }>, o: OptionsQuiz): Carte[] {
   const possibles: Carte[] = [];
   for (const oeuvre of oeuvres) {
@@ -317,6 +319,12 @@ export function composerQuiz(oeuvres: Oeuvre[], termes: Array<{ id: string }>, o
     for (const t of o.types) if (t !== 'definition' && types.includes(t)) possibles.push({ id: idCarte(oeuvre.id, t), oeuvreId: oeuvre.id, type: t });
   }
   if (o.types.includes('definition')) for (const t of termes) possibles.push({ id: idCarte(t.id, 'definition'), oeuvreId: t.id, type: 'definition' });
+  if (o.types.includes('carte'))
+    for (const oeuvre of oeuvres)
+      if (oeuvre.lat !== undefined && oeuvre.lng !== undefined && (!o.aireId || oeuvre.aireId === o.aireId))
+        possibles.push({ id: idCarte(oeuvre.id, 'carte'), oeuvreId: oeuvre.id, type: 'carte' });
+  if (o.types.includes('dynastie'))
+    for (const q of questionsDynastie()) if (!o.aireId || q.aireId === o.aireId) possibles.push({ id: idCarte(q.id, 'dynastie'), oeuvreId: q.id, type: 'dynastie' });
   const quiz: Carte[] = [];
   const pris = new Set<string>();
   for (const c of melanger(possibles, o.hasard)) {

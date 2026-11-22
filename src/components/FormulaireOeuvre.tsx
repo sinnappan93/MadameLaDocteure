@@ -110,6 +110,21 @@ export function FormulaireOeuvre({ initiale, enregistrer, annuler }: Props) {
       </div>
 
       {champ('site', 'Site / provenance', 'Sarnath, Uttar Pradesh')}
+      <label>
+        Coordonnées du site (latitude, longitude)
+        <input
+          inputMode="decimal"
+          defaultValue={o.lat !== undefined && o.lng !== undefined ? `${o.lat}, ${o.lng}` : ''}
+          placeholder="20.024, 75.179 (pour la carte)"
+          onChange={(e) => {
+            const m = /^\s*(-?\d+(?:[.]\d+)?)\s*[,; ]\s*(-?\d+(?:[.]\d+)?)\s*$/.exec(e.target.value);
+            const lat = m ? Number(m[1]) : undefined;
+            const lng = m ? Number(m[2]) : undefined;
+            const valides = lat !== undefined && lng !== undefined && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+            setO((p) => ({ ...p, lat: valides ? lat : undefined, lng: valides ? lng : undefined }));
+          }}
+        />
+      </label>
       {champ('materiau', 'Matériau et technique', 'Grès de Chunar')}
       {champ('conservation', 'Lieu de conservation', 'Musée Guimet, Paris (MG …)')}
       {champ('style', 'Style', 'École de Sarnath')}

@@ -9,6 +9,9 @@ export type EcranMenu =
   | 'revision-comparaisons'
   | 'revision-glossaire'
   | 'revision-quiz'
+  | 'revision-reperes'
+  | 'frise'
+  | 'carte'
   | 'oeuvres'
   | 'comparaisons'
   | 'glossaire'
@@ -38,6 +41,7 @@ const SECTIONS: Array<{ titre: string; icone: string; entrees: Array<[EcranMenu,
       ['revision-comparaisons', 'Comparer deux œuvres', 'Côte à côte, puis les critères'],
       ['revision-glossaire', 'Glossaire en cartes', 'Termes et définitions'],
       ['revision-quiz', 'Quiz libre', 'QCM tout de suite, sans calendrier'],
+      ['revision-reperes', 'Quiz de repères', 'Dynasties par siècle, sites sur la carte'],
     ],
   },
   {
@@ -49,9 +53,17 @@ const SECTIONS: Array<{ titre: string; icone: string; entrees: Array<[EcranMenu,
       ['glossaire', 'Glossaire', 'Vocabulaire iconographique'],
     ],
   },
+  {
+    titre: 'Repères',
+    icone: '◷',
+    entrees: [
+      ['frise', 'Frise chronologique', 'Périodes et œuvres, par aire'],
+      ['carte', 'Carte des sites', 'Sites et centres artistiques'],
+    ],
+  },
 ];
 
-const BIENTOT = ['Démarches et plan de préparation', 'Bibliographie', 'Frise chronologique et carte', 'Sujets blancs', 'Simulateur d’oral'];
+const BIENTOT = ['Démarches et plan de préparation', 'Bibliographie', 'Sujets blancs', 'Simulateur d’oral'];
 
 export function Menu({ reglages, modifier, aller, fermer, actuel }: Props) {
   const [restauration, setRestauration] = useState<string>();

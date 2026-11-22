@@ -1,4 +1,7 @@
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
+import { enonceDynastie, optionsDynastie, type QuestionDynastie, questionDynastieParId } from '../domain/reperes';
+
+const QuestionCarte = lazy(() => import('./carte/QuestionCarte'));
 import { CATEGORIES_GLOSSAIRE, type CategorieGlossaire, GLOSSAIRE, type Terme } from '../data/glossaire';
 import { type Comparaison } from '../data/comparaisons';
 import { comparaisonParId, comparaisonsDisponibles, composerSeanceComparaisons } from '../domain/comparaisons';
@@ -18,13 +21,16 @@ type Etape =
   | { nom: 'quiz'; cartes: Carte[]; index: number; resultats: Resultat[] }
   | { nom: 'finQuiz'; resultats: Resultat[] };
 
-type ChoixQuiz = 'melange' | TypeQuiz;
+export type ChoixQuiz = 'melange' | 'reperes' | TypeQuiz;
 const CHOIX_QUIZ: Array<[ChoixQuiz, string]> = [
   ['melange', 'Mélange'],
   ['periode', 'Période'],
   ['site', 'Site'],
   ['musee', 'Musée'],
   ['definition', 'Termes'],
+  ['reperes', 'Repères'],
+  ['dynastie', 'Dynasties'],
+  ['carte', 'Carte'],
 ];
 
 interface Resultat {
@@ -36,7 +42,7 @@ const MAXIMUM = 30;
 
 export type ModeRevision = 'oeuvres' | 'comparaisons' | 'glossaire' | 'quiz';
 
-export function Revision({ retourAccueil, modeInitial = 'oeuvres' }: { retourAccueil: () => void; modeInitial?: ModeRevision }) {
+export function Revision({ retourAccueil, modeInitial = 'oeuvres', quizInitial = 'melange' }: { retourAccueil: () => void; modeInitial?: ModeRevision; quizInitial?: ChoixQuiz }) {
   const oeuvres = useLive(() => db.oeuvres.toArray(), []);
   const etats = useLive(() => db.revisions.toArray(), []);
   const [etape, setEtape] = useState<Etape>({ nom: 'depart' });
@@ -44,7 +50,7 @@ export function Revision({ retourAccueil, modeInitial = 'oeuvres' }: { retourAcc
   const [nouvelles, setNouvelles] = useState(10);
   const [mode, setMode] = useState<ModeRevision>(modeInitial);
   const [categorie, setCategorie] = useState<CategorieGlossaire | ''>('');
-  const [choixQuiz, setChoixQuiz] = useState<ChoixQuiz>('melange');
+  const [choixQuiz, setChoixQuiz] = useState<ChoixQuiz>(quizInitial);
   const [nombreQuiz, setNombreQuiz] = useState(10);
 
   if (!oeuvres || !etats) return <section className="panneau" />;
@@ -133,7 +139,8 @@ export function Revision({ retourAccueil, modeInitial = 'oeuvres' }: { retourAcc
     );
   }
 
-  const typesQuiz: TypeQuiz[] = choixQuiz === 'melange' ? ['periode', 'site', 'musee', 'definition'] : [choixQuiz];
+  const typesQuiz: TypeQuiz[] =
+    choixQuiz === 'melange' ? ['periode', 'site', 'musee', 'definition', 'dynastie', 'carte'] : choixQuiz === 'reperes' ? ['dynastie', 'carte'] : [choixQuiz];
   const lancerQuiz = (cartes: Carte[]) => cartes.length && setEtape({ nom: 'quiz', cartes, index: 0, resultats: [] });
 
   if (etape.nom === 'depart' && mode === 'quiz') {
@@ -209,7 +216,8 @@ export function Revision({ retourAccueil, modeInitial = 'oeuvres' }: { retourAcc
           <ul className="liste-fin">
             {etape.resultats.map((r, i) => (
               <li key={i} className={r.note === 0 ? 'rate' : 'reussi'}>
-                <span aria-hidden>{r.note === 0 ? '✗' : '✓'}</span> {parId.get(r.carte.oeuvreId)?.titre ?? termeParId(r.carte.oeuvreId)?.terme}
+                <span aria-hidden>{r.note === 0 ? '✗' : '✓'}</span>{' '}
+                {parId.get(r.carte.oeuvreId)?.titre ?? termeParId(r.carte.oeuvreId)?.terme ?? (questionDynastieParId(r.carte.oeuvreId) && enonceDynastie(questionDynastieParId(r.carte.oeuvreId)!))}
                 <span className="discret"> · {LIBELLES_TYPES[r.carte.type]}</span>
               </li>
             ))}
@@ -255,12 +263,18 @@ export function Revision({ retourAccueil, modeInitial = 'oeuvres' }: { retourAcc
         </div>
         {carte.type === 'definition' && termeQuiz ? (
           <CarteDefinition key={cle} terme={termeQuiz} repondre={suivante} />
+        ) : carte.type === 'dynastie' && questionDynastieParId(carte.oeuvreId) ? (
+          <CarteDynastie key={cle} question={questionDynastieParId(carte.oeuvreId)!} repondre={suivante} />
         ) : !oeuvreQuiz ? (
           <button className="bouton large" onClick={() => suivante(2)}>
             Fiche supprimée, passer
           </button>
         ) : carte.type === 'periode' ? (
           <CartePeriode key={cle} oeuvre={oeuvreQuiz} repondre={suivante} />
+        ) : carte.type === 'carte' ? (
+          <Suspense fallback={<p className="discret">Chargement de la carte…</p>}>
+            <QuestionCarte key={cle} oeuvre={oeuvreQuiz} repondre={suivante} />
+          </Suspense>
         ) : (
           <CarteChoix key={cle} type={carte.type as 'site' | 'musee'} oeuvre={oeuvreQuiz} oeuvres={oeuvres} repondre={suivante} />
         )}
@@ -662,6 +676,8 @@ const LIBELLES_TYPES: Record<TypeCarte, string> = {
   terme: 'définition',
   definition: 'terme',
   comparaison: 'comparaison',
+  dynastie: 'dynastie',
+  carte: 'carte',
 };
 
 /** QCM de site ou de musée, avec des réponses tirées des autres fiches. */
@@ -788,6 +804,46 @@ export function TableauCriteres({ comparaison: c }: { comparaison: Comparaison }
       <p className="a-retenir">
         <strong>À retenir :</strong> {c.aRetenir}
       </p>
+    </div>
+  );
+}
+
+/** « Quelle période au IXe siècle au Cambodge ? » : QCM de quatre périodes, dont des contemporaines d'autres aires. */
+function CarteDynastie({ question, repondre }: { question: QuestionDynastie; repondre: (n: Note) => void }) {
+  const options = useMemo(() => optionsDynastie(question), [question.id]);
+  const [choix, setChoix] = useState<string>();
+  const juste = choix === question.periodeId;
+  const bonne = periodeParId(question.periodeId)!;
+  return (
+    <div className="carte-question">
+      <div className="carte-mot definition">
+        <span className="carte-mot-categorie">Repère chronologique</span>
+        <span className="carte-mot-definition">{enonceDynastie(question)}</span>
+      </div>
+      <div className="qcm">
+        {options.map((id) => {
+          const p = periodeParId(id)!;
+          const etat = !choix ? '' : id === question.periodeId ? 'juste' : id === choix ? 'faux' : 'neutre';
+          return (
+            <button key={id} className={`option ${etat}`} disabled={!!choix} onClick={() => setChoix(id)}>
+              <span className="option-nom">{p.nom}</span>
+              {choix && (
+                <span className="discret">
+                  {aireParId(p.aireId)?.nom} · {formatAnnee(p.debut)} – {formatAnnee(p.fin)}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      {choix && (
+        <>
+          <p className={`verdict ${juste ? 'juste' : 'faux'}`}>{juste ? 'Bonne réponse !' : `C’était : ${bonne.nom}`}</p>
+          <button className="bouton principal large grand" onClick={() => repondre(juste ? 2 : 0)}>
+            Continuer
+          </button>
+        </>
+      )}
     </div>
   );
 }

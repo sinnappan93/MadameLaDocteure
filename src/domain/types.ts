@@ -34,6 +34,9 @@ export interface Oeuvre {
   periodeId?: string;
   aireId?: string;
   site: string;
+  /** Coordonnées du site ou de la provenance, pour la carte. */
+  lat?: number;
+  lng?: number;
   materiau: string;
   /** Lieu de conservation : « Musée Guimet, Paris (MA 1234) », « in situ ». */
   conservation: string;

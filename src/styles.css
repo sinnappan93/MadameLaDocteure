@@ -339,3 +339,40 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); o
 .sous-menu { display: grid; gap: 6px; padding: 2px 0 8px; }
 .sous-menu.formulaire { gap: 14px; }
 ul.sous-menu.bientot { margin: 0; padding: 0 4px 8px 28px; gap: 4px; color: var(--muted); font-size: 0.85rem; }
+
+/* Frise chronologique */
+.frise-outils { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.frise-outils .puces { flex: 1; margin: 0; overflow-x: auto; flex-wrap: nowrap; }
+.frise-outils .puces button { flex: none; }
+.frise-zoom { display: flex; gap: 6px; flex: none; }
+.frise-zoom .bouton-icone:disabled { opacity: 0.4; }
+.frise { display: flex; border-radius: 14px; overflow: hidden; background: var(--surface-2); }
+.frise-etiquettes { flex: none; width: 92px; border-right: 1px solid var(--border); background: var(--surface-2); z-index: 1; }
+.frise-axe-vide { height: 28px; }
+.frise-etiquette { display: flex; align-items: center; padding: 0 8px; font-size: 0.7rem; font-weight: 700; line-height: 1.15; color: var(--muted); border-top: 1px solid var(--border); }
+.frise-defilement { flex: 1; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
+.frise-contenu { position: relative; }
+.frise-axe { position: absolute; top: 0; left: 0; right: 0; height: 28px; }
+.graduation { position: absolute; top: 7px; transform: translateX(-50%); font-size: 0.68rem; color: var(--muted); white-space: nowrap; }
+.frise-repere { position: absolute; top: 28px; bottom: 0; width: 1px; background: var(--border); }
+.frise-repere.zero { background: var(--muted); opacity: 0.5; }
+.frise-ligne { position: absolute; left: 0; right: 0; border-top: 1px solid var(--border); }
+.frise-periode { position: absolute; height: 20px; border: 0; border-radius: 6px; padding: 0 6px; cursor: pointer; color: var(--tuile-texte); font-size: 0.68rem; font-weight: 700; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; box-shadow: 0 1px 0 rgb(0 0 0 / 0.08); }
+.frise-periode span { overflow: hidden; text-overflow: ellipsis; display: block; }
+.frise-periode.choisie, .frise-oeuvre.choisie { outline: 2px solid var(--primary); outline-offset: 1px; }
+.frise-oeuvre { position: absolute; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--surface); background: var(--primary); cursor: pointer; padding: 0; }
+.detail-frise { margin-top: 12px; }
+.detail-frise .carte-revision-titre { display: block; margin: 0; }
+.detail-frise p { margin: 2px 0 8px; }
+.contemporaines { margin-top: 10px !important; }
+
+/* Carte */
+.carte-leaflet { height: 60vh; min-height: 320px; border-radius: 14px; overflow: hidden; background: var(--surface-2); z-index: 0; }
+.carte-leaflet.quiz { height: 52vh; margin-top: 10px; }
+.carte-page .barre-recherche select { flex: 1; width: 100%; }
+.legende { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 0.75rem; color: var(--muted); }
+.legende i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: -1px; }
+.bulle-carte { display: grid; gap: 6px; min-width: 180px; font-family: 'Nunito Variable', system-ui, sans-serif; }
+.bulle-fiche { text-align: left; border: 0; background: #f6f2ea; color: #2a3440; border-radius: 8px; padding: 6px 8px; font: inherit; font-weight: 700; cursor: pointer; }
+.bulle-detail { font-size: 0.75rem; color: #8a8f96; }
+.leaflet-container { font-family: 'Nunito Variable', system-ui, sans-serif; }

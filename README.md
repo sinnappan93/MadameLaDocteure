@@ -43,6 +43,14 @@ Organisé en sections dépliables : **Réviser** (identifier les œuvres, compar
 - **Révision** (onglet Glossaire) : terme → définition (auto-évaluation), puis à partir du surlendemain définition → terme
   (QCM de quatre termes de la même catégorie), même répétition espacée que pour les œuvres
 
+### Repères chronologiques et géographiques
+- **Frise chronologique** : une ligne par aire, périodes en barres (sans chevauchement), œuvres des fiches en points ;
+  défilement, zoom, raccourcis Antiquité / Médiéval / Moderne ; détail d'une période (fiches, périodes contemporaines ailleurs)
+- **Carte des sites** (Leaflet, fonds CARTO / OpenStreetMap, chargée à la demande) : coordonnées de 48 fiches préparées,
+  un point par lieu coloré selon l'aire, bulle avec liens vers les fiches ; coordonnées modifiables dans le formulaire
+- **Quiz de repères** : 28 questions de dynasties choisies à la main (« Quelle période au Xe siècle au Cambodge ? »)
+  et « Place … sur la carte » sur un fond sans noms (réussi à moins de 200 km)
+
 ### Fiches préparées
 - **51 fiches d'œuvres de référence** installées au premier lancement, de l'Indus à l'art moderne, de l'Inde à Java
   (`src/data/references.ts`) : datation, site, matériau, lieu de conservation, iconographie, points à retenir, étiquettes
@@ -79,10 +87,9 @@ Organisé en sections dépliables : **Réviser** (identifier les œuvres, compar
 ## Feuille de route
 1. Démarches et plan de préparation (inscriptions, Prépa Talents, lectures) avec rappels
 2. Suivi de bibliographie
-3. Frise chronologique et carte des sites
-4. Sujets blancs chronométrés et correction par l'IA
-5. Simulateur d'oral (30 min de préparation et 30 min d'épreuve, jury joué par l'IA)
-6. Projection : couverture, mémorisation, notes des sujets blancs, rythme
+3. Sujets blancs chronométrés et correction par l'IA
+4. Simulateur d'oral (30 min de préparation et 30 min d'épreuve, jury joué par l'IA)
+5. Projection : couverture, mémorisation, notes des sujets blancs, rythme
 
 ## Démarrer
 

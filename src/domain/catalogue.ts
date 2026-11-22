@@ -6,6 +6,8 @@
 export interface Aire {
   id: string;
   nom: string;
+  /** Complément de lieu : « au Cambodge », « en Inde du Nord »… */
+  dans: string;
 }
 
 export interface Periode {
@@ -17,16 +19,16 @@ export interface Periode {
 }
 
 export const AIRES: Aire[] = [
-  { id: 'inde-nord', nom: 'Inde du Nord' },
-  { id: 'inde-sud', nom: 'Inde du Sud' },
-  { id: 'gandhara', nom: 'Gandhāra et Nord-Ouest' },
-  { id: 'bengale', nom: 'Bengale et delta du Gange' },
-  { id: 'sri-lanka', nom: 'Sri Lanka' },
-  { id: 'cambodge', nom: 'Cambodge' },
-  { id: 'champa', nom: 'Champa' },
-  { id: 'java', nom: 'Java et Sumatra' },
-  { id: 'birmanie-thai', nom: 'Birmanie, Thaïlande, Laos' },
-  { id: 'himalaya', nom: 'Népal et Himalaya' },
+  { id: 'inde-nord', nom: 'Inde du Nord' , dans: 'en Inde du Nord' },
+  { id: 'inde-sud', nom: 'Inde du Sud' , dans: 'en Inde du Sud' },
+  { id: 'gandhara', nom: 'Gandhāra et Nord-Ouest' , dans: 'au Gandhāra et dans le Nord-Ouest' },
+  { id: 'bengale', nom: 'Bengale et delta du Gange' , dans: 'au Bengale' },
+  { id: 'sri-lanka', nom: 'Sri Lanka' , dans: 'à Sri Lanka' },
+  { id: 'cambodge', nom: 'Cambodge' , dans: 'au Cambodge' },
+  { id: 'champa', nom: 'Champa' , dans: 'au Champa' },
+  { id: 'java', nom: 'Java et Sumatra' , dans: 'à Java et Sumatra' },
+  { id: 'birmanie-thai', nom: 'Birmanie, Thaïlande, Laos' , dans: 'en Birmanie, Thaïlande et Laos' },
+  { id: 'himalaya', nom: 'Népal et Himalaya' , dans: 'au Népal et dans l’Himalaya' },
 ];
 
 export const PERIODES: Periode[] = [
@@ -40,6 +42,7 @@ export const PERIODES: Periode[] = [
   { id: 'chalukya', nom: 'Chālukya', aireId: 'inde-sud', debut: 543, fin: 753 },
   { id: 'pallava', nom: 'Pallava', aireId: 'inde-sud', debut: 275, fin: 897 },
   { id: 'rashtrakuta', nom: 'Rāṣṭrakūṭa (Ellora)', aireId: 'inde-sud', debut: 753, fin: 982 },
+  { id: 'pratihara', nom: 'Gurjara-Pratīhāra', aireId: 'inde-nord', debut: 730, fin: 1036 },
   { id: 'pala', nom: 'Pāla', aireId: 'bengale', debut: 750, fin: 1174 },
   { id: 'chola', nom: 'Chola', aireId: 'inde-sud', debut: 850, fin: 1279 },
   { id: 'chandela', nom: 'Chandela (Khajuraho)', aireId: 'inde-nord', debut: 831, fin: 1315 },

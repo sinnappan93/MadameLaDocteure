@@ -74,6 +74,25 @@ export function Aide() {
         </ul>
       </Rubrique>
 
+      <Rubrique titre="Repères : frise, carte et quiz">
+        <ul>
+          <li>
+            Menu › <em>Repères</em> › <em>Frise chronologique</em> : une ligne par aire, les périodes en barres et tes fiches en points. Fais défiler de côté,
+            zoome avec − et +, ou choisis <em>Antiquité</em>, <em>Médiéval</em>, <em>Moderne</em>. Touche une période pour voir ses fiches et ce qui se passe au
+            même moment ailleurs ; touche un point pour ouvrir la fiche.
+          </li>
+          <li>
+            Menu › <em>Repères</em> › <em>Carte des sites</em> : un point par lieu, coloré selon l’aire ; touche-le pour ouvrir la fiche. Pour placer une fiche à
+            toi, ajoute ses coordonnées (latitude, longitude) dans <em>Modifier</em>. La carte demande une connexion Internet.
+          </li>
+          <li>
+            Menu › <em>Réviser</em> › <em>Quiz de repères</em> : « Quelle période au IXe siècle au Cambodge ? » (seulement des siècles où une période domine
+            nettement) et « Place Ellora sur la carte » (carte sans noms ; réussi à moins de 200 km). Aussi disponibles dans le quiz libre (<em>Dynasties</em>,{' '}
+            <em>Carte</em>).
+          </li>
+        </ul>
+      </Rubrique>
+
       <Rubrique titre="Le glossaire">
         <ul>
           <li>
@@ -182,10 +201,13 @@ export function Aide() {
       <Rubrique titre="Le menu">
         <ul>
           <li>
-            <strong>Réviser</strong> : identifier les œuvres, comparer deux œuvres, glossaire en cartes, quiz libre.
+            <strong>Réviser</strong> : identifier les œuvres, comparer deux œuvres, glossaire en cartes, quiz libre, quiz de repères.
           </li>
           <li>
             <strong>Consulter</strong> : œuvres de référence, comparaisons, glossaire.
+          </li>
+          <li>
+            <strong>Repères</strong> : frise chronologique, carte des sites.
           </li>
           <li>
             <strong>Aide</strong>, <strong>Réglages</strong> et <strong>Bientôt</strong> (fonctions prévues) : touche le titre d’une section pour la déplier.
@@ -234,7 +256,7 @@ export function Aide() {
       </Rubrique>
 
       <Rubrique titre="Bientôt">
-        <p>Démarches et plan de préparation, bibliographie, frise et carte, sujets blancs, simulateur d’oral.</p>
+        <p>Démarches et plan de préparation, bibliographie, sujets blancs, simulateur d’oral.</p>
       </Rubrique>
     </section>
   );

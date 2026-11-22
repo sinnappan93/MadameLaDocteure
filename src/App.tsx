@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Accueil } from './components/Accueil';
 import { Aide } from './components/Aide';
 import { Comparaisons } from './components/Comparaisons';
@@ -6,7 +6,10 @@ import { FicheOeuvre } from './components/FicheOeuvre';
 import { Glossaire } from './components/Glossaire';
 import { FormulaireOeuvre } from './components/FormulaireOeuvre';
 import { ListeOeuvres } from './components/ListeOeuvres';
-import { type ModeRevision, Revision } from './components/Revision';
+import { type ChoixQuiz, type ModeRevision, Revision } from './components/Revision';
+import { Frise } from './components/Frise';
+
+const CarteSites = lazy(() => import('./components/carte/CarteSites'));
 import { type EcranMenu, Logo, Menu } from './components/Menu';
 import { aireParId } from './domain/catalogue';
 import { creerOeuvre, db, installerReferences, mettreAJourReferences, modifierOeuvre } from './lib/db';
@@ -17,7 +20,9 @@ import { useLive } from './lib/useLive';
 type Vue =
   | { type: 'accueil' }
   | { type: 'aide' }
-  | { type: 'revision'; mode?: ModeRevision }
+  | { type: 'revision'; mode?: ModeRevision; quiz?: ChoixQuiz }
+  | { type: 'frise' }
+  | { type: 'carte' }
   | { type: 'glossaire' }
   | { type: 'comparaisons' }
   | { type: 'liste'; aireId?: string }
@@ -59,7 +64,11 @@ export function App() {
   const titre =
     vue.type === 'liste'
       ? aireParId(vue.aireId)?.nom ?? 'Œuvres de référence'
-      : vue.type === 'comparaisons'
+      : vue.type === 'frise'
+        ? 'Frise chronologique'
+        : vue.type === 'carte'
+          ? 'Carte des sites'
+          : vue.type === 'comparaisons'
         ? 'Comparaisons'
         : vue.type === 'glossaire'
         ? 'Glossaire'
@@ -104,12 +113,19 @@ export function App() {
           />
         )}
         {vue.type === 'aide' && <Aide />}
+        {vue.type === 'frise' && <Frise ouvrirFiche={(id) => aller({ type: 'fiche', id })} />}
+        {vue.type === 'carte' && (
+          <Suspense fallback={<section className="panneau"><p className="discret">Chargement de la carte…</p></section>}>
+            <CarteSites ouvrirFiche={(id) => aller({ type: 'fiche', id })} />
+          </Suspense>
+        )}
         {vue.type === 'comparaisons' && <Comparaisons ouvrirFiche={(id) => aller({ type: 'fiche', id })} reviser={() => aller({ type: 'revision', mode: 'comparaisons' })} />}
         {vue.type === 'glossaire' && <Glossaire ouvrirFiche={(id) => aller({ type: 'fiche', id })} reviser={() => aller({ type: 'revision', mode: 'glossaire' })} />}
         {vue.type === 'revision' && (
           <Revision
-            key={vue.mode ?? 'oeuvres'}
+            key={`${vue.mode ?? 'oeuvres'}-${vue.quiz ?? ''}`}
             modeInitial={vue.mode}
+            quizInitial={vue.quiz}
             retourAccueil={() => {
               setHistorique([]);
               setVue({ type: 'accueil' });
@@ -162,9 +178,11 @@ function ecranDuMenu(vue: Vue): EcranMenu | undefined {
     case 'aide':
     case 'glossaire':
     case 'comparaisons':
+    case 'frise':
+    case 'carte':
       return vue.type;
     case 'revision':
-      return `revision-${vue.mode ?? 'oeuvres'}`;
+      return vue.mode === 'quiz' && vue.quiz === 'reperes' ? 'revision-reperes' : `revision-${vue.mode ?? 'oeuvres'}`;
     default:
       return 'oeuvres';
   }
@@ -180,6 +198,8 @@ function vueDuMenu(ecran: EcranMenu): Vue {
       return { type: 'revision', mode: 'glossaire' };
     case 'revision-quiz':
       return { type: 'revision', mode: 'quiz' };
+    case 'revision-reperes':
+      return { type: 'revision', mode: 'quiz', quiz: 'reperes' };
     case 'oeuvres':
       return { type: 'liste' };
     default:
