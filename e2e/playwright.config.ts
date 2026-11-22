@@ -19,6 +19,8 @@ export default defineConfig({
     timezoneId: 'Europe/Paris',
     permissions: ['microphone'],
     trace: 'off',
+    // Le service worker n'est activé que dans les tests hors ligne (12-hors-ligne) : ailleurs, réseau simulé par page.
+    serviceWorkers: 'block',
     launchOptions: { args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] },
   },
   webServer: {

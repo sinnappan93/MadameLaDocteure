@@ -158,9 +158,17 @@ npm run test:tout  # tout : types, unitaires, construction, bout en bout
     `base-v5.json`, générées par `e2e/fixtures/generer-base-ancienne.mjs`), textes, utilisation sans réseau
   - `10-affichage` : thèmes clair et sombre, 360 et 1 280 px, sans débordement horizontal
   - `11-parcours` : parcours de A à Z sur plusieurs jours
+  - `12-hors-ligne` : manifeste et icônes, relance sans réseau, nouvelle version proposée puis installée
 - **Intégration continue** : la publication sur GitHub Pages n'a lieu que si tous les tests passent.
 
 ## Version web (GitHub Pages)
+
+**Installable et utilisable hors ligne** (`vite-plugin-pwa`, `src/components/HorsLigne.tsx`) : manifeste et icônes,
+service worker qui garde l'appli (code, styles, polices, icônes) sur l'appareil, fonds de carte consultés gardés en cache,
+stockage persistant demandé au navigateur, pastille « Hors ligne », nouvelle version proposée par un bandeau
+(jamais installée d'office, pour ne pas interrompre une épreuve). Hors ligne, seuls l'IA, les musées, Wikimedia et les
+fonds de carte jamais vus manquent.
+
 
 À chaque `push` sur `main`, le flux **Site web (GitHub Pages)** (`.github/workflows/pages.yml`) vérifie les types et les tests,
 construit l'application et la publie sur GitHub Pages : https://sinnappan93.github.io/MadameLaDocteure/

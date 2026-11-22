@@ -178,8 +178,11 @@ describe('préparation', () => {
     const o = await ficheDepuisPhoto(v.id, { ...oeuvreVide(), titre: 'Linteau', conservation: 'Musée Guimet (MG 1)' }, image(), image(), base);
     expect((await base.visites.get(v.id))?.oeuvreIds).toEqual([o.id]);
     const imgs = await imagesDe(o.id, base);
-    expect(imgs.map((i) => i.titre)).toEqual(['Photo prise pendant la visite', 'Cartel']);
-    expect((await base.oeuvres.get(o.id))?.imagePrincipaleId).toBe(imgs[0].id);
+    // Les deux images sont ajoutées dans la même milliseconde : on ne dépend pas de leur ordre.
+    expect(imgs.map((i) => i.titre).sort()).toEqual(['Cartel', 'Photo prise pendant la visite']);
+    const principaleId = (await base.oeuvres.get(o.id))?.imagePrincipaleId;
+    const principale = imgs.find((i) => i.id === principaleId);
+    expect(principale?.titre).toBe('Photo prise pendant la visite');
     await supprimerVisite(v.id, base);
     expect(await base.oeuvres.get(o.id)).toBeDefined();
   });

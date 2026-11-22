@@ -74,6 +74,32 @@ export function Aide() {
         </ul>
       </Rubrique>
 
+      <Rubrique titre="Installer l’appli et l’utiliser hors ligne">
+        <ul>
+          <li>
+            <strong>Sur Android (Chrome)</strong> : ouvre l’appli, puis menu ⋮ › <em>Installer l’application</em> (ou <em>Ajouter à l’écran d’accueil</em>).
+            <strong> Sur iPhone (Safari)</strong> : bouton Partager › <em>Sur l’écran d’accueil</em>. <strong>Sur ordinateur (Chrome, Edge)</strong> : icône
+            d’installation dans la barre d’adresse.
+          </li>
+          <li>
+            Après la première ouverture, l’appli est gardée sur l’appareil : elle se lance <strong>sans réseau</strong>. Tes fiches, images, révisions, copies,
+            enregistrements, plan et notes sont stockés sur l’appareil. La pastille « Hors ligne » s’affiche quand il n’y a pas de réseau.
+          </li>
+          <li>
+            Sans réseau, ne fonctionnent pas : l’IA (corrections, jury), la recherche dans les musées et sur Wikimedia, les images des musées en ligne, et les
+            fonds de carte jamais consultés (ceux déjà vus sont gardés).
+          </li>
+          <li>
+            Quand une nouvelle version est publiée, un bandeau la propose : <em>Mettre à jour</em> ou <em>Plus tard</em>. Elle ne s’installe jamais toute seule,
+            pour ne pas interrompre un sujet blanc ou un oral.
+          </li>
+          <li>
+            Les données restent dans le navigateur de cet appareil : ne vide pas les données du site, et sur iPhone, ouvre l’appli de temps en temps (Safari
+            peut effacer les données d’un site inutilisé pendant plusieurs semaines, sauf pour une appli installée sur l’écran d’accueil).
+          </li>
+        </ul>
+      </Rubrique>
+
       <Rubrique titre="Plan de révision et calendrier">
         <ul>
           <li>

@@ -1,5 +1,7 @@
+import { Capacitor } from '@capacitor/core';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Accueil } from './components/Accueil';
+import { MiseAJour, PastilleHorsLigne } from './components/HorsLigne';
 import { Aide } from './components/Aide';
 import { Comparaisons } from './components/Comparaisons';
 import { FicheOeuvre } from './components/FicheOeuvre';
@@ -70,6 +72,8 @@ export function App() {
   // Installe les fiches d'œuvres de référence au premier lancement (et les nouvelles des mises à jour).
   // puis applique les corrections aux fiches non modifiées et télécharge leurs photos en arrière-plan.
   useEffect(() => {
+    // Demande au navigateur de ne jamais effacer les données (fiches, copies, enregistrements) pour faire de la place.
+    navigator.storage?.persist?.().catch(() => undefined);
     (async () => {
       await installerReferences();
       await mettreAJourReferences();
@@ -188,12 +192,15 @@ export function App() {
             <h1 className="titre-ecran">{titre}</h1>
           </>
         )}
+        <PastilleHorsLigne />
         <button className="bouton-menu" onClick={() => setMenu(true)} aria-label="Ouvrir le menu">
           <span />
           <span />
           <span />
         </button>
       </header>
+      {/* Version web seulement : l'APK embarque déjà l'appli. */}
+      {!Capacitor.isNativePlatform() && <MiseAJour />}
 
       <main>
         {vue.type === 'accueil' && (

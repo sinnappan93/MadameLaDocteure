@@ -38,7 +38,8 @@ export function ajouterFond(carte: L.Map, avecNoms: boolean) {
   let calque: L.TileLayer;
   const poser = () => {
     const f = fonds[indice];
-    calque = L.tileLayer(f.url, { attribution: f.attribution, maxNativeZoom: f.maxNativeZoom, maxZoom: 18 });
+    // crossOrigin : tuiles en CORS (les serveurs l'autorisent), pour pouvoir les garder hors ligne.
+    calque = L.tileLayer(f.url, { attribution: f.attribution, maxNativeZoom: f.maxNativeZoom, maxZoom: 18, crossOrigin: true });
     calque.on('tileerror', () => {
       erreurs++;
       if (erreurs >= SEUIL_ERREURS && indice < fonds.length - 1) {

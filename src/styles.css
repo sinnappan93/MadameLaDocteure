@@ -602,3 +602,8 @@ ul.sous-menu.bientot { margin: 0; padding: 0 4px 8px 28px; gap: 4px; color: var(
 .apercu-projection .couverture-globale { margin: 12px 0 8px; grid-template-columns: 6.5em 1fr auto; }
 .apercu-projection .projections-dates { margin: 8px 0; }
 .apercu-projection > p.discret { margin: 4px 0 0; font-size: 0.8rem; }
+
+/* ——— Hors ligne et mises à jour ——— */
+.pastille-hors-ligne { margin-left: auto; margin-right: 8px; font-size: 0.75rem; font-weight: 800; background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+.bandeau-maj { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 30; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: var(--surface); color: var(--text); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 14px; padding: 10px 12px; max-width: 520px; margin: 0 auto; }
+.bandeau-maj span { flex: 1 1 200px; font-weight: 700; font-size: 0.9rem; }

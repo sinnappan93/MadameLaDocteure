@@ -2,7 +2,7 @@
  * Outils communs des tests de bout en bout : réseau simulé, horloge fixée, erreurs de console surveillées,
  * navigation dans le menu et lecture de la base IndexedDB.
  */
-import { test as base, expect, type Page, type Route } from '@playwright/test';
+import { test as base, type BrowserContext, expect, type Page, type Route } from '@playwright/test';
 import { deflateSync } from 'node:zlib';
 import aic from '../src/domain/__fixtures__/aic-recherche.json' with { type: 'json' };
 import cleveland from '../src/domain/__fixtures__/cleveland-recherche.json' with { type: 'json' };
@@ -109,7 +109,8 @@ export interface Reseau {
   erreurIA: number;
 }
 
-export async function simulerReseau(page: Page, reseau: Reseau) {
+/** Simule le réseau sur une page, ou sur tout le contexte (y compris les requêtes du service worker). */
+export async function simulerReseau(page: Page | BrowserContext, reseau: Reseau) {
   const corsJson = (route: Route, corps: unknown, status = 200) =>
     route.fulfill({ status, headers: { 'access-control-allow-origin': '*', 'content-type': 'application/json' }, body: JSON.stringify(corps) });
   const image = (route: Route) => route.fulfill({ status: 200, headers: { 'access-control-allow-origin': '*', 'content-type': 'image/png' }, body: png(64, 48, couleur(route.request().url())) });
