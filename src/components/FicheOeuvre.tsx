@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { aireParId, periodeParId } from '../domain/catalogue';
+import { comparaisonsDe } from '../domain/comparaisons';
 import { termesDeFiche } from '../domain/glossaire';
 import { MUSEES } from '../domain/musees';
 import { db, imagesDe, modifierOeuvre, retirerNotice, supprimerImage, supprimerOeuvre } from '../lib/db';
@@ -9,9 +10,14 @@ import { Bloc } from './Bloc';
 import { NoticeDetaillee, RechercheMusees } from './RechercheMusees';
 import { Vignette } from './Vignette';
 
-export function FicheOeuvre({ id, retour, modifier }: { id: string; retour: () => void; modifier: () => void }) {
+export function FicheOeuvre({ id, retour, modifier, ouvrirFiche }: { id: string; retour: () => void; modifier: () => void; ouvrirFiche?: (id: string) => void }) {
   const oeuvre = useLive(() => db.oeuvres.get(id), [id]);
   const images = useLive(() => imagesDe(id), [id]);
+  const aComparer = useLive(async () => {
+    const liste = comparaisonsDe(id);
+    const fiches = await db.oeuvres.bulkGet(liste.map((x) => x.autre));
+    return liste.flatMap((x, i) => (fiches[i] ? [{ ...x, oeuvre: fiches[i]! }] : []));
+  }, [id]);
   const [ajout, setAjout] = useState(false);
   const [musees, setMusees] = useState(false);
   const [selection, setSelection] = useState<string>();
@@ -104,6 +110,17 @@ export function FicheOeuvre({ id, retour, modifier }: { id: string; retour: () =
       {oeuvre.iconographie && <Bloc titre="Iconographie" texte={oeuvre.iconographie} />}
       {oeuvre.notes && <Bloc titre="Points à retenir" texte={oeuvre.notes} />}
       {oeuvre.bibliographie && <Bloc titre="Bibliographie" texte={oeuvre.bibliographie} />}
+      {aComparer && aComparer.length > 0 && (
+        <section className="bloc">
+          <h3>À comparer avec</h3>
+          {aComparer.map(({ comparaison, oeuvre: autre }) => (
+            <button key={comparaison.id} className="lien-comparaison" onClick={() => ouvrirFiche?.(autre.id)}>
+              <span className="carte-revision-titre">{autre.titre}</span>
+              <span className="discret">{comparaison.titre} · critères dans Menu › Comparaisons</span>
+            </button>
+          ))}
+        </section>
+      )}
       {termesDeFiche(id).length > 0 && (
         <details className="bloc vocabulaire">
           <summary>Vocabulaire à connaître ({termesDeFiche(id).length})</summary>

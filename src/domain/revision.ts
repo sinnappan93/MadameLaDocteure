@@ -10,7 +10,10 @@ import type { Oeuvre } from './types';
  * Œuvres : « identifier » (photo puis auto-évaluation) et « periode » (QCM).
  * Glossaire : « terme » (terme puis définition, auto-évaluation) et « definition » (définition, QCM du terme).
  */
-export type TypeCarte = 'identifier' | 'periode' | 'terme' | 'definition';
+export type TypeCarte = 'identifier' | 'periode' | 'site' | 'musee' | 'iconographie' | 'terme' | 'definition' | 'comparaison';
+
+/** Variantes proposées après la première identification d'une œuvre. */
+export const VARIANTES_OEUVRE: TypeCarte[] = ['periode', 'site', 'musee', 'iconographie'];
 
 /** 0 : à revoir, 1 : difficile, 2 : bien, 3 : facile. */
 export type Note = 0 | 1 | 2 | 3;
@@ -115,10 +118,25 @@ function debutDeJournee(d: Date): number {
 
 export const estDue = (etat: EtatCarte, maintenant: Date) => new Date(etat.echeance).getTime() <= finDeJournee(maintenant);
 
-/** Cartes possibles pour une fiche : il faut une image ; le QCM demande une période. */
+/**
+ * Nom court du lieu de conservation, si l'œuvre est dans un musée (et non en place, ni dispersée) :
+ * « Musée Guimet, Paris (MG 14910) » devient « Musée Guimet, Paris ».
+ */
+export function museeDe(conservation: string): string | undefined {
+  const court = conservation.split(/ \(|;/)[0].trim();
+  if (!court || /^(in situ|plusieurs|nombreux|feuillets|exemplaires|détruit)/i.test(court)) return undefined;
+  return /mus[eé]|museum|gallery|galerie|collection/i.test(court) ? court : undefined;
+}
+
+/** Cartes possibles pour une fiche : il faut une image ; chaque variante demande l'information correspondante. */
 export function cartesDe(o: Oeuvre): TypeCarte[] {
   if (!o.imagePrincipaleId) return [];
-  return o.periodeId && periodeParId(o.periodeId) ? ['identifier', 'periode'] : ['identifier'];
+  const types: TypeCarte[] = ['identifier'];
+  if (o.periodeId && periodeParId(o.periodeId)) types.push('periode');
+  if (o.site.trim()) types.push('site');
+  if (museeDe(o.conservation)) types.push('musee');
+  if (o.iconographie.trim()) types.push('iconographie');
+  return types;
 }
 
 export interface OptionsSeance {
@@ -151,7 +169,7 @@ export interface Sujet {
  * niveau (QCM) pour des sujets déjà vus un jour précédent, puis des sujets jamais vus.
  * Une seule carte par sujet et par séance, pour ne pas révéler la réponse d'une carte par l'autre.
  */
-export function composer(sujets: Sujet[], etats: EtatCarte[], o: OptionsSeance, premier: TypeCarte, second: TypeCarte): Carte[] {
+export function composer(sujets: Sujet[], etats: EtatCarte[], o: OptionsSeance, premier: TypeCarte, seconds: TypeCarte[]): Carte[] {
   const parId = new Map(etats.map((e) => [e.id, e]));
   const dues: Carte[] = [];
   const nouvelles: Carte[] = [];
@@ -178,7 +196,7 @@ export function composer(sujets: Sujet[], etats: EtatCarte[], o: OptionsSeance, 
   // QCM pour des sujets déjà connus (vus un jour précédent) : 5 au plus par séance.
   let qcm = 0;
   for (const c of nouvellesTriees) {
-    if (c.type !== second || qcm >= QCM_PAR_SEANCE) continue;
+    if (!seconds.includes(c.type) || qcm >= QCM_PAR_SEANCE) continue;
     const vu = parId.get(idCarte(c.oeuvreId, premier));
     if (!vu || new Date(vu.derniereRevision).getTime() >= debutDeJournee(o.maintenant)) continue;
     if (ajouter(c)) qcm++;
@@ -195,7 +213,7 @@ export function composer(sujets: Sujet[], etats: EtatCarte[], o: OptionsSeance, 
 /** Séance sur les œuvres (fiches illustrées), éventuellement limitée à une aire. */
 export function composerSeance(oeuvres: Oeuvre[], etats: EtatCarte[], o: OptionsSeance): Carte[] {
   const sujets = oeuvres.filter((x) => !o.aireId || x.aireId === o.aireId).map((x) => ({ id: x.id, types: cartesDe(x) }));
-  return composer(sujets, etats, o, 'identifier', 'periode');
+  return composer(sujets, etats, o, 'identifier', VARIANTES_OEUVRE);
 }
 
 /** Bilan pour l'accueil : cartes dues aujourd'hui, nouvelles disponibles, œuvres maîtrisées. */
@@ -232,4 +250,47 @@ export function optionsPeriode(periodeId: string, hasard: () => number = Math.ra
     .slice(0, 3)
     .map((x) => x.p.id);
   return melanger([bonne.id, ...autres], hasard);
+}
+
+/** Choix distincts : la bonne réponse et trois leurres, d'abord pris parmi les « proches », puis ailleurs. */
+function choixDistincts(bonne: string, proches: string[], autres: string[], hasard: () => number): string[] {
+  const vus = new Set([bonne]);
+  const leurres: string[] = [];
+  for (const v of [...melanger(proches, hasard), ...melanger(autres, hasard)]) {
+    if (leurres.length >= 3) break;
+    if (v && !vus.has(v)) {
+      vus.add(v);
+      leurres.push(v);
+    }
+  }
+  return melanger([bonne, ...leurres], hasard);
+}
+
+/** QCM « D'où provient cette œuvre ? » : sites d'autres fiches, de la même aire de préférence. */
+export function optionsSite(oeuvre: Oeuvre, toutes: Oeuvre[], hasard: () => number = Math.random): string[] {
+  const autres = toutes.filter((o) => o.id !== oeuvre.id && o.site.trim());
+  return choixDistincts(
+    oeuvre.site,
+    autres.filter((o) => o.aireId === oeuvre.aireId).map((o) => o.site),
+    autres.filter((o) => o.aireId !== oeuvre.aireId).map((o) => o.site),
+    hasard,
+  );
+}
+
+const MUSEES_DE_SECOURS = [
+  'Musée Guimet, Paris',
+  'Musée national, New Delhi',
+  'Indian Museum, Kolkata',
+  'Musée national du Cambodge, Phnom Penh',
+  'British Museum, Londres',
+  'Musée national d’Indonésie, Jakarta',
+];
+
+/** QCM « Où est conservée cette œuvre ? » : musées des autres fiches, puis quelques grands musées. */
+export function optionsMusee(oeuvre: Oeuvre, toutes: Oeuvre[], hasard: () => number = Math.random): string[] {
+  const bonne = museeDe(oeuvre.conservation);
+  if (!bonne) return [];
+  const musees = (liste: Oeuvre[]) => liste.map((o) => museeDe(o.conservation)).filter((m): m is string => !!m);
+  const autres = toutes.filter((o) => o.id !== oeuvre.id);
+  return choixDistincts(bonne, musees(autres.filter((o) => o.aireId === oeuvre.aireId)), [...musees(autres), ...MUSEES_DE_SECOURS], hasard);
 }

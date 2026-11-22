@@ -99,3 +99,48 @@ describe('QCM de période', () => {
     expect(o.filter((id) => periodeParId(id)?.aireId === 'cambodge')).toContain('preangkorien');
   });
 });
+
+describe('variantes : site, musée, iconographie', () => {
+  it('reconnaît une œuvre conservée dans un musée', async () => {
+    const { museeDe } = await import('./revision');
+    expect(museeDe('Musée Guimet, Paris (MG 14910)')).toBe('Musée Guimet, Paris');
+    expect(museeDe('Indian Museum, Kolkata (balustrade et porte remontées) ; éléments au Musée national de New Delhi')).toBe('Indian Museum, Kolkata');
+    expect(museeDe('Cleveland Museum of Art (inv. 1930.331)')).toBe('Cleveland Museum of Art');
+    expect(museeDe('In situ ; patrimoine mondial de l’UNESCO')).toBeUndefined();
+    expect(museeDe('Nombreux exemplaires ; référence classique : Government Museum, Chennai')).toBeUndefined();
+    expect(museeDe('Feuillets dispersés : MAK (Vienne)')).toBeUndefined();
+  });
+
+  it('propose les variantes selon les informations de la fiche', async () => {
+    const { cartesDe } = await import('./revision');
+    expect(cartesDe(oeuvre('a', { site: 'Sarnath', conservation: 'Musée de Sarnath', iconographie: 'Bouddha' }))).toEqual(['identifier', 'periode', 'site', 'musee', 'iconographie']);
+    expect(cartesDe(oeuvre('b', { site: 'Angkor', conservation: 'In situ' }))).toEqual(['identifier', 'periode', 'site']);
+  });
+
+  it('construit des QCM de site et de musée sans doublons', async () => {
+    const { optionsMusee, optionsSite } = await import('./revision');
+    const fiches = [
+      oeuvre('a', { site: 'Sarnath', conservation: 'Musée de Sarnath' }),
+      oeuvre('b', { site: 'Mathurā', conservation: 'Government Museum, Mathurā (inv. A-1)' }),
+      oeuvre('c', { site: 'Mathurā', conservation: 'Government Museum, Mathurā (inv. 00-A-5)' }),
+      oeuvre('d', { site: 'Angkor', aireId: 'cambodge', conservation: 'Musée Guimet, Paris' }),
+    ];
+    const sites = optionsSite(fiches[0], fiches, hasard);
+    expect(sites).toContain('Sarnath');
+    expect(new Set(sites).size).toBe(sites.length);
+    expect(sites.length).toBe(3); // seulement trois sites distincts disponibles
+    const musees = optionsMusee(fiches[0], fiches, hasard);
+    expect(musees).toHaveLength(4);
+    expect(musees).toContain('Musée de Sarnath');
+    expect(new Set(musees).size).toBe(4);
+  });
+
+  it('propose les variantes à partir du lendemain, cinq au plus', () => {
+    const fiches = ['a', 'b', 'c', 'd', 'e', 'f', 'g'].map((id) => oeuvre(id, { site: `site ${id}`, iconographie: 'x' }));
+    const hier = new Date(2026, 10, 21);
+    const etats = fiches.map((f) => ({ ...noter(undefined, { oeuvreId: f.id, type: 'identifier' }, 2, hier), echeance: new Date(2026, 11, 1).toISOString() }));
+    const s = composerSeance(fiches, etats, { maintenant, nouvelles: 0, maximum: 30, hasard });
+    expect(s).toHaveLength(5);
+    expect(s.every((c) => ['periode', 'site', 'iconographie'].includes(c.type))).toBe(true);
+  });
+});

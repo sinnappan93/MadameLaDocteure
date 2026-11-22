@@ -858,7 +858,7 @@ export const REFERENCES: FicheReference[] = [
     periodeId: 'dvaravati',
     aireId: 'birmanie-thai',
     site: 'Thaïlande centrale (Nakhon Pathom…)',
-    materiau: 'Calcaire',
+    materiau: 'Pierre : grès (exemplaire du Guimet) ou calcaire selon les exemplaires',
     conservation: 'Plusieurs exemplaires, dont un au Musée Guimet, Paris (provenance exacte inconnue)',
     iconographie: 'Grande roue sur pilier, souvent associée à une gazelle couchée : évocation du premier sermon.',
     notes: "• Dvāravatī (VIe–XIe s. environ) : culture môn de Thaïlande centrale, bouddhisme theravāda.\n• Grandes roues sur piliers, parfois avec une gazelle couchée et des inscriptions en pali.\n• Survivance des symboles aniconiques de l’Inde ancienne : la roue évoque le premier sermon.\n• Le Musée Guimet en possède une (provenance exacte inconnue, VIIe–IXe s. selon le cartel).\n• Comparer avec le chapiteau de Sarnath et les reliefs de Sanchi.",

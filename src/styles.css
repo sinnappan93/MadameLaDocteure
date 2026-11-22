@@ -302,3 +302,23 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); o
 .vocabulaire dl { margin: 10px 0 0; display: grid; gap: 8px; }
 .vocabulaire dt { font-weight: 800; color: var(--primary); }
 .vocabulaire dd { margin: 0; font-size: 0.92rem; }
+
+/* Comparaisons */
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.duo figure { margin: 0; }
+.duo .duo-image { aspect-ratio: 3 / 4; height: auto; border-radius: 14px; object-fit: cover; }
+.duo figcaption { text-align: center; font-weight: 800; font-size: 0.85rem; margin-top: 4px; }
+.duo.mini { width: 104px; flex: none; gap: 4px; }
+.duo.mini .duo-image { border-radius: 8px; }
+.criteres { display: grid; gap: 8px; margin-top: 16px; }
+.critere { background: var(--surface-2); border-radius: 12px; padding: 10px 12px; display: grid; gap: 4px; }
+.critere-nom { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.critere-valeur b { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--primary); color: var(--primary-ink); font-size: 0.72rem; margin-right: 6px; }
+.a-retenir { background: var(--primary-soft); border-radius: 12px; padding: 10px 12px; margin: 4px 0 0; }
+.comparaison { background: var(--surface-2); border-radius: var(--radius); padding: 10px; margin-bottom: 10px; }
+.comparaison > summary { display: flex; gap: 12px; align-items: center; cursor: pointer; list-style: none; }
+.comparaison > summary::-webkit-details-marker { display: none; }
+.comparaison-texte { display: flex; flex-direction: column; min-width: 0; }
+.comparaison .critere { background: var(--surface); }
+.comparaison .exemples { margin-top: 10px; }
+.lien-comparaison { display: flex; flex-direction: column; width: 100%; text-align: left; border: 0; background: var(--surface); border-radius: 12px; padding: 10px 12px; margin-top: 6px; cursor: pointer; }

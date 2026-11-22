@@ -6,7 +6,7 @@ import type { Reglages, Theme } from '../lib/reglages';
 interface Props {
   reglages: Reglages;
   modifier: (c: Partial<Reglages>) => void;
-  aller: (ecran: 'accueil' | 'oeuvres' | 'aide' | 'revision' | 'glossaire') => void;
+  aller: (ecran: 'accueil' | 'oeuvres' | 'aide' | 'revision' | 'glossaire' | 'comparaisons') => void;
   fermer: () => void;
 }
 
@@ -42,6 +42,9 @@ export function Menu({ reglages, modifier, aller, fermer }: Props) {
         </button>
         <button className="entree-menu entree-aide" onClick={() => aller('aide')}>
           Comment m’utiliser ?
+        </button>
+        <button className="entree-menu" onClick={() => aller('comparaisons')}>
+          Comparaisons
         </button>
         <button className="entree-menu" onClick={() => aller('glossaire')}>
           Glossaire

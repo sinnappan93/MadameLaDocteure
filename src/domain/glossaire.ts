@@ -13,7 +13,7 @@ export function composerSeanceGlossaire(
     etats,
     o,
     'terme',
-    'definition',
+    ['definition'],
   );
 }
 

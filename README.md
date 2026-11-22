@@ -19,10 +19,14 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 
 ### Révision « identifie cette œuvre »
 - Cartes tirées des fiches illustrées : **identifier** (photo, puis réponse et auto-évaluation : à revoir, difficile, bien, facile)
-  et **dater** (QCM de quatre périodes, leurres de la même aire et d'époques proches, corrigé automatiquement)
+  puis, à partir du lendemain, des **variantes** : **dater** (QCM de période, leurres de la même aire et d'époques proches),
+  **retrouver le site** (QCM), **trouver le musée** (QCM, œuvres conservées dans un musée) et **décrire l'iconographie**
+  (auto-évaluation, avec le vocabulaire du glossaire)
+- **Comparaisons** : 15 paires d'œuvres (`src/data/comparaisons.ts`) — Gandhāra ou Mathurā, Angkor Vat ou Bayon, nāgara ou
+  drāviḍa… — révisées côte à côte puis avec le tableau des critères ; page **Comparaisons** et lien « À comparer avec » sur les fiches
 - **Répétition espacée** (variante simplifiée de SM-2) : intervalles croissants, carte ratée repassée dans la séance,
-  œuvre « maîtrisée » au-delà de 21 jours ; une seule carte par œuvre et par séance ; QCM proposé à partir du lendemain
-  de la première identification (5 au plus par séance)
+  œuvre « maîtrisée » au-delà de 21 jours ; une seule carte par œuvre et par séance ; variantes proposées à partir du
+  lendemain de la première identification (5 au plus par séance)
 - Séance du jour : cartes dues + 0, 5, 10 ou 20 nouvelles œuvres, filtre par aire ; bilan en fin de séance
 - Carte « Révision du jour » sur l'accueil
 

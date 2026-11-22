@@ -40,7 +40,13 @@ export function Aide() {
             note-toi honnêtement : <em>À revoir</em>, <em>Difficile</em>, <em>Bien</em> ou <em>Facile</em>.
           </li>
           <li>
-            <strong>Dater</strong> : une fois l’œuvre identifiée une première fois, un QCM te demande sa période parmi quatre, corrigé automatiquement.
+            <strong>Variantes</strong>, à partir du lendemain de la première identification (cinq au plus par séance) : <em>dater</em> (QCM de période),{' '}
+            <em>retrouver le site</em> (QCM), <em>trouver le musée</em> (QCM, seulement pour les œuvres conservées dans un musée) et <em>décrire
+            l’iconographie</em> (auto-évaluation, avec le vocabulaire à employer).
+          </li>
+          <li>
+            <strong>Comparer</strong> (onglet de la révision) : deux œuvres côte à côte, à identifier et à distinguer, puis le tableau des critères. Toutes les
+            comparaisons sont aussi consultables dans Menu › <em>Comparaisons</em>, et chaque fiche concernée affiche <em>À comparer avec</em>.
           </li>
           <li>
             <strong>Répétition espacée</strong> : une carte réussie revient de plus en plus tard (1 jour, 3 jours, une semaine, un mois…) ; une carte ratée

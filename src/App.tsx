@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Accueil } from './components/Accueil';
 import { Aide } from './components/Aide';
+import { Comparaisons } from './components/Comparaisons';
 import { FicheOeuvre } from './components/FicheOeuvre';
 import { Glossaire } from './components/Glossaire';
 import { FormulaireOeuvre } from './components/FormulaireOeuvre';
@@ -18,6 +19,7 @@ type Vue =
   | { type: 'aide' }
   | { type: 'revision' }
   | { type: 'glossaire' }
+  | { type: 'comparaisons' }
   | { type: 'liste'; aireId?: string }
   | { type: 'fiche'; id: string }
   | { type: 'edition'; id?: string };
@@ -57,7 +59,9 @@ export function App() {
   const titre =
     vue.type === 'liste'
       ? aireParId(vue.aireId)?.nom ?? 'Œuvres de référence'
-      : vue.type === 'glossaire'
+      : vue.type === 'comparaisons'
+        ? 'Comparaisons'
+        : vue.type === 'glossaire'
         ? 'Glossaire'
         : vue.type === 'revision'
         ? 'Révision'
@@ -100,6 +104,7 @@ export function App() {
           />
         )}
         {vue.type === 'aide' && <Aide />}
+        {vue.type === 'comparaisons' && <Comparaisons ouvrirFiche={(id) => aller({ type: 'fiche', id })} reviser={() => aller({ type: 'revision' })} />}
         {vue.type === 'glossaire' && <Glossaire ouvrirFiche={(id) => aller({ type: 'fiche', id })} reviser={() => aller({ type: 'revision' })} />}
         {vue.type === 'revision' && (
           <Revision
@@ -112,7 +117,7 @@ export function App() {
         {vue.type === 'liste' && (
           <ListeOeuvres key={vue.aireId ?? 'toutes'} aireInitiale={vue.aireId} ouvrir={(id) => aller({ type: 'fiche', id })} creer={() => aller({ type: 'edition' })} />
         )}
-        {vue.type === 'fiche' && <FicheOeuvre id={vue.id} retour={retour} modifier={() => aller({ type: 'edition', id: vue.id })} />}
+        {vue.type === 'fiche' && <FicheOeuvre key={vue.id} id={vue.id} retour={retour} modifier={() => aller({ type: 'edition', id: vue.id })} ouvrirFiche={(id) => aller({ type: 'fiche', id })} />}
         {vue.type === 'edition' && (!vue.id || enEdition) && (
           <FormulaireOeuvre
             key={vue.id ?? 'nouvelle'}
@@ -139,7 +144,7 @@ export function App() {
           aller={(ecran) => {
             setMenu(false);
             setHistorique([]);
-            setVue(ecran === 'accueil' ? { type: 'accueil' } : ecran === 'aide' ? { type: 'aide' } : ecran === 'revision' ? { type: 'revision' } : ecran === 'glossaire' ? { type: 'glossaire' } : { type: 'liste' });
+            setVue(ecran === 'accueil' ? { type: 'accueil' } : ecran === 'aide' ? { type: 'aide' } : ecran === 'revision' ? { type: 'revision' } : ecran === 'glossaire' ? { type: 'glossaire' } : ecran === 'comparaisons' ? { type: 'comparaisons' } : { type: 'liste' });
           }}
         />
       )}
