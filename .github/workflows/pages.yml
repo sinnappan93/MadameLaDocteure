@@ -1,4 +1,5 @@
-# Publie l'application web sur GitHub Pages à chaque envoi sur main.
+# Publie l'application web sur GitHub Pages à chaque envoi sur main,
+# seulement si les tests (unitaires et de bout en bout) passent.
 name: Site web (GitHub Pages)
 
 on:
@@ -36,6 +37,11 @@ jobs:
 
       - name: Construire l'application web
         run: npm run build
+
+      - name: Tests de bout en bout (navigateur, réseau simulé)
+        run: |
+          npx playwright install --with-deps chromium
+          npm run e2e
 
       - uses: actions/upload-pages-artifact@v3
         with:

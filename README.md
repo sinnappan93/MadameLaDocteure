@@ -133,7 +133,32 @@ npm run dev        # http://localhost:5173
 npm test           # tests unitaires (Vitest)
 npm run typecheck
 npm run build
+npm run e2e        # tests de bout en bout (Playwright), sur la version construite
+npm run test:tout  # tout : types, unitaires, construction, bout en bout
 ```
+
+## Tests
+
+- **Unitaires** (`src/**/*.test.ts`, Vitest) : logique métier (répétition espacée, plan, projection, oral, examen,
+  musées, Commons…) et base de données (fake-indexeddb).
+- **De bout en bout** (`e2e/`, Playwright, téléphone 390 px) : chaque fonction parcourue dans un vrai navigateur, sur la
+  version construite. Le réseau est simulé (`e2e/outils.ts`) : images Wikimedia, API des musées (`src/domain/__fixtures__`),
+  fonds de carte, IA (réponses factices : aucun crédit dépensé), micro factice pour l'oral. L'horloge est fixée au
+  23 novembre 2026, et chaque test échoue si la console affiche une erreur.
+  - `01-navigation` : tous les écrans du menu, réglages, aide
+  - `02-fiches` : fiches préparées et images, création, modification, suppression, restauration, musées, Commons
+  - `03-revisions` : identification et variantes le lendemain, glossaire, comparaisons, anglais, quiz libre, repères
+  - `04-ressources` : frise (sans chevauchement à tous les zooms), carte des sites, glossaire, comparaisons
+  - `05-examen` : sujets blancs (reprise après rechargement), copie photographiée, plan en 15 minutes, banque,
+    note du correcteur, erreurs de l'IA
+  - `06-oral` : oral complet enregistré, banque de questions et cartels masqués, thème, format
+  - `07-preparation` : plan (semaine, mois, accueil, cases cochées automatiquement, recalcul), bibliographie, visites
+  - `08-projection` : chiffres comparés au calcul attendu sur un jeu de données « préparation en cours » (`e2e/donnees.ts`)
+  - `09-non-regression` : **mise à jour d'une base créée par d'anciennes versions publiées** (`e2e/fixtures/base-v4.json`,
+    `base-v5.json`, générées par `e2e/fixtures/generer-base-ancienne.mjs`), textes, utilisation sans réseau
+  - `10-affichage` : thèmes clair et sombre, 360 et 1 280 px, sans débordement horizontal
+  - `11-parcours` : parcours de A à Z sur plusieurs jours
+- **Intégration continue** : la publication sur GitHub Pages n'a lieu que si tous les tests passent.
 
 ## Version web (GitHub Pages)
 
