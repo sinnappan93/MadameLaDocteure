@@ -51,6 +51,13 @@ export interface CommentairePlan {
   commenteLe: string;
 }
 
+export interface NoteCorrecteur {
+  note: number;
+  correcteur: string;
+  commentaire?: string;
+  le: string;
+}
+
 export interface Copie {
   id: string;
   type: TypeCopie;
@@ -68,6 +75,8 @@ export interface Copie {
   /** Fichiers (photos de la copie manuscrite) dans la table `fichiers`. */
   photos: string[];
   correction?: Correction;
+  /** Note d'un correcteur (enseignant, pair), qui prime sur celle de l'IA. */
+  noteCorrecteur?: NoteCorrecteur;
   commentairePlan?: CommentairePlan;
   modifieeLe: string;
 }
@@ -246,4 +255,11 @@ export function lireSujetsGeneres(json: unknown): string[] {
     vus.add(cle);
     return true;
   });
+}
+
+/** Note retenue pour une copie : celle du correcteur si elle existe, sinon celle de l'IA. */
+export function noteRetenue(c: Copie): { note: number; source: 'correcteur' | 'ia' } | undefined {
+  if (c.noteCorrecteur) return { note: c.noteCorrecteur.note, source: 'correcteur' };
+  if (c.correction) return { note: c.correction.noteSur20, source: 'ia' };
+  return undefined;
 }

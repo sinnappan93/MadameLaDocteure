@@ -102,6 +102,31 @@ export function Aide() {
         </ul>
       </Rubrique>
 
+      <Rubrique titre="Projection">
+        <ul>
+          <li>
+            Menu › <em>Préparation</em> › <em>Projection</em> : des <strong>repères</strong>, pas des notes garanties. « Prêt pour l’écrit » et « Prêt pour
+            l’oral », puis un indicateur par épreuve (touche-le pour voir de quoi il est fait). Ce qui ne se mesure pas encore (pas de copie notée, pas d’oral)
+            est laissé de côté et l’indicateur est marqué « incomplet ».
+          </li>
+          <li>
+            <strong>Couverture</strong> : une période est couverte quand au moins 2 de ses œuvres sont maîtrisées (révisées avec succès sur plus de 3 semaines),
+            aire par aire, avec les fiches qui manquent.
+          </li>
+          <li>
+            <strong>Mémorisation</strong> : œuvres maîtrisées, bonnes réponses, glossaire et anglais, cartes en retard.
+          </li>
+          <li>
+            <strong>Notes</strong> des sujets blancs et leur évolution : la note d’un correcteur (à ajouter sur la copie, ou pour un sujet fait hors de l’appli)
+            prime sur celle de l’IA.
+          </li>
+          <li>
+            <strong>Rythme</strong> : temps fait par rapport au plan, et date à laquelle tu couvriras l’Inde et l’Asie du Sud-Est au rythme des 4 dernières
+            semaines. L’appli prend chaque jour une photo de ta progression : la date apparaît après une semaine de recul.
+          </li>
+        </ul>
+      </Rubrique>
+
       <Rubrique titre="Bibliographie">
         <ul>
           <li>
@@ -326,7 +351,7 @@ export function Aide() {
             <strong>Exercices</strong> : identifier les œuvres, comparer deux œuvres, glossaire en cartes, quiz libre, quiz de repères.
           </li>
           <li>
-            <strong>Préparation</strong> : plan de révision, bibliographie, journal de visites.
+            <strong>Préparation</strong> : plan de révision, projection, bibliographie, journal de visites.
           </li>
           <li>
             <strong>Mode examen</strong> : sujets blancs, plan en 15 minutes, copies et corrections, banque de sujets, simulateur d’oral, vocabulaire anglais.
@@ -381,7 +406,7 @@ export function Aide() {
       </Rubrique>
 
       <Rubrique titre="Bientôt">
-        <p>Projection : couverture du programme, mémorisation, notes des sujets blancs, rythme.</p>
+        <p>Rappels des séances (notifications), avec la version APK.</p>
       </Rubrique>
     </section>
   );

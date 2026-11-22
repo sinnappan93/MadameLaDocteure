@@ -10,7 +10,7 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 ## Fonctionnalités (version actuelle)
 
 ### Menu
-Organisé en sections dépliables : **Préparation** (plan de révision, bibliographie, journal de visites), **Exercices** (identifier les œuvres, comparer, glossaire en cartes, quiz libre, quiz de repères),
+Organisé en sections dépliables : **Préparation** (plan de révision, projection, bibliographie, journal de visites), **Exercices** (identifier les œuvres, comparer, glossaire en cartes, quiz libre, quiz de repères),
 **Mode examen** (sujets blancs, plan en 15 minutes, copies et corrections, banque de sujets, simulateur d'oral, vocabulaire anglais),
 **Ressources** (œuvres de référence, comparaisons, glossaire, frise chronologique, carte des sites), **Aide**, **Réglages**, **Bientôt** ; l'écran affiché est mis en évidence.
 
@@ -59,6 +59,11 @@ Organisé en sections dépliables : **Préparation** (plan de révision, bibliog
   séances pondérées par les lacunes mesurées (révisions, erreurs, couverture, glossaire, notes des copies et oraux) ;
   démarches en jalons ; vues semaine et mois ; calendrier du mois et séances du jour sur l'accueil ; cochées automatiquement quand l'appli voit
   l'activité ; recalcul qui garde le passé et ce qui est fait
+- **Projection** (`src/domain/projection.ts`) : sans QCM, à partir de la couverture du programme (périodes avec au
+  moins 2 œuvres maîtrisées), de la mémorisation (répétition espacée), des notes des sujets blancs (correcteur ou IA) et
+  de leur évolution, du rythme (temps fait par rapport au plan, date de couverture estimée au rythme des 4 dernières
+  semaines grâce à une photo quotidienne de la progression) ; indicateurs « prêt pour l'écrit / l'oral » par épreuve,
+  présentés comme des repères
 - **Bibliographie** (`src/domain/preparation.ts`) : livres et articles, pages lues, notes, œuvres citées reliées aux
   fiches, suggestions à compléter (`src/data/preparation.ts`)
 - **Journal de visites** : date, salles du Guimet, notes, photos d'œuvres (et du cartel) transformées en fiches ; visites
@@ -118,8 +123,7 @@ Organisé en sections dépliables : **Préparation** (plan de révision, bibliog
 - Images réduites à 1 600 px de côté au maximum ; choix de l'image de couverture
 
 ## Feuille de route
-1. Projection : couverture, mémorisation, notes des sujets blancs, rythme
-2. Rappels (notifications) des séances du plan : couverture, mémorisation, notes des sujets blancs, rythme
+1. Rappels (notifications) des séances du plan, avec l'APK : couverture, mémorisation, notes des sujets blancs, rythme
 
 ## Démarrer
 

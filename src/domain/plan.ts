@@ -7,7 +7,7 @@ import { SECTIONS_GUIMET } from '../data/preparation';
 import type { TypeEpreuve } from '../data/sujets';
 import { AIRES, aireParId } from './catalogue';
 import { couverture } from './progression';
-import type { Copie } from './examen';
+import { type Copie, noteRetenue } from './examen';
 import type { Oral } from './oral';
 import type { Lecture, Visite } from './preparation';
 import type { EtatCarte } from './revision';
@@ -204,7 +204,7 @@ export function mesurerLacunes(d: {
     return { aireId: a.id, score, raison };
   }).sort((a, b) => b.score - a.score);
 
-  const notes = (t: TypeEpreuve) => noteMoyenne(d.copies.filter((c) => c.type === t && c.correction).map((c) => c.correction!.noteSur20));
+  const notes = (t: TypeEpreuve) => noteMoyenne(d.copies.filter((c) => c.type === t).flatMap((c) => noteRetenue(c)?.note ?? []));
   const moyennes = { specialite: notes('specialite'), culture: notes('culture'), synthese: notes('synthese') };
   const moyenneOral = noteMoyenne(d.oraux.filter((o) => o.bilan).map((o) => o.bilan!.noteSur20));
   const l: Lacunes = {

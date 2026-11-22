@@ -1,5 +1,5 @@
 import { TYPES_EPREUVE } from '../../data/sujets';
-import { type Copie, formatDuree } from '../../domain/examen';
+import { type Copie, formatDuree, noteRetenue } from '../../domain/examen';
 import { db } from '../../lib/db';
 import { useLive } from '../../lib/useLive';
 
@@ -10,8 +10,9 @@ const dateCourte = (iso: string) => new Date(iso).toLocaleDateString('fr-FR', { 
 export function Copies({ ouvrir, reprendre }: { ouvrir: (id: string) => void; reprendre: (id: string) => void }) {
   const copies = useLive(async () => (await db.copies.toArray()).sort((a, b) => b.debut.localeCompare(a.debut)), []);
   if (!copies) return <section className="panneau" />;
-  const corrigees = copies.filter((c) => c.correction);
-  const moyenne = corrigees.length ? corrigees.reduce((t, c) => t + c.correction!.noteSur20, 0) / corrigees.length : undefined;
+  const notes = copies.flatMap((c) => noteRetenue(c)?.note ?? []);
+  const corrigees = notes;
+  const moyenne = notes.length ? notes.reduce((t, n) => t + n, 0) / notes.length : undefined;
   return (
     <section className="panneau examen">
       {corrigees.length > 0 && (
@@ -22,7 +23,7 @@ export function Copies({ ouvrir, reprendre }: { ouvrir: (id: string) => void; re
           </div>
           <div className="stat">
             <span className="stat-valeur">{moyenne!.toFixed(1).replace('.', ',')}</span>
-            <span className="stat-libelle">moyenne indicative (IA)</span>
+            <span className="stat-libelle">moyenne indicative</span>
           </div>
         </div>
       )}
@@ -35,11 +36,11 @@ export function Copies({ ouvrir, reprendre }: { ouvrir: (id: string) => void; re
                 {nomType(c)} · {dateCourte(c.debut)} · {formatDuree(c.dureePrevueMin)}
               </span>
               <span className="sujet-intitule">{c.sujet}</span>
-              <span className={`etat-copie ${c.correction || c.commentairePlan ? 'ok' : ''}`}>
+              <span className={`etat-copie ${noteRetenue(c) || c.commentairePlan ? 'ok' : ''}`}>
                 {!c.fin
                   ? 'En cours : reprendre'
-                  : c.correction
-                    ? `Corrigée · ${String(c.correction.noteSur20).replace('.', ',')}/20`
+                  : noteRetenue(c)
+                    ? `Corrigée · ${String(noteRetenue(c)!.note).replace('.', ',')}/20${noteRetenue(c)!.source === 'correcteur' ? ' (correcteur)' : ''}`
                     : c.commentairePlan
                       ? 'Commentée par l’IA'
                       : 'Rendue · pas encore corrigée'}

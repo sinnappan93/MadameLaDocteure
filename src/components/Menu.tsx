@@ -18,6 +18,7 @@ export type EcranMenu =
   | 'examen-banque'
   | 'oral'
   | 'plan'
+  | 'projection'
   | 'biblio'
   | 'visites'
   | 'frise'
@@ -48,6 +49,7 @@ const SECTIONS: Array<{ titre: string; icone: string; entrees: Array<[EcranMenu,
     icone: '◷',
     entrees: [
       ['plan', 'Plan de révision', 'Calendrier jusqu’aux oraux, séances du jour'],
+      ['projection', 'Projection', 'Prêt pour l’écrit et l’oral, couverture, notes, rythme'],
       ['biblio', 'Bibliographie', 'Livres et articles, pages lues, notes'],
       ['visites', 'Journal de visites', 'Guimet : salles vues, photos transformées en fiches'],
     ],
@@ -88,7 +90,7 @@ const SECTIONS: Array<{ titre: string; icone: string; entrees: Array<[EcranMenu,
   },
 ];
 
-const BIENTOT = ['Projection : couverture, mémorisation, notes, rythme'];
+const BIENTOT = ['Rappels des séances (notifications, avec l’APK)'];
 
 export function Menu({ reglages, modifier, aller, fermer, actuel }: Props) {
   const [restauration, setRestauration] = useState<string>();

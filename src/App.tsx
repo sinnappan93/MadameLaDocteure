@@ -19,6 +19,7 @@ import { Simulateur } from './components/oral/Simulateur';
 import { Bibliographie } from './components/preparation/Bibliographie';
 import { LectureDetail } from './components/preparation/LectureDetail';
 import { PlanRevision } from './components/preparation/PlanRevision';
+import { Projection } from './components/preparation/Projection';
 import { nouvelleVisite, VisiteDetail, Visites } from './components/preparation/Visites';
 import type { TypeEpreuve } from './data/sujets';
 import type { Seance } from './domain/plan';
@@ -28,6 +29,7 @@ import { type EcranMenu, Logo, Menu } from './components/Menu';
 import { aireParId } from './domain/catalogue';
 import { creerOeuvre, creerVisite, db, installerReferences, mettreAJourReferences, modifierOeuvre } from './lib/db';
 import { telechargerImagesReferences } from './lib/imagesReferences';
+import { enregistrerInstantane } from './lib/projection';
 import { useReglages } from './lib/reglages';
 import { useLive } from './lib/useLive';
 
@@ -36,6 +38,7 @@ type Vue =
   | { type: 'aide' }
   | { type: 'revision'; mode?: ModeRevision; quiz?: ChoixQuiz; aireId?: string }
   | { type: 'plan' }
+  | { type: 'projection' }
   | { type: 'biblio' }
   | { type: 'lecture'; id: string }
   | { type: 'visites' }
@@ -70,6 +73,7 @@ export function App() {
     (async () => {
       await installerReferences();
       await mettreAJourReferences();
+      await enregistrerInstantane();
       await telechargerImagesReferences();
     })().catch(console.error);
   }, []);
@@ -137,6 +141,8 @@ export function App() {
                   ? 'Copie'
                   : vue.type === 'plan'
                   ? 'Plan de révision'
+                  : vue.type === 'projection'
+                  ? 'Projection'
                   : vue.type === 'biblio'
                   ? 'Bibliographie'
                   : vue.type === 'lecture'
@@ -209,6 +215,7 @@ export function App() {
         {vue.type === 'ecriture' && <Ecriture id={vue.id} rendue={(id) => remplacer({ type: 'copie', id })} />}
         {vue.type === 'copie' && <CopieDetail id={vue.id} retour={retour} />}
         {vue.type === 'plan' && <PlanRevision reglages={reglages} modifierReglages={modifierReglages} lancer={lancerSeance} />}
+        {vue.type === 'projection' && <Projection reglages={reglages} ouvrirCopie={(id) => aller({ type: 'copie', id })} ouvrirPlan={() => aller({ type: 'plan' })} />}
         {vue.type === 'biblio' && <Bibliographie ouvrir={(id) => aller({ type: 'lecture', id })} />}
         {vue.type === 'lecture' && <LectureDetail key={vue.id} id={vue.id} retour={retour} ouvrirFiche={(id) => aller({ type: 'fiche', id })} />}
         {vue.type === 'visites' && (
@@ -308,6 +315,7 @@ function ecranDuMenu(vue: Vue): EcranMenu | undefined {
     case 'examen-banque':
     case 'oral':
     case 'plan':
+    case 'projection':
     case 'biblio':
     case 'visites':
       return vue.type;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TYPES_EPREUVE } from '../../data/sujets';
-import { compterMots, formatDuree, GRILLES, NOTE_CRITERE_MAX } from '../../domain/examen';
+import { compterMots, formatDuree, GRILLES, NOTE_CRITERE_MAX, type NoteCorrecteur } from '../../domain/examen';
 import { reduireImage } from '../../lib/images';
 import { ajouterPhotoCopie, db, modifierCopie, retirerPhotoCopie, supprimerCopie } from '../../lib/db';
 import { commenterPlan, corrigerCopie, expliquerErreur, iaPrete } from '../../lib/ia';
@@ -134,6 +134,8 @@ export function CopieDetail({ id, retour }: { id: string; retour: () => void }) 
         </div>
       )}
 
+      {!estPlan && <NoteDuCorrecteur id={id} note={copie.noteCorrecteur} />}
+
       {copie.commentairePlan && (
         <div className="correction">
           <p>{copie.commentairePlan.appreciation}</p>
@@ -212,5 +214,81 @@ function PageCopie({ fichierId, numero, retirer }: { fichierId: string; numero: 
         </button>
       </figcaption>
     </figure>
+  );
+}
+
+/** Note d'un enseignant ou d'un pair : elle prime sur celle de l'IA dans la projection. */
+function NoteDuCorrecteur({ id, note }: { id: string; note?: NoteCorrecteur }) {
+  const [edition, setEdition] = useState(false);
+  const [valeur, setValeur] = useState(note ? String(note.note).replace('.', ',') : '');
+  const [correcteur, setCorrecteur] = useState(note?.correcteur ?? '');
+  const [commentaire, setCommentaire] = useState(note?.commentaire ?? '');
+  const n = Number(valeur.replace(',', '.'));
+  const valide = valeur.trim() !== '' && Number.isFinite(n) && n >= 0 && n <= 20;
+  if (!edition)
+    return (
+      <div className="bloc note-correcteur">
+        <h3>Note d’un correcteur</h3>
+        {note ? (
+          <p>
+            <strong>{String(note.note).replace('.', ',')}/20</strong>
+            {note.correcteur && ` · ${note.correcteur}`}
+            {note.commentaire && <span className="discret"> · {note.commentaire}</span>}
+          </p>
+        ) : (
+          <p className="discret">Enseignant, pair, prépa : sa note prime sur celle de l’IA dans la projection.</p>
+        )}
+        <button className="lien" onClick={() => setEdition(true)}>
+          {note ? 'Modifier' : '+ Ajouter la note du correcteur'}
+        </button>
+      </div>
+    );
+  return (
+    <form
+      className="bloc formulaire note-correcteur"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        if (!valide) return;
+        await modifierCopie(id, { noteCorrecteur: { note: Math.round(n * 2) / 2, correcteur: correcteur.trim(), commentaire: commentaire.trim() || undefined, le: new Date().toISOString() } });
+        setEdition(false);
+      }}
+    >
+      <h3>Note d’un correcteur</h3>
+      <div className="deux-colonnes">
+        <label>
+          Note sur 20
+          <input inputMode="decimal" value={valeur} onChange={(e) => setValeur(e.target.value)} placeholder="Ex. : 12,5" />
+        </label>
+        <label>
+          Correcteur
+          <input value={correcteur} onChange={(e) => setCorrecteur(e.target.value)} placeholder="Ex. : Mme X, binôme" />
+        </label>
+      </div>
+      <label>
+        Commentaire (facultatif)
+        <input value={commentaire} onChange={(e) => setCommentaire(e.target.value)} />
+      </label>
+      <div className="actions">
+        {note && (
+          <button
+            type="button"
+            className="bouton danger"
+            onClick={async () => {
+              await modifierCopie(id, { noteCorrecteur: undefined });
+              setValeur('');
+              setEdition(false);
+            }}
+          >
+            Retirer
+          </button>
+        )}
+        <button type="button" className="bouton" onClick={() => setEdition(false)}>
+          Annuler
+        </button>
+        <button type="submit" className="bouton principal" disabled={!valide}>
+          Enregistrer
+        </button>
+      </div>
+    </form>
   );
 }

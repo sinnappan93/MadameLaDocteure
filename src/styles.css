@@ -538,3 +538,63 @@ ul.sous-menu.bientot { margin: 0; padding: 0 4px 8px 28px; gap: 4px; color: var(
 .calendrier-accueil .nav-calendrier { margin-top: 0; }
 .calendrier-accueil .case-jour { min-height: 44px; }
 .retour-aujourdhui { font-size: 0.8rem; text-transform: none; margin-left: auto; }
+
+/* ——— Projection ——— */
+.projection {
+  --serie-1: #2a78d6; --serie-2: #eb6834; --serie-3: #1baf7a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='clair']) .projection { --serie-1: #3987e5; --serie-2: #d95926; --serie-3: #199e70; }
+}
+:root[data-theme='sombre'] .projection { --serie-1: #3987e5; --serie-2: #d95926; --serie-3: #199e70; }
+.avertissement-projection { background: var(--primary-soft); border-radius: 12px; padding: 10px 12px; font-size: 0.9rem; margin: 0 0 12px; }
+.tuiles-pret { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tuile-pret { background: var(--surface-2); border-radius: var(--radius); padding: 14px; display: grid; gap: 6px; }
+.tuile-pret-nom { font-weight: 700; font-size: 0.9rem; }
+.tuile-pret-valeur { font-size: 2rem; font-weight: 800; line-height: 1; }
+.tuile-pret-niveau { font-size: 0.85rem; color: var(--muted); font-weight: 700; }
+.sous-titre-projection { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 10px 0 4px; }
+.ligne-pret { background: var(--surface-2); border-radius: 12px; padding: 10px 12px; margin: 6px 0; }
+.ligne-pret summary { cursor: pointer; display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; list-style: none; }
+.ligne-pret summary::-webkit-details-marker { display: none; }
+.ligne-pret summary .barre { grid-column: 1 / -1; }
+.ligne-pret-nom { font-weight: 700; }
+.ligne-pret-niveau { font-size: 0.85rem; color: var(--muted); }
+.composantes { list-style: none; padding: 0; margin: 10px 0 4px; display: grid; gap: 6px; font-size: 0.85rem; }
+.composantes li { display: grid; gap: 1px; }
+.barres-aires, .barres-semaines { display: grid; gap: 8px; margin: 8px 0 12px; }
+.barre-aire { display: grid; grid-template-columns: 7.5em 1fr 6.5em; gap: 2px 8px; align-items: center; font-size: 0.85rem; }
+.barre-aire-note { grid-column: 2 / -1; font-size: 0.75rem; }
+.barre-aire-nom { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.barre-aire-valeur { font-variant-numeric: tabular-nums; text-align: right; }
+.piste { display: flex; gap: 2px; height: 10px; background: var(--barre-fond); border-radius: 999px; overflow: hidden; }
+.segment { height: 100%; }
+.segment:empty { min-width: 0; }
+.segment.couverte { background: var(--primary); border-radius: 999px; }
+.segment.commencee { background: var(--primary); opacity: 0.35; border-radius: 999px; }
+.pastille-legende { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--primary); vertical-align: -1px; }
+.pastille-legende.commencee { opacity: 0.35; }
+.stats-projection { grid-template-columns: 1fr 1fr; }
+.graphique-notes { position: relative; margin: 8px 0; }
+.graphique-notes svg { width: 100%; height: auto; display: block; overflow: visible; }
+.graphique-notes .grille { stroke: var(--border); stroke-width: 1; }
+.graphique-notes .axe { fill: var(--muted); font-size: 9px; }
+.graphique-notes .serie polyline { fill: none; stroke: var(--c); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.graphique-notes .point-note { fill: var(--c); stroke: var(--surface); stroke-width: 2; }
+.graphique-notes .point-note.correcteur { fill: var(--surface); stroke: var(--c); stroke-width: 2.5; }
+.graphique-notes .zone-survol { fill: transparent; cursor: pointer; outline: none; }
+.graphique-notes .zone-survol:focus-visible { stroke: var(--text); stroke-width: 1; }
+.graphique-notes .etiquette-serie { fill: var(--text); font-size: 10px; font-weight: 700; }
+.serie-1 { --c: var(--serie-1); } .serie-2 { --c: var(--serie-2); } .serie-3 { --c: var(--serie-3); }
+.pastille-serie { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--c); vertical-align: -1px; }
+.info-bulle { position: absolute; transform: translate(-50%, calc(-100% - 12px)); background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 8px; padding: 6px 8px; font-size: 0.8rem; display: grid; pointer-events: none; white-space: nowrap; z-index: 2; }
+.tendances { list-style: none; padding: 0; margin: 6px 0; display: grid; gap: 4px; font-size: 0.9rem; }
+.table-notes { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 8px; }
+.table-notes th, .table-notes td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--border); }
+.table-notes tbody tr { cursor: pointer; }
+.table-notes td:nth-child(3) { font-variant-numeric: tabular-nums; }
+.projections-dates { display: grid; gap: 8px; margin: 10px 0 4px; }
+.phrase-projection { margin: 0; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); border-left: 4px solid var(--muted); }
+.phrase-projection.ok { border-left-color: #2e9d5b; }
+.phrase-projection.alerte { border-left-color: var(--danger); }
+.note-correcteur h3 { margin-top: 0; }
