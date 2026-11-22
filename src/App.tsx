@@ -6,7 +6,7 @@ import { FicheOeuvre } from './components/FicheOeuvre';
 import { Glossaire } from './components/Glossaire';
 import { FormulaireOeuvre } from './components/FormulaireOeuvre';
 import { ListeOeuvres } from './components/ListeOeuvres';
-import { Revision } from './components/Revision';
+import { type ModeRevision, Revision } from './components/Revision';
 import { Logo, Menu } from './components/Menu';
 import { aireParId } from './domain/catalogue';
 import { creerOeuvre, db, installerReferences, mettreAJourReferences, modifierOeuvre } from './lib/db';
@@ -17,7 +17,7 @@ import { useLive } from './lib/useLive';
 type Vue =
   | { type: 'accueil' }
   | { type: 'aide' }
-  | { type: 'revision' }
+  | { type: 'revision'; mode?: ModeRevision }
   | { type: 'glossaire' }
   | { type: 'comparaisons' }
   | { type: 'liste'; aireId?: string }
@@ -104,10 +104,12 @@ export function App() {
           />
         )}
         {vue.type === 'aide' && <Aide />}
-        {vue.type === 'comparaisons' && <Comparaisons ouvrirFiche={(id) => aller({ type: 'fiche', id })} reviser={() => aller({ type: 'revision' })} />}
-        {vue.type === 'glossaire' && <Glossaire ouvrirFiche={(id) => aller({ type: 'fiche', id })} reviser={() => aller({ type: 'revision' })} />}
+        {vue.type === 'comparaisons' && <Comparaisons ouvrirFiche={(id) => aller({ type: 'fiche', id })} reviser={() => aller({ type: 'revision', mode: 'comparaisons' })} />}
+        {vue.type === 'glossaire' && <Glossaire ouvrirFiche={(id) => aller({ type: 'fiche', id })} reviser={() => aller({ type: 'revision', mode: 'glossaire' })} />}
         {vue.type === 'revision' && (
           <Revision
+            key={vue.mode ?? 'oeuvres'}
+            modeInitial={vue.mode}
             retourAccueil={() => {
               setHistorique([]);
               setVue({ type: 'accueil' });

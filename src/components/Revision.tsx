@@ -20,13 +20,15 @@ interface Resultat {
 
 const MAXIMUM = 30;
 
-export function Revision({ retourAccueil }: { retourAccueil: () => void }) {
+export type ModeRevision = 'oeuvres' | 'comparaisons' | 'glossaire';
+
+export function Revision({ retourAccueil, modeInitial = 'oeuvres' }: { retourAccueil: () => void; modeInitial?: ModeRevision }) {
   const oeuvres = useLive(() => db.oeuvres.toArray(), []);
   const etats = useLive(() => db.revisions.toArray(), []);
   const [etape, setEtape] = useState<Etape>({ nom: 'depart' });
   const [aire, setAire] = useState('');
   const [nouvelles, setNouvelles] = useState(10);
-  const [mode, setMode] = useState<'oeuvres' | 'comparaisons' | 'glossaire'>('oeuvres');
+  const [mode, setMode] = useState<ModeRevision>(modeInitial);
   const [categorie, setCategorie] = useState<CategorieGlossaire | ''>('');
 
   if (!oeuvres || !etats) return <section className="panneau" />;
@@ -182,8 +184,9 @@ export function Revision({ retourAccueil }: { retourAccueil: () => void }) {
         )}
         {b.sansImage > 0 && (
           <p className="discret">
-            {b.sansImage} fiche{b.sansImage > 1 ? 's' : ''} sans image n’{b.sansImage > 1 ? 'apparaissent' : 'apparaît'} pas dans la révision : ajoute une image pour
-            {b.sansImage > 1 ? ' les' : ' l’'} inclure.
+            {b.sansImage > 1
+              ? `${b.sansImage} fiches sans image n’apparaissent pas dans la révision : ajoute une image pour les inclure.`
+              : '1 fiche sans image n’apparaît pas dans la révision : ajoute une image pour l’inclure.'}
           </p>
         )}
       </section>
