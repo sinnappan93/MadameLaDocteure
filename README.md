@@ -177,13 +177,15 @@ de chaque appareil : rien n'est envoyé au serveur.
 
 ## Application Android (APK)
 
-> Flux désactivé pour l'instant : l'APK sera construit plus tard.
+Dernier APK : https://github.com/sinnappan93/MadameLaDocteure/releases/tag/apk-latest
 
-
-À chaque `push`, le flux GitHub Actions **APK Android** (`.github/workflows/android.yml`) vérifie les types et les tests,
+À chaque envoi sur `main`, le flux GitHub Actions **APK Android** (`.github/workflows/android.yml`) vérifie les types et les tests,
 compile l'APK et le publie dans la release **`apk-latest`** du dépôt. Sur le téléphone : télécharger
 `MadameLaDocteure.apk` depuis la page *Releases*, l'ouvrir et autoriser l'installation depuis cette source.
 Les mises à jour s'installent par-dessus sans perdre les données (clé de signature de test fixe, `android/app/debug.keystore`).
+Spécificités Android : permission micro (simulateur d'oral), bouton « retour » qui revient à l'écran précédent
+(`@capacitor/app`), pas de service worker (l'appli est embarquée). La dictée du navigateur n'existe pas dans l'APK.
+Les données de l'APK sont séparées de celles de la version web (stockage propre à chaque appli).
 
 Construction locale (SDK Android et JDK 21 requis) :
 
