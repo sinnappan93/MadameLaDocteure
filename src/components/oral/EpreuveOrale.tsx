@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { formatChrono } from '../../domain/examen';
-import { minutage, NOMS_CATEGORIES, type Oral, questionsDeBanque, type QuestionJury } from '../../domain/oral';
+import { minutage, NOMS_CATEGORIES, type Oral, questionsDeBanque, type QuestionJury, vocabulaireOral } from '../../domain/oral';
 import {
   arreterLecture,
   demarrerDictee,
@@ -16,7 +16,7 @@ import { db, enregistrerAudio, modifierOral } from '../../lib/db';
 import { expliquerErreur, iaPrete, questionsJury } from '../../lib/ia';
 import { useLive } from '../../lib/useLive';
 import { BandeauChrono, useChrono } from '../examen/Chrono';
-import { DossierVue, TexteAuto, useEcoule } from './communs';
+import { BoutonTranscrire, DossierVue, NoteTranscription, TexteAuto, useEcoule } from './communs';
 import { lireReglagesOral } from './Simulateur';
 
 interface Prise {
@@ -219,6 +219,7 @@ function Expose({ oral, prise, ecoule }: { oral: Oral; prise: PriseHook; ecoule:
 function Questions({ oral, prise, ecoule, restant, terminer }: { oral: Oral; prise: PriseHook; ecoule: number; restant: number; terminer: () => void }) {
   const [attente, setAttente] = useState(false);
   const [erreur, setErreur] = useState<string>();
+  const [version, setVersion] = useState(0);
   const premiere = oral.questions.findIndex((q) => !q.audio && !q.texte);
   const [indice, setIndice] = useState(premiere < 0 ? Math.max(0, oral.questions.length - 1) : premiere);
   useEffect(() => {
@@ -248,7 +249,23 @@ function Questions({ oral, prise, ecoule, restant, terminer }: { oral: Oral; pri
         <label className="libelle" htmlFor="resume-expose">
           Ton exposé en quelques lignes (facultatif)
         </label>
+        {oral.exposeAudio && (
+          <>
+            <BoutonTranscrire
+              fichierId={oral.exposeAudio}
+              texte={oral.exposeTexte}
+              vocabulaire={vocabulaireOral(oral)}
+              libelle="Transcrire mon exposé"
+              enregistrer={async (exposeTexte) => {
+                await modifierOral(oral.id, { exposeTexte });
+                setVersion((v) => v + 1);
+              }}
+            />
+            <NoteTranscription />
+          </>
+        )}
         <TexteAuto
+          key={`resume-${version}`}
           id="resume-expose"
           rows={6}
           initial={oral.exposeTexte}

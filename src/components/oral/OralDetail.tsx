@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { formatChrono } from '../../domain/examen';
 import { formatDuree } from '../../domain/examen';
-import { NOMS_CATEGORIES, texteDisponible } from '../../domain/oral';
+import { NOMS_CATEGORIES, texteDisponible, vocabulaireOral } from '../../domain/oral';
 import { db, modifierOral, supprimerOral } from '../../lib/db';
 import { bilanOral, expliquerErreur, iaPrete } from '../../lib/ia';
 import { useLive } from '../../lib/useLive';
-import { DossierVue, LecteurAudio, TexteAuto } from './communs';
+import { BoutonTranscrire, DossierVue, LecteurAudio, NoteTranscription, TexteAuto } from './communs';
 
 /** Un oral terminé : réécoute, transcriptions, pistes attendues et bilan du jury par l'IA. */
 export function OralDetail({ id, retour, ouvrirFiche }: { id: string; retour: () => void; ouvrirFiche: (id: string) => void }) {
   const oral = useLive(() => db.oraux.get(id), [id]);
   const [etat, setEtat] = useState<{ enCours: boolean; erreur?: string }>({ enCours: false });
+  // Incrémenté après une transcription, pour recharger les zones de texte.
+  const [version, setVersion] = useState(0);
   if (!oral) return <section className="panneau" />;
 
   const demanderBilan = async () => {
@@ -50,7 +52,19 @@ export function OralDetail({ id, retour, ouvrirFiche }: { id: string; retour: ()
           {oral.exposeDureeSec ? ` · ${formatChrono(Math.round(oral.exposeDureeSec))} (prévu ${oral.dureeExposeMin} min)` : ''}
         </h3>
         {oral.exposeAudio ? <LecteurAudio fichierId={oral.exposeAudio} /> : <p className="discret">Pas d’enregistrement.</p>}
+        {oral.exposeAudio && (
+          <BoutonTranscrire
+            fichierId={oral.exposeAudio}
+            texte={oral.exposeTexte}
+            vocabulaire={vocabulaireOral(oral)}
+            enregistrer={async (exposeTexte) => {
+              await modifierOral(id, { exposeTexte });
+              setVersion((v) => v + 1);
+            }}
+          />
+        )}
         <TexteAuto
+          key={`expose-${version}`}
           rows={5}
           initial={oral.exposeTexte}
           placeholder="Transcription ou résumé de ton exposé (sert au bilan de l’IA)."
@@ -70,7 +84,21 @@ export function OralDetail({ id, retour, ouvrirFiche }: { id: string; retour: ()
               </span>
               <p className="question-texte">{q.question}</p>
               {q.audio ? <LecteurAudio fichierId={q.audio} /> : <p className="discret">Pas de réponse enregistrée.</p>}
+              {q.audio && (
+                <BoutonTranscrire
+                  fichierId={q.audio}
+                  texte={q.texte ?? ''}
+                  vocabulaire={vocabulaireOral(oral)}
+                  libelle="Transcrire la réponse"
+                  enregistrer={async (texte) => {
+                    const frais = await db.oraux.get(id);
+                    if (frais) await modifierOral(id, { questions: frais.questions.map((x) => (x.id === q.id ? { ...x, texte } : x)) });
+                    setVersion((v) => v + 1);
+                  }}
+                />
+              )}
               <TexteAuto
+                key={`${q.id}-${version}`}
                 rows={3}
                 initial={q.texte ?? ''}
                 placeholder="Ta réponse par écrit (facultatif)"
@@ -91,12 +119,14 @@ export function OralDetail({ id, retour, ouvrirFiche }: { id: string; retour: ()
         </>
       )}
 
+      {(oral.exposeAudio || oral.questions.some((q) => q.audio)) && <NoteTranscription />}
+
       {!oral.bilan && (
         <div className="bloc appel-ia">
           <h3>Bilan du jury par l’IA</h3>
           <p className="discret">
             Appréciation, note indicative, points forts, à améliorer, conseils et un commentaire par réponse. L’IA ne peut pas écouter l’audio : elle lit tes notes,
-            les transcriptions et tes résumés.
+            les transcriptions et tes résumés. Transcris d’abord tes enregistrements (boutons ✎ ci-dessus).
           </p>
           {!iaPrete() ? (
             <p className="discret">À activer dans Menu › Réglages › Intelligence artificielle (clé d’API et accord).</p>
@@ -105,7 +135,7 @@ export function OralDetail({ id, retour, ouvrirFiche }: { id: string; retour: ()
               {etat.enCours ? 'Le jury délibère… (jusqu’à une minute)' : 'Demander le bilan du jury'}
             </button>
           )}
-          {!texteDisponible(oral) && <p className="discret">Écris d’abord au moins un résumé de ton exposé ou d’une réponse.</p>}
+          {!texteDisponible(oral) && <p className="discret">Transcris ou résume d’abord au moins ton exposé ou une réponse.</p>}
           {etat.erreur && <p className="erreur">{etat.erreur}</p>}
         </div>
       )}

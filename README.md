@@ -82,7 +82,9 @@ Organisé en sections dépliables : **Préparation** (plan de révision, project
   proches, cartels masquables) ou thème (`src/data/oral.ts`) ; format de 2015 (30 min de préparation, 30 min d'épreuve
   dont 10 min d'exposé, réglable) ; notes de préparation enregistrées ; exposé et réponses enregistrés au micro
   (`src/lib/audio.ts`, sauvegarde partielle toutes les 15 s, écran maintenu allumé) ; transcription facultative par la
-  dictée du navigateur ; questions du jury par l'IA (relances, motivation, mises en situation) ou par la banque, avec
+  dictée du navigateur ; transcription des enregistrements sur l'appareil (Whisper base via transformers.js et ONNX
+  Runtime en WebAssembly, `src/lib/transcription*.ts`, amorce de vocabulaire tirée du dossier et des notes, modèle
+  téléchargé une fois puis hors ligne, web et APK) ; questions du jury par l'IA (relances, motivation, mises en situation) ou par la banque, avec
   les pistes attendues ; bilan de l'IA à partir de l'écrit (elle n'écoute pas l'audio)
 - **Vocabulaire anglais** (`src/data/anglais.ts`) : 77 mots d’histoire de l’art, de musée et de patrimoine, faux amis
   compris, révisés comme le glossaire
@@ -159,6 +161,7 @@ npm run test:tout  # tout : types, unitaires, construction, bout en bout
   - `10-affichage` : thèmes clair et sombre, 360 et 1 280 px, sans débordement horizontal
   - `11-parcours` : parcours de A à Z sur plusieurs jours
   - `12-hors-ligne` : manifeste et icônes, relance sans réseau, nouvelle version proposée puis installée
+  - `13-transcription` : transcription des enregistrements (factice ; vrai modèle Whisper avec `TRANSCRIPTION_REELLE=1`)
 - **Intégration continue** : la publication sur GitHub Pages n'a lieu que si tous les tests passent.
 
 ## Version web (GitHub Pages)
@@ -184,7 +187,7 @@ compile l'APK et le publie dans la release **`apk-latest`** du dépôt. Sur le t
 `MadameLaDocteure.apk` depuis la page *Releases*, l'ouvrir et autoriser l'installation depuis cette source.
 Les mises à jour s'installent par-dessus sans perdre les données (clé de signature de test fixe, `android/app/debug.keystore`).
 Spécificités Android : permission micro (simulateur d'oral), bouton « retour » qui revient à l'écran précédent
-(`@capacitor/app`), pas de service worker (l'appli est embarquée). La dictée du navigateur n'existe pas dans l'APK.
+(`@capacitor/app`), pas de service worker (l'appli est embarquée). La dictée en direct du navigateur n'existe pas dans l'APK : la transcription des enregistrements sur l'appareil la remplace.
 Les données de l'APK sont séparées de celles de la version web (stockage propre à chaque appli).
 
 Construction locale (SDK Android et JDK 21 requis) :

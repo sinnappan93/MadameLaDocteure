@@ -156,3 +156,13 @@ describe('bilan', () => {
     expect(texteDisponible(oral({ questions: [{ id: 'q', categorie: 'situation', question: 'Q', attendu: '', texte: 'Réponse' }] }))).toBe(true);
   });
 });
+
+describe('vocabulaire pour la transcription', () => {
+  it('reprend les noms du dossier et les noms propres des notes, sans doublon', async () => {
+    const { vocabulaireOral } = await import('./oral');
+    const dossier = creerDossier('oeuvres', [oeuvre('Bouddha prêchant', { site: 'Sarnath, Uttar Pradesh', materiau: 'Grès de Chunar', datation: 'Ve s.' })], false);
+    const v = vocabulaireOral({ dossier, notes: 'I. Le modèle gupta de Sarnath\nII. Mathurā et le Gandhāra ; dharmacakra-mudrā' });
+    expect(v).toBe('Bouddha prêchant, Sarnath, Grès de Chunar, Ve s., Mathurā, Gandhāra, dharmacakra-mudrā.');
+    expect(vocabulaireOral({ dossier: creerDossier('theme', [], false, ''), notes: '' })).toBe('');
+  });
+});

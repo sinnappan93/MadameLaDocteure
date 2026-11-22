@@ -214,7 +214,9 @@ export function Simulateur({ commencer, ouvrir }: { commencer: (id: string) => v
           </p>
         </>
       ) : (
-        <p className="discret">Ce navigateur ne propose pas la dictée : tu pourras résumer ton exposé et tes réponses à l’écrit.</p>
+        <p className="discret">
+          Pas de dictée en direct ici : après l’exposé et après l’oral, tu pourras transcrire tes enregistrements sur l’appareil (bouton ✎).
+        </p>
       )}
       {!enregistrementPossible() && <p className="erreur">Ce navigateur ne permet pas d’enregistrer le son : l’oral se fera sans enregistrement.</p>}
 

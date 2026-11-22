@@ -241,8 +241,14 @@ export function Aide() {
             <strong>bilan du jury</strong> (note indicative, conseils). L’IA ne peut pas écouter l’audio : elle lit seulement l’écrit.
           </li>
           <li>
-            <strong>Transcription</strong> (facultative, Chrome et Safari) : la dictée du navigateur écrit ce que tu dis. Dans Chrome, le son passe par le service de
-            Google ; sur certains téléphones, elle ne marche pas pendant l’enregistrement.
+            <strong>Transcription sur l’appareil</strong> (version web et APK) : bouton ✎ <em>Transcrire</em> sous chaque enregistrement, après l’exposé ou
+            après l’oral. Le modèle Whisper tourne sur ton téléphone : rien n’est envoyé. La première fois, il est téléchargé (environ 80 Mo, Wi-Fi conseillé),
+            ensuite tout marche hors ligne. Les noms de ton dossier et de tes notes l’aident à reconnaître les noms propres ; relis et corrige le texte avant le
+            bilan. Compte à peu près la durée de l’enregistrement, plus sur un téléphone ancien.
+          </li>
+          <li>
+            <strong>Dictée en direct</strong> (facultative, navigateur seulement : Chrome, Safari) : le texte s’écrit pendant que tu parles. Dans Chrome, le son
+            passe par le service de Google ; sur certains téléphones, elle ne marche pas pendant l’enregistrement.
           </li>
         </ul>
       </Rubrique>

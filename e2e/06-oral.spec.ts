@@ -79,7 +79,7 @@ test('sans IA, cartels masqués : questions de la banque, aucune œuvre nommée'
   expect(reseau.appelsIA).toHaveLength(0);
   // Sans texte, pas de bilan possible : l'IA n'écoute pas l'audio.
   await appli.getByRole('button', { name: 'Arrêter l’oral ici' }).click();
-  await expect(appli.getByText('Écris d’abord au moins un résumé de ton exposé ou d’une réponse.')).toBeVisible();
+  await expect(appli.getByText('Transcris ou résume d’abord au moins ton exposé ou une réponse.')).toBeVisible();
 });
 
 test('dossier sur un thème, avec les œuvres de mes fiches liées', async ({ appli }) => {

@@ -72,6 +72,14 @@ export function TexteAuto({
   const [texte, setTexte] = useState(initial);
   const minuteur = useRef<ReturnType<typeof setTimeout>>();
   const dernier = useRef(initial);
+  const enSaisie = useRef(false);
+  // Texte changé ailleurs (transcription) : on l'affiche, sauf pendant la saisie.
+  useEffect(() => {
+    if (!enSaisie.current && initial !== dernier.current) {
+      dernier.current = initial;
+      setTexte(initial);
+    }
+  }, [initial]);
   useEffect(
     () => () => {
       clearTimeout(minuteur.current);
@@ -89,7 +97,11 @@ export function TexteAuto({
         clearTimeout(minuteur.current);
         minuteur.current = setTimeout(() => enregistrer(dernier.current), 800);
       }}
+      onFocus={() => {
+        enSaisie.current = true;
+      }}
       onBlur={() => {
+        enSaisie.current = false;
         clearTimeout(minuteur.current);
         enregistrer(dernier.current);
       }}
@@ -110,4 +122,87 @@ export function useEcoule(depuis: number | undefined): number {
     return () => clearInterval(t);
   }, [depuis]);
   return s;
+}
+
+const CLE_MODELE = 'madameladocteure:modele-transcription';
+const modeleDejaTelecharge = () => {
+  try {
+    return localStorage.getItem(CLE_MODELE) === 'oui';
+  } catch {
+    return false;
+  }
+};
+
+/** Bouton « Transcrire l'enregistrement » : Whisper sur l'appareil, avec l'avancement. */
+export function BoutonTranscrire({
+  fichierId,
+  texte,
+  enregistrer,
+  vocabulaire,
+  libelle = 'Transcrire l’enregistrement',
+}: {
+  fichierId: string;
+  texte: string;
+  enregistrer: (t: string) => Promise<void> | void;
+  /** Noms du dossier et des notes, pour aider à reconnaître les noms propres. */
+  vocabulaire?: string;
+  libelle?: string;
+}) {
+  const [etat, setEtat] = useState<{ enCours: boolean; message?: string; erreur?: string; apercu?: string }>({ enCours: false });
+  const lancer = async () => {
+    if (texte.trim() && !confirm('Remplacer le texte actuel par la transcription ?')) return;
+    setEtat({ enCours: true, message: 'Préparation de l’audio…' });
+    try {
+      const fichier = await db.fichiers.get(fichierId);
+      if (!fichier) throw new Error('Enregistrement introuvable.');
+      const { transcrire } = await import('../../lib/transcription');
+      const resultat = await transcrire(
+        fichier.blob,
+        (a) =>
+          setEtat({
+            enCours: true,
+            message: a.etape === 'telechargement' ? `Téléchargement du modèle (une seule fois) : ${Math.round(a.part * 100)} %` : `Transcription : ${Math.round(a.part * 100)} %`,
+            apercu: a.texte,
+          }),
+        vocabulaire,
+      );
+      try {
+        localStorage.setItem(CLE_MODELE, 'oui');
+      } catch {
+        /* stockage indisponible */
+      }
+      if (!resultat.trim()) throw new Error('Aucune parole reconnue dans l’enregistrement.');
+      await enregistrer(resultat);
+      setEtat({ enCours: false });
+    } catch (e) {
+      setEtat({ enCours: false, erreur: `Transcription impossible : ${e instanceof Error ? e.message : String(e)}${navigator.onLine ? '' : ' (le modèle doit être téléchargé une première fois avec du réseau)'}` });
+    }
+  };
+  return (
+    <div className="transcription">
+      <button className="bouton petit" disabled={etat.enCours} onClick={lancer}>
+        {etat.enCours ? 'Transcription en cours…' : `✎ ${libelle}`}
+      </button>
+      {etat.enCours && (
+        <>
+          <p className="discret">{etat.message}</p>
+          {etat.apercu && <p className="transcription-direct">{etat.apercu}</p>}
+        </>
+      )}
+      {etat.erreur && <p className="erreur">{etat.erreur}</p>}
+    </div>
+  );
+}
+
+/** Explication affichée près des boutons de transcription. */
+export function NoteTranscription() {
+  return (
+    <p className="discret">
+      La transcription se fait sur ton appareil (modèle Whisper) : rien n’est envoyé.{' '}
+      {modeleDejaTelecharge()
+        ? 'Le modèle est déjà téléchargé : elle marche hors ligne.'
+        : 'La première fois, le modèle est téléchargé (environ 80 Mo, Wi-Fi conseillé), puis elle marche hors ligne.'}{' '}
+      Compte environ le temps de l’enregistrement, parfois plus sur un téléphone ancien.
+    </p>
+  );
 }

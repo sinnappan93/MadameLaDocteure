@@ -353,3 +353,39 @@ export function texteDisponible(o: Oral): boolean {
 }
 
 export const formatSecondes = (s: number) => `${Math.floor(s / 60)} min ${String(Math.round(s % 60)).padStart(2, '0')}`;
+
+/**
+ * Amorce de vocabulaire pour la transcription : noms du dossier (titres, sites, matériaux, datations) et mots
+ * marquants des notes de préparation (noms propres, termes à diacritiques), pour aider à reconnaître les noms propres.
+ */
+const MOTS_COURANTS = new Set(
+  'les une des dans pour avec mais donc comment pourquoi quel quelle quels quelles introduction conclusion problématique partie plan ainsi cette ces son sur par'.split(' '),
+);
+
+export function vocabulaireOral(o: Pick<Oral, 'dossier' | 'notes'>, longueurMax = 500): string {
+  const vus = new Set<string>();
+  const termes: string[] = [];
+  const ajouter = (t: string | undefined) => {
+    const x = t?.replace(/[«»"()]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!x || x.length < 3) return;
+    const cle = x.toLowerCase();
+    if (vus.has(cle)) return;
+    vus.add(cle);
+    termes.push(x);
+  };
+  ajouter(o.dossier.theme);
+  for (const d of o.dossier.documents) {
+    ajouter(d.titre);
+    ajouter(d.site.split(',')[0]);
+    ajouter(d.materiau);
+    ajouter(d.datation);
+  }
+  for (const mot of o.notes.match(/[\p{L}’'-]+/gu) ?? []) if ((/^\p{Lu}/u.test(mot) && !MOTS_COURANTS.has(mot.toLowerCase())) || /[āīūṛṣṇṭḍñśḥṃ]/i.test(mot)) ajouter(mot);
+  let texte = '';
+  for (const t of termes) {
+    const suivant = texte ? `${texte}, ${t}` : t;
+    if (suivant.length > longueurMax) break;
+    texte = suivant;
+  }
+  return texte ? `${texte}.` : '';
+}

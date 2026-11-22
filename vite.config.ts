@@ -1,11 +1,24 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import { copyFileSync, mkdirSync } from 'node:fs';
 import { VitePWA } from 'vite-plugin-pwa';
+
+/** ONNX Runtime (WebAssembly) livré avec l'appli pour la transcription : pas de CDN, fonctionne hors ligne et dans l'APK. */
+const onnxRuntime = {
+  name: 'onnx-runtime',
+  apply: 'build' as const,
+  closeBundle() {
+    mkdirSync('dist/ort', { recursive: true });
+    for (const f of ['ort-wasm-simd-threaded.jsep.wasm', 'ort-wasm-simd-threaded.jsep.mjs']) copyFileSync(`node_modules/onnxruntime-web/dist/${f}`, `dist/ort/${f}`);
+  },
+};
 
 export default defineConfig({
   base: './',
+  worker: { format: 'es' },
   plugins: [
     react(),
+    onnxRuntime,
     // Version web installable et utilisable hors ligne : l'appli (code, styles, polices, icônes) est gardée sur
     // l'appareil par un service worker ; les données sont déjà dans IndexedDB.
     VitePWA({
@@ -31,10 +44,17 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff,woff2}'],
+        // Transcription : chargée seulement si on s'en sert (gardée ensuite, voir plus bas).
+        globIgnores: ['**/transcription.worker-*.js', 'ort/**'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: 'index.html',
         cleanupOutdatedCaches: true,
         runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.includes('/ort/') || url.pathname.includes('transcription.worker-'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'transcription', cacheableResponse: { statuses: [200] } },
+          },
           {
             // Fonds de carte déjà consultés, pour la carte des sites et le quiz hors ligne.
             urlPattern: ({ url }) => url.hostname === 'server.arcgisonline.com' || url.hostname === 'tile.openstreetmap.org',
