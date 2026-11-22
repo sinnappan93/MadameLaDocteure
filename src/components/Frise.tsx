@@ -28,19 +28,24 @@ function couloirsPeriodes(periodes: Periode[]): Map<string, number> {
   return r;
 }
 
-/** Disposition verticale : pour chaque aire, couloirs des périodes, hauteur et position de la ligne. */
-const DISPOSITION = (() => {
+const COULOIRS_PERIODES = new Map(AIRES.map((aire) => [aire.id, couloirsPeriodes(PERIODES.filter((p) => p.aireId === aire.id))]));
+
+/**
+ * Disposition verticale : pour chaque aire, couloirs des périodes, hauteur et position de la ligne.
+ * La hauteur s'adapte au nombre de couloirs de points nécessaires au zoom courant.
+ */
+function disposition(couloirsPoints: Map<string, number>) {
   let haut = 28;
   return AIRES.map((aire) => {
-    const couloirs = couloirsPeriodes(PERIODES.filter((p) => p.aireId === aire.id));
+    const couloirs = COULOIRS_PERIODES.get(aire.id)!;
     const nb = Math.max(1, ...[...couloirs.values()].map((c) => c + 1));
-    const hauteur = MARGE + nb * (BARRE + 2) + NB_COULOIRS_POINTS * POINT + MARGE + 2;
+    const nbPoints = Math.max(NB_COULOIRS_POINTS, couloirsPoints.get(aire.id) ?? 0);
+    const hauteur = MARGE + nb * (BARRE + 2) + nbPoints * POINT + MARGE + 2;
     const ligne = { aire, couloirs, haut, hauteur, hautPoints: MARGE + nb * (BARRE + 2) + 1 };
     haut += hauteur;
     return ligne;
   });
-})();
-const HAUTEUR_TOTALE = DISPOSITION.reduce((t, l) => t + l.hauteur, 28);
+}
 const RACCOURCIS: Array<[string, number, number]> = [
   ['Tout', DEBUT, FIN],
   ['Antiquité', -600, 600],
@@ -52,14 +57,14 @@ type Selection = { type: 'periode'; periode: Periode } | { type: 'oeuvre'; oeuvr
 
 const milieu = (o: Oeuvre) => ((o.debut ?? o.fin)! + (o.fin ?? o.debut)!) / 2;
 
-/** Répartit les points proches sur deux couloirs pour qu'ils restent touchables ; renvoie le couloir de chaque œuvre. */
+/** Répartit les points proches sur autant de couloirs que nécessaire pour qu'ils restent touchables ; renvoie le couloir de chaque œuvre. */
 function couloirs(oeuvres: Oeuvre[], x: (a: number) => number): Map<string, number> {
-  const fin = Array.from({ length: NB_COULOIRS_POINTS }, () => -Infinity);
+  const fin: number[] = [];
   const resultat = new Map<string, number>();
   for (const o of [...oeuvres].sort((a, b) => milieu(a) - milieu(b))) {
     const position = x(milieu(o));
     let c = fin.findIndex((f) => position - f >= POINT + 2);
-    if (c === -1) c = fin.indexOf(Math.min(...fin));
+    if (c === -1) c = fin.length;
     fin[c] = position;
     resultat.set(o.id, c);
   }
@@ -83,6 +88,9 @@ export function Frise({ ouvrirFiche }: { ouvrirFiche: (id: string) => void }) {
   const largeur = (FIN - DEBUT) * px;
 
   const datees = useMemo(() => (oeuvres ?? []).filter((o) => o.debut !== undefined || o.fin !== undefined), [oeuvres]);
+  const couloirsOeuvres = useMemo(() => new Map(AIRES.map((a) => [a.id, couloirs(datees.filter((o) => o.aireId === a.id), x)])), [datees, px]);
+  const lignes = useMemo(() => disposition(new Map([...couloirsOeuvres].map(([id, c]) => [id, c.size ? Math.max(...c.values()) + 1 : 0]))), [couloirsOeuvres]);
+  const hauteurTotale = lignes.reduce((t, l) => t + l.hauteur, 28);
 
   // Conserve l'année au centre de l'écran quand on zoome.
   const changerZoom = (nouveau: number) => {
@@ -143,14 +151,14 @@ export function Frise({ ouvrirFiche }: { ouvrirFiche: (id: string) => void }) {
       <div className="frise">
         <div className="frise-etiquettes" aria-hidden>
           <div className="frise-axe-vide" />
-          {DISPOSITION.map(({ aire, hauteur }) => (
+          {lignes.map(({ aire, hauteur }) => (
             <div key={aire.id} className="frise-etiquette" style={{ height: hauteur }}>
               {aire.nom}
             </div>
           ))}
         </div>
         <div className="frise-defilement" ref={defilement}>
-          <div className="frise-contenu" style={{ width: largeur, height: HAUTEUR_TOTALE }}>
+          <div className="frise-contenu" style={{ width: largeur, height: hauteurTotale }}>
             <div className="frise-axe">
               {graduations.map((a) => (
                 <span key={a} className="graduation" style={{ left: x(a) }}>
@@ -161,7 +169,7 @@ export function Frise({ ouvrirFiche }: { ouvrirFiche: (id: string) => void }) {
             {graduations.map((a) => (
               <span key={`l${a}`} className={`frise-repere ${a === 0 ? 'zero' : ''}`} style={{ left: x(a) }} />
             ))}
-            {DISPOSITION.map(({ aire, couloirs: couloirsLigne, haut, hauteur, hautPoints }, i) => (
+            {lignes.map(({ aire, couloirs: couloirsLigne, haut, hauteur, hautPoints }, i) => (
               <div key={aire.id} className="frise-ligne" style={{ top: haut, height: hauteur }} aria-label={aire.nom}>
                 {PERIODES.filter((p) => p.aireId === aire.id).map((p) => (
                   <button
@@ -176,7 +184,7 @@ export function Frise({ ouvrirFiche }: { ouvrirFiche: (id: string) => void }) {
                 ))}
                 {(() => {
                   const ici = datees.filter((o) => o.aireId === aire.id);
-                  const c = couloirs(ici, x);
+                  const c = couloirsOeuvres.get(aire.id)!;
                   return ici.map((o) => (
                     <button
                       key={o.id}

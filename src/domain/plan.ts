@@ -535,9 +535,9 @@ export function activitesDuJour(
   const faits = new Set<TypeSeance>();
   const revues = d.etats.filter((e) => e.derniereRevision.slice(0, 10) === jour);
   const compte = (f: (e: EtatCarte) => boolean) => revues.filter(f).length;
-  if (compte((e) => !/^(gl|en|cmp)-/.test(e.oeuvreId) && (e.type === 'identifier' || e.type === 'periode' || e.type === 'site')) >= 5) faits.add('identifier');
-  if (compte((e) => e.oeuvreId.startsWith('gl-')) >= 5) faits.add('glossaire');
-  if (compte((e) => e.oeuvreId.startsWith('en-')) >= 5) faits.add('anglais');
+  if (compte((e) => !/^(gl|en|cmp)-/.test(e.oeuvreId) && (e.type === 'identifier' || e.type === 'periode' || e.type === 'site')) >= 3) faits.add('identifier');
+  if (compte((e) => e.oeuvreId.startsWith('gl-')) >= 3) faits.add('glossaire');
+  if (compte((e) => e.oeuvreId.startsWith('en-')) >= 3) faits.add('anglais');
   if (compte((e) => e.oeuvreId.startsWith('cmp-')) >= 1) faits.add('comparer');
   if (compte((e) => e.type === 'dynastie' || e.type === 'carte') >= 3) faits.add('reperes');
   const debutLe = (iso: string) => cleJour(new Date(iso)) === jour;

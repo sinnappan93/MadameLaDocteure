@@ -24,6 +24,7 @@ export default function CarteSites({ ouvrirFiche }: { ouvrirFiche: (id: string) 
     ajouterFond(carte.current, true);
     calque.current = L.layerGroup().addTo(carte.current);
     return () => {
+      carte.current?.stop();
       carte.current?.remove();
       carte.current = undefined;
     };

@@ -27,10 +27,12 @@ export default function QuestionCarte({ oeuvre, repondre }: { oeuvre: Oeuvre; re
         .bindTooltip(siteCourt(oeuvre.site), { permanent: true, direction: 'top', offset: [0, -8] })
         .addTo(carte);
       L.polyline([choisi, vrai], { color: '#ef8a4c', dashArray: '6 6', weight: 2 }).addTo(carte);
-      carte.fitBounds(L.latLngBounds([choisi, vrai]), { padding: [60, 60], maxZoom: 7 });
+      // Sans animation : la carte peut être retirée aussitôt (« Continuer »), ce qui ferait planter une animation en cours.
+      carte.fitBounds(L.latLngBounds([choisi, vrai]), { padding: [60, 60], maxZoom: 7, animate: false });
       setDistance(d);
     });
     return () => {
+      carte.stop();
       carte.remove();
     };
   }, [oeuvre.id]);

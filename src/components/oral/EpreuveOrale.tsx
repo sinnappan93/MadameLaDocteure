@@ -107,7 +107,7 @@ export function EpreuveOrale({ id, terminee }: { id: string; terminee: (id: stri
       {oral.phase === 'preparation' && <Preparation oral={oral} restant={restant} commencer={(fichierId) => prise.demarrer(fichierId)} />}
       {oral.phase === 'expose' && <Expose oral={oral} prise={prise} ecoule={ecoule} />}
       {oral.phase === 'questions' && <Questions oral={oral} prise={prise} ecoule={ecoule} restant={restant} terminer={terminer} />}
-      {(oral.phase === 'expose' || (oral.phase === 'questions' && !prise.enCours && oral.questions.length > 0)) && (
+      {(oral.phase === 'expose' || (oral.phase === 'questions' && !prise.enCours)) && (
         <button className="bouton large" onClick={terminer}>
           Arrêter l’oral ici
         </button>

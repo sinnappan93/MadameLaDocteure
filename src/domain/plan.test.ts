@@ -171,7 +171,7 @@ describe('régénération et suivi', () => {
   });
 
   it('reconnaît l’activité du jour', () => {
-    const etats = ['a', 'b', 'c', 'd', 'e'].map((x) => etat(x, 'identifier'));
+    const etats = ['a', 'b', 'c'].map((x) => etat(x, 'identifier'));
     const a = activitesDuJour('2026-11-22', { etats, copies: [], oraux: [], visites: [{ date: '2026-11-22' } as never], lectures: [] });
     expect([...a].sort()).toEqual(['identifier', 'visite']);
     expect(estFaite({ type: 'identifier' } as never, a)).toBe(true);
