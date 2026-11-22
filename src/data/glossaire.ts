@@ -19,7 +19,7 @@ export interface Terme {
   /** Identifiant stable, préfixé « gl- ». */
   id: string;
   terme: string;
-  categorie: CategorieGlossaire;
+  categorie: CategorieGlossaire | `en-${string}`;
   definition: string;
   /** Fiches préparées où l'on peut observer le terme. */
   exemples?: string[];

@@ -8,6 +8,11 @@ import { FormulaireOeuvre } from './components/FormulaireOeuvre';
 import { ListeOeuvres } from './components/ListeOeuvres';
 import { type ChoixQuiz, type ModeRevision, Revision } from './components/Revision';
 import { Frise } from './components/Frise';
+import { Banque } from './components/examen/Banque';
+import { CopieDetail } from './components/examen/CopieDetail';
+import { Copies } from './components/examen/Copies';
+import { Ecriture } from './components/examen/Ecriture';
+import { SujetBlanc } from './components/examen/SujetBlanc';
 
 const CarteSites = lazy(() => import('./components/carte/CarteSites'));
 import { type EcranMenu, Logo, Menu } from './components/Menu';
@@ -22,6 +27,12 @@ type Vue =
   | { type: 'aide' }
   | { type: 'revision'; mode?: ModeRevision; quiz?: ChoixQuiz }
   | { type: 'frise' }
+  | { type: 'examen-blanc'; sujetId?: string }
+  | { type: 'examen-plan' }
+  | { type: 'examen-copies' }
+  | { type: 'examen-banque' }
+  | { type: 'ecriture'; id: string }
+  | { type: 'copie'; id: string }
   | { type: 'carte' }
   | { type: 'glossaire' }
   | { type: 'comparaisons' }
@@ -64,7 +75,19 @@ export function App() {
   const titre =
     vue.type === 'liste'
       ? aireParId(vue.aireId)?.nom ?? 'Œuvres de référence'
-      : vue.type === 'frise'
+      : vue.type === 'examen-blanc'
+        ? 'Sujet blanc'
+        : vue.type === 'examen-plan'
+          ? 'Plan en 15 minutes'
+          : vue.type === 'examen-copies'
+            ? 'Mes copies'
+            : vue.type === 'examen-banque'
+              ? 'Banque de sujets'
+              : vue.type === 'ecriture'
+                ? 'Épreuve en cours'
+                : vue.type === 'copie'
+                  ? 'Copie'
+                  : vue.type === 'frise'
         ? 'Frise chronologique'
         : vue.type === 'carte'
           ? 'Carte des sites'
@@ -113,6 +136,12 @@ export function App() {
           />
         )}
         {vue.type === 'aide' && <Aide />}
+        {vue.type === 'examen-blanc' && <SujetBlanc key={vue.sujetId ?? 'hasard'} sujetInitial={vue.sujetId} commencer={(id) => remplacer({ type: 'ecriture', id })} />}
+        {vue.type === 'examen-plan' && <SujetBlanc plan commencer={(id) => remplacer({ type: 'ecriture', id })} />}
+        {vue.type === 'examen-banque' && <Banque sEntrainer={(sujetId) => aller({ type: 'examen-blanc', sujetId })} />}
+        {vue.type === 'examen-copies' && <Copies ouvrir={(id) => aller({ type: 'copie', id })} reprendre={(id) => aller({ type: 'ecriture', id })} />}
+        {vue.type === 'ecriture' && <Ecriture id={vue.id} rendue={(id) => remplacer({ type: 'copie', id })} />}
+        {vue.type === 'copie' && <CopieDetail id={vue.id} retour={retour} />}
         {vue.type === 'frise' && <Frise ouvrirFiche={(id) => aller({ type: 'fiche', id })} />}
         {vue.type === 'carte' && (
           <Suspense fallback={<section className="panneau"><p className="discret">Chargement de la carte…</p></section>}>
@@ -180,7 +209,14 @@ function ecranDuMenu(vue: Vue): EcranMenu | undefined {
     case 'comparaisons':
     case 'frise':
     case 'carte':
+    case 'examen-blanc':
+    case 'examen-plan':
+    case 'examen-copies':
+    case 'examen-banque':
       return vue.type;
+    case 'ecriture':
+    case 'copie':
+      return 'examen-copies';
     case 'revision':
       return vue.mode === 'quiz' && vue.quiz === 'reperes' ? 'revision-reperes' : `revision-${vue.mode ?? 'oeuvres'}`;
     default:
@@ -200,6 +236,8 @@ function vueDuMenu(ecran: EcranMenu): Vue {
       return { type: 'revision', mode: 'quiz' };
     case 'revision-reperes':
       return { type: 'revision', mode: 'quiz', quiz: 'reperes' };
+    case 'revision-anglais':
+      return { type: 'revision', mode: 'anglais' };
     case 'oeuvres':
       return { type: 'liste' };
     default:

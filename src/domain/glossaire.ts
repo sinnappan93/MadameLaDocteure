@@ -1,11 +1,12 @@
 /** Révision du glossaire : cartes « terme » (auto-évaluation) et « definition » (QCM du terme). */
+import { VOCABULAIRE } from '../data/anglais';
 import { type CategorieGlossaire, GLOSSAIRE, type Terme } from '../data/glossaire';
 import { type Carte, composer, type EtatCarte, estDue, idCarte, melanger, type OptionsSeance, SEUIL_MAITRISE } from './revision';
 
 export function composerSeanceGlossaire(
   termes: Terme[],
   etats: EtatCarte[],
-  o: OptionsSeance & { categorie?: CategorieGlossaire },
+  o: OptionsSeance & { categorie?: CategorieGlossaire | string },
 ): Carte[] {
   const sujets = termes.filter((t) => !o.categorie || t.categorie === o.categorie).map((t) => ({ id: t.id, types: ['terme', 'definition'] as const }));
   return composer(
@@ -35,7 +36,7 @@ export function bilanGlossaire(termes: Terme[], etats: EtatCarte[], maintenant: 
 }
 
 /** Le bon terme et trois leurres de la même catégorie (complétés par d'autres catégories s'il le faut). */
-export function optionsTermes(termeId: string, hasard: () => number = Math.random, glossaire: Terme[] = GLOSSAIRE): string[] {
+export function optionsTermes(termeId: string, hasard: () => number = Math.random, glossaire: Terme[] = termeId.startsWith('en-') ? VOCABULAIRE : GLOSSAIRE): string[] {
   const bon = glossaire.find((t) => t.id === termeId);
   if (!bon) return [];
   const memeCategorie = melanger(glossaire.filter((t) => t.id !== bon.id && t.categorie === bon.categorie), hasard);
@@ -44,7 +45,8 @@ export function optionsTermes(termeId: string, hasard: () => number = Math.rando
   return melanger([bon.id, ...leurres], hasard);
 }
 
-export const termeParId = (id: string) => GLOSSAIRE.find((t) => t.id === id);
+/** Terme du glossaire ou mot du vocabulaire anglais (« en-… »). */
+export const termeParId = (id: string) => (id.startsWith('en-') ? VOCABULAIRE : GLOSSAIRE).find((t) => t.id === id);
 
 const normaliser = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 

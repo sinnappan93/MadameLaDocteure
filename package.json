@@ -15,6 +15,7 @@
     "android:apk": "npm run android:sync && cd android && ./gradlew assembleDebug"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "0.137.0",
     "@capacitor/android": "8.5.3",
     "@capacitor/core": "8.5.3",
     "@fontsource-variable/nunito": "5.3.0",

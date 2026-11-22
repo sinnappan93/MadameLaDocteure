@@ -11,6 +11,7 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 
 ### Menu
 Organisé en sections dépliables : **Exercices** (identifier les œuvres, comparer, glossaire en cartes, quiz libre, quiz de repères),
+**Mode examen** (sujets blancs, plan en 15 minutes, copies et corrections, banque de sujets, vocabulaire anglais),
 **Ressources** (œuvres de référence, comparaisons, glossaire, frise chronologique, carte des sites), **Aide**, **Réglages**, **Bientôt** ; l'écran affiché est mis en évidence.
 
 ### Accueil
@@ -51,6 +52,20 @@ Organisé en sections dépliables : **Exercices** (identifier les œuvres, compa
 - **Quiz de repères** : 28 questions de dynasties choisies à la main (« Quelle période au Xe siècle au Cambodge ? »)
   et « Place … sur la carte » sur un fond sans noms (réussi à moins de 200 km)
 
+### Mode examen
+- **Sujets blancs chronométrés** : dissertation de spécialité, culture générale, note de synthèse ; écriture dans l'appli
+  (sauvegarde automatique) ou sur papier (photos des pages) ; chronomètre calculé depuis l'heure de début (survit aux
+  rechargements) ; durées réglables, à aligner sur l'arrêté 2027
+- **Plan en 15 minutes** : problématique et plan détaillé, commentés par l'IA avec un plan de comparaison
+- **Correction par l'IA** (`src/lib/ia.ts`) : grille de critères par épreuve, note indicative sur 20, points forts,
+  à améliorer, conseils ; copies tapées ou photographiées ; complète la correction par un pair, sans la remplacer
+- **Banque de sujets** : 27 sujets d'entraînement proposés (`src/data/sujets.ts`, pas des sujets tombés), sujets des
+  rapports de jury ajoutés à la main, sujets générés par l'IA
+- **Vocabulaire anglais** (`src/data/anglais.ts`) : 76 mots d'histoire de l'art, de musée et de patrimoine, faux amis
+  compris, révisés comme le glossaire
+- **IA** : API Claude (Claude Opus 5.5, sorties structurées vérifiées, repli automatique en cas de refus), avec la clé
+  d'API personnelle stockée sur l'appareil et un accord explicite sur les données envoyées (comme JeSuisCoach)
+
 ### Fiches préparées
 - **51 fiches d'œuvres de référence** installées au premier lancement, de l'Indus à l'art moderne, de l'Inde à Java
   (`src/data/references.ts`) : datation, site, matériau, lieu de conservation, iconographie, points à retenir, étiquettes
@@ -87,9 +102,8 @@ Organisé en sections dépliables : **Exercices** (identifier les œuvres, compa
 ## Feuille de route
 1. Démarches et plan de préparation (inscriptions, Prépa Talents, lectures) avec rappels
 2. Suivi de bibliographie
-3. Sujets blancs chronométrés et correction par l'IA
-4. Simulateur d'oral (30 min de préparation et 30 min d'épreuve, jury joué par l'IA)
-5. Projection : couverture, mémorisation, notes des sujets blancs, rythme
+3. Simulateur d'oral (30 min de préparation et 30 min d'épreuve, jury joué par l'IA)
+4. Projection : couverture, mémorisation, notes des sujets blancs, rythme
 
 ## Démarrer
 

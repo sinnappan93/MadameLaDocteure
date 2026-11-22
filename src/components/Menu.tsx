@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { REFERENCES } from '../data/references';
 import { restaurerReferences } from '../lib/db';
+import { ReglagesIA } from './examen/ReglagesIA';
 import type { Reglages, Theme } from '../lib/reglages';
 
 export type EcranMenu =
@@ -10,6 +11,11 @@ export type EcranMenu =
   | 'revision-glossaire'
   | 'revision-quiz'
   | 'revision-reperes'
+  | 'revision-anglais'
+  | 'examen-blanc'
+  | 'examen-plan'
+  | 'examen-copies'
+  | 'examen-banque'
   | 'frise'
   | 'carte'
   | 'oeuvres'
@@ -45,6 +51,17 @@ const SECTIONS: Array<{ titre: string; icone: string; entrees: Array<[EcranMenu,
     ],
   },
   {
+    titre: 'Mode examen',
+    icone: '✎',
+    entrees: [
+      ['examen-blanc', 'Sujets blancs', 'Chronométrés : spécialité, culture générale, synthèse'],
+      ['examen-plan', 'Plan en 15 minutes', 'Problématique et plan, commentés par l’IA'],
+      ['examen-copies', 'Mes copies et corrections', 'Correction par l’IA, grille de critères'],
+      ['examen-banque', 'Banque de sujets', 'Rapports de jury, sujets proposés ou générés'],
+      ['revision-anglais', 'Vocabulaire anglais', 'Fiches mémo pour l’épreuve de langue'],
+    ],
+  },
+  {
     titre: 'Ressources',
     icone: '❖',
     entrees: [
@@ -57,7 +74,7 @@ const SECTIONS: Array<{ titre: string; icone: string; entrees: Array<[EcranMenu,
   },
 ];
 
-const BIENTOT = ['Démarches et plan de préparation', 'Bibliographie', 'Sujets blancs', 'Simulateur d’oral'];
+const BIENTOT = ['Démarches et plan de préparation', 'Bibliographie', 'Simulateur d’oral'];
 
 export function Menu({ reglages, modifier, aller, fermer, actuel }: Props) {
   const [restauration, setRestauration] = useState<string>();
@@ -122,6 +139,7 @@ export function Menu({ reglages, modifier, aller, fermer, actuel }: Props) {
                 ))}
               </div>
             </div>
+            <ReglagesIA />
             <div>
               <span className="libelle">Fiches préparées ({REFERENCES.length})</span>
               <button type="button" className="bouton large" onClick={restaurer}>

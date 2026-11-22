@@ -119,3 +119,21 @@ describe('révisions', () => {
     expect(await base.revisions.count()).toBe(0);
   });
 });
+
+describe('mode examen', () => {
+  it('crée une copie, lui ajoute puis retire des photos, et la supprime avec ses fichiers', async () => {
+    const { creerCopie, ajouterPhotoCopie, retirerPhotoCopie, supprimerCopie, modifierCopie } = await import('./db');
+    const c = await creerCopie({ type: 'culture', sujetId: 'cg-ruine', sujet: 'La ruine.', mode: 'manuscrit', debut: new Date().toISOString(), dureePrevueMin: 240 }, base);
+    await ajouterPhotoCopie(c.id, image(), base);
+    await ajouterPhotoCopie(c.id, image(), base);
+    let copie = await base.copies.get(c.id);
+    expect(copie?.photos).toHaveLength(2);
+    await retirerPhotoCopie(c.id, copie!.photos[0], base);
+    await modifierCopie(c.id, { fin: new Date().toISOString() }, base);
+    copie = await base.copies.get(c.id);
+    expect(copie?.photos).toHaveLength(1);
+    expect(copie?.fin).toBeDefined();
+    await supprimerCopie(c.id, base);
+    expect(await base.fichiers.count()).toBe(0);
+  });
+});

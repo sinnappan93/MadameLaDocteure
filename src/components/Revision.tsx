@@ -2,6 +2,7 @@ import { lazy, Suspense, useMemo, useState } from 'react';
 import { enonceDynastie, optionsDynastie, type QuestionDynastie, questionDynastieParId } from '../domain/reperes';
 
 const QuestionCarte = lazy(() => import('./carte/QuestionCarte'));
+import { CATEGORIES_ANGLAIS, VOCABULAIRE } from '../data/anglais';
 import { CATEGORIES_GLOSSAIRE, type CategorieGlossaire, GLOSSAIRE, type Terme } from '../data/glossaire';
 import { type Comparaison } from '../data/comparaisons';
 import { comparaisonParId, comparaisonsDisponibles, composerSeanceComparaisons } from '../domain/comparaisons';
@@ -40,7 +41,7 @@ interface Resultat {
 
 const MAXIMUM = 30;
 
-export type ModeRevision = 'oeuvres' | 'comparaisons' | 'glossaire' | 'quiz';
+export type ModeRevision = 'oeuvres' | 'comparaisons' | 'glossaire' | 'anglais' | 'quiz';
 
 export function Revision({ retourAccueil, modeInitial = 'oeuvres', quizInitial = 'melange' }: { retourAccueil: () => void; modeInitial?: ModeRevision; quizInitial?: ChoixQuiz }) {
   const oeuvres = useLive(() => db.oeuvres.toArray(), []);
@@ -49,7 +50,9 @@ export function Revision({ retourAccueil, modeInitial = 'oeuvres', quizInitial =
   const [aire, setAire] = useState('');
   const [nouvelles, setNouvelles] = useState(10);
   const [mode, setMode] = useState<ModeRevision>(modeInitial);
-  const [categorie, setCategorie] = useState<CategorieGlossaire | ''>('');
+  const [categorie, setCategorie] = useState<CategorieGlossaire | string>('');
+  const lexique = mode === 'anglais' ? VOCABULAIRE : GLOSSAIRE;
+  const categoriesLexique = mode === 'anglais' ? CATEGORIES_ANGLAIS : CATEGORIES_GLOSSAIRE;
   const [choixQuiz, setChoixQuiz] = useState<ChoixQuiz>(quizInitial);
   const [nombreQuiz, setNombreQuiz] = useState(10);
 
@@ -61,25 +64,33 @@ export function Revision({ retourAccueil, modeInitial = 'oeuvres', quizInitial =
       ? composerSeance(oeuvres, etats, { maintenant: new Date(), nouvelles, maximum: MAXIMUM, aireId: aire || undefined, hasard })
       : mode === 'comparaisons'
         ? composerSeanceComparaisons(oeuvres, etats, { maintenant: new Date(), nouvelles, maximum: MAXIMUM, hasard })
-        : composerSeanceGlossaire(GLOSSAIRE, etats, { maintenant: new Date(), nouvelles, maximum: MAXIMUM, categorie: categorie || undefined, hasard });
+        : composerSeanceGlossaire(lexique, etats, { maintenant: new Date(), nouvelles, maximum: MAXIMUM, categorie: categorie || undefined, hasard });
 
   const demarrer = () => {
     const cartes = composerCartes();
     if (cartes.length) setEtape({ nom: 'seance', cartes, index: 0, resultats: [], repassees: {} });
   };
 
+  const changerMode = (m: ModeRevision) => {
+    setMode(m);
+    setCategorie('');
+  };
+
   const choixMode = (
-    <div className="onglets" role="tablist" aria-label="Que réviser ?">
-      <button role="tab" aria-selected={mode === 'oeuvres'} className={mode === 'oeuvres' ? 'actif' : ''} onClick={() => setMode('oeuvres')}>
+    <div className="onglets onglets-revision" role="tablist" aria-label="Que réviser ?">
+      <button role="tab" aria-selected={mode === 'oeuvres'} className={mode === 'oeuvres' ? 'actif' : ''} onClick={() => changerMode('oeuvres')}>
         Œuvres
       </button>
-      <button role="tab" aria-selected={mode === 'comparaisons'} className={mode === 'comparaisons' ? 'actif' : ''} onClick={() => setMode('comparaisons')}>
+      <button role="tab" aria-selected={mode === 'comparaisons'} className={mode === 'comparaisons' ? 'actif' : ''} onClick={() => changerMode('comparaisons')}>
         Comparer
       </button>
-      <button role="tab" aria-selected={mode === 'glossaire'} className={mode === 'glossaire' ? 'actif' : ''} onClick={() => setMode('glossaire')}>
+      <button role="tab" aria-selected={mode === 'glossaire'} className={mode === 'glossaire' ? 'actif' : ''} onClick={() => changerMode('glossaire')}>
         Glossaire
       </button>
-      <button role="tab" aria-selected={mode === 'quiz'} className={mode === 'quiz' ? 'actif' : ''} onClick={() => setMode('quiz')}>
+      <button role="tab" aria-selected={mode === 'anglais'} className={mode === 'anglais' ? 'actif' : ''} onClick={() => changerMode('anglais')}>
+        Anglais
+      </button>
+      <button role="tab" aria-selected={mode === 'quiz'} className={mode === 'quiz' ? 'actif' : ''} onClick={() => changerMode('quiz')}>
         Quiz
       </button>
     </div>
@@ -87,7 +98,7 @@ export function Revision({ retourAccueil, modeInitial = 'oeuvres', quizInitial =
 
   const choixNouvelles = (
     <div>
-      <span className="libelle">{mode === 'oeuvres' ? 'Nouvelles œuvres par séance' : mode === 'comparaisons' ? 'Nouvelles comparaisons par séance' : 'Nouveaux termes par séance'}</span>
+      <span className="libelle">{mode === 'oeuvres' ? 'Nouvelles œuvres par séance' : mode === 'comparaisons' ? 'Nouvelles comparaisons par séance' : mode === 'anglais' ? 'Nouveaux mots par séance' : 'Nouveaux termes par séance'}</span>
       <div className="onglets" role="radiogroup" aria-label="Nouveautés par séance">
         {[0, 5, 10, 20].map((n) => (
           <button key={n} role="radio" aria-checked={nouvelles === n} className={nouvelles === n ? 'actif' : ''} onClick={() => setNouvelles(n)}>
@@ -98,8 +109,8 @@ export function Revision({ retourAccueil, modeInitial = 'oeuvres', quizInitial =
     </div>
   );
 
-  if (etape.nom === 'depart' && mode === 'glossaire') {
-    const termes = categorie ? GLOSSAIRE.filter((t) => t.categorie === categorie) : GLOSSAIRE;
+  if (etape.nom === 'depart' && (mode === 'glossaire' || mode === 'anglais')) {
+    const termes = categorie ? lexique.filter((t) => t.categorie === categorie) : lexique;
     const b = bilanGlossaire(termes, etats, new Date());
     const apercu = composerCartes(() => 0);
     return (
@@ -111,15 +122,16 @@ export function Revision({ retourAccueil, modeInitial = 'oeuvres', quizInitial =
           <Stat valeur={b.maitrises} libelle="termes maîtrisés" />
         </div>
         <p className="discret">
-          Gestes, postures, attributs, divinités, montures, architecture : retrouve la définition d’un terme, puis, les jours suivants, le terme qui correspond à une
-          définition.
+          {mode === 'anglais'
+            ? 'Anglais de l’histoire de l’art et du musée, faux amis compris (curator, conservator…) : retrouve le sens d’un mot anglais, puis, les jours suivants, le mot anglais qui correspond à une traduction.'
+            : 'Gestes, postures, attributs, divinités, montures, architecture : retrouve la définition d’un terme, puis, les jours suivants, le terme qui correspond à une définition.'}
         </p>
         <div className="formulaire">
           <label>
             Catégorie
-            <select value={categorie} onChange={(e) => setCategorie(e.target.value as CategorieGlossaire | '')}>
-              <option value="">Tout le glossaire ({GLOSSAIRE.length} termes)</option>
-              {CATEGORIES_GLOSSAIRE.map((c) => (
+            <select value={categorie} onChange={(e) => setCategorie(e.target.value)}>
+              <option value="">{mode === 'anglais' ? `Tout le vocabulaire (${VOCABULAIRE.length} mots)` : `Tout le glossaire (${GLOSSAIRE.length} termes)`}</option>
+              {categoriesLexique.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.nom}
                 </option>
@@ -572,7 +584,7 @@ function Reponse({ oeuvre: o }: { oeuvre: Oeuvre }) {
   );
 }
 
-const NOMS_CATEGORIES = Object.fromEntries(CATEGORIES_GLOSSAIRE.map((c) => [c.id, c.nom]));
+const NOMS_CATEGORIES: Record<string, string> = Object.fromEntries([...CATEGORIES_GLOSSAIRE, ...CATEGORIES_ANGLAIS].map((c) => [c.id, c.nom]));
 
 function BoutonsNotes({ carte, repondre }: { carte: Carte; repondre: (n: Note) => void }) {
   const intervalles = useMemo(() => apercuIntervalles(carte.etat, carte, new Date()), [carte]);
@@ -602,10 +614,10 @@ function CarteTerme({ carte, terme, repondre }: { carte: Carte; terme: Terme; re
         <span className="carte-mot-categorie">{NOMS_CATEGORIES[terme.categorie]}</span>
         <span className="carte-mot-terme">{terme.terme}</span>
       </div>
-      <p className="consigne">Que désigne ce terme ? Comment le reconnaître ?</p>
+      <p className="consigne">{terme.id.startsWith('en-') ? 'Que veut dire ce mot anglais ?' : 'Que désigne ce terme ? Comment le reconnaître ?'}</p>
       {!revelee ? (
         <button className="bouton principal large grand" onClick={() => setRevelee(true)}>
-          Voir la définition
+          {terme.id.startsWith('en-') ? 'Voir la traduction' : 'Voir la définition'}
         </button>
       ) : (
         <>
@@ -628,7 +640,7 @@ function CarteDefinition({ terme, repondre }: { terme: Terme; repondre: (n: Note
         <span className="carte-mot-categorie">{NOMS_CATEGORIES[terme.categorie]}</span>
         <span className="carte-mot-definition">{terme.definition}</span>
       </div>
-      <p className="consigne">Quel terme correspond à cette définition ?</p>
+      <p className="consigne">{terme.id.startsWith('en-') ? 'Quel mot anglais correspond ?' : 'Quel terme correspond à cette définition ?'}</p>
       <div className="qcm">
         {options.map((id) => {
           const t = termeParId(id)!;

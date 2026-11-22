@@ -10,7 +10,7 @@ const maintenant = new Date(2026, 10, 22, 9);
 describe('données du glossaire', () => {
   it('a des identifiants uniques, des catégories connues et des exemples qui renvoient à des fiches existantes', () => {
     expect(new Set(GLOSSAIRE.map((t) => t.id)).size).toBe(GLOSSAIRE.length);
-    const categories = new Set(CATEGORIES_GLOSSAIRE.map((c) => c.id));
+    const categories = new Set<string>(CATEGORIES_GLOSSAIRE.map((c) => c.id));
     const fiches = new Set(REFERENCES.map((r) => r.id));
     for (const t of GLOSSAIRE) {
       expect(t.id.startsWith('gl-'), t.id).toBe(true);
@@ -59,5 +59,18 @@ describe('consultation', () => {
 
   it('retrouve les termes illustrés par une fiche', () => {
     expect(termesDeFiche('ref-nataraja-chola').map((t) => t.id)).toEqual(expect.arrayContaining(['gl-nataraja', 'gl-damaru', 'gl-gaja-hasta']));
+  });
+});
+
+describe('vocabulaire anglais', () => {
+  it('a des identifiants uniques et des QCM pris dans le vocabulaire anglais', async () => {
+    const { VOCABULAIRE, CATEGORIES_ANGLAIS } = await import('../data/anglais');
+    const { optionsTermes, termeParId } = await import('./glossaire');
+    expect(new Set(VOCABULAIRE.map((t) => t.id)).size).toBe(VOCABULAIRE.length);
+    const categories = new Set(CATEGORIES_ANGLAIS.map((c) => c.id));
+    for (const t of VOCABULAIRE) expect(categories.has(t.categorie), t.id).toBe(true);
+    for (const c of categories) expect(VOCABULAIRE.filter((t) => t.categorie === c).length, c).toBeGreaterThanOrEqual(4);
+    expect(termeParId('en-curator')?.definition).toMatch(/^Conservateur/);
+    expect(optionsTermes('en-curator', () => 0.4).every((id) => id.startsWith('en-'))).toBe(true);
   });
 });

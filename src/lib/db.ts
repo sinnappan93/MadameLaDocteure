@@ -5,6 +5,7 @@
 import Dexie, { type EntityTable } from 'dexie';
 import { type FicheReference, REFERENCES } from '../data/references';
 import type { NoticeMusee } from '../domain/musees';
+import type { Copie, Sujet } from '../domain/examen';
 import { type Carte, type EtatCarte, type Note, noter } from '../domain/revision';
 import { type ImageOeuvre, type ImageSource, type NouvelleOeuvre, type Oeuvre, oeuvreVide } from '../domain/types';
 
@@ -24,6 +25,8 @@ export class Base extends Dexie {
   fichiers!: EntityTable<Fichier, 'id'>;
   meta!: EntityTable<Meta, 'cle'>;
   revisions!: EntityTable<EtatCarte, 'id'>;
+  sujets!: EntityTable<Sujet, 'id'>;
+  copies!: EntityTable<Copie, 'id'>;
 
   constructor(nom = 'madameladocteure') {
     super(nom);
@@ -34,6 +37,7 @@ export class Base extends Dexie {
     });
     this.version(2).stores({ meta: 'cle' });
     this.version(3).stores({ revisions: 'id, oeuvreId, echeance' });
+    this.version(4).stores({ sujets: 'id, type', copies: 'id, type, debut' });
   }
 }
 
@@ -190,4 +194,50 @@ export async function enregistrerReponse(carte: Carte, note: Note, maintenant = 
   const etat = noter(precedent, carte, note, maintenant);
   await base.revisions.put(etat);
   return etat;
+}
+
+// ——— Mode examen ———
+
+export async function ajouterSujet(s: Omit<Sujet, 'id' | 'creeLe'>, base: Base = db): Promise<Sujet> {
+  const sujet: Sujet = { ...s, id: nouvelId(), creeLe: maintenant() };
+  await base.sujets.add(sujet);
+  return sujet;
+}
+
+export async function creerCopie(c: Omit<Copie, 'id' | 'modifieeLe' | 'photos' | 'texte'> & Partial<Pick<Copie, 'texte' | 'photos'>>, base: Base = db): Promise<Copie> {
+  const copie: Copie = { texte: '', photos: [], ...c, id: nouvelId(), modifieeLe: maintenant() };
+  await base.copies.add(copie);
+  return copie;
+}
+
+export async function modifierCopie(id: string, changements: Partial<Copie>, base: Base = db): Promise<void> {
+  await base.copies.update(id, { ...changements, modifieeLe: maintenant() });
+}
+
+/** Ajoute la photo d'une page de copie manuscrite. */
+export async function ajouterPhotoCopie(id: string, blob: Blob, base: Base = db): Promise<void> {
+  await base.transaction('rw', base.copies, base.fichiers, async () => {
+    const copie = await base.copies.get(id);
+    if (!copie) return;
+    const fichierId = nouvelId();
+    await base.fichiers.add({ id: fichierId, blob });
+    await base.copies.update(id, { photos: [...copie.photos, fichierId], modifieeLe: maintenant() });
+  });
+}
+
+export async function retirerPhotoCopie(id: string, fichierId: string, base: Base = db): Promise<void> {
+  await base.transaction('rw', base.copies, base.fichiers, async () => {
+    const copie = await base.copies.get(id);
+    if (!copie) return;
+    await base.fichiers.delete(fichierId);
+    await base.copies.update(id, { photos: copie.photos.filter((p) => p !== fichierId), modifieeLe: maintenant() });
+  });
+}
+
+export async function supprimerCopie(id: string, base: Base = db): Promise<void> {
+  await base.transaction('rw', base.copies, base.fichiers, async () => {
+    const copie = await base.copies.get(id);
+    if (copie) await base.fichiers.bulkDelete(copie.photos);
+    await base.copies.delete(id);
+  });
 }

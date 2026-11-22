@@ -74,6 +74,38 @@ export function Aide() {
         </ul>
       </Rubrique>
 
+      <Rubrique titre="Mode examen">
+        <ul>
+          <li>
+            <strong>Sujets blancs</strong> (Menu › <em>Mode examen</em>) : choisis l’épreuve (spécialité, culture générale, note de synthèse), un sujet (au hasard
+            ou dans la liste), la durée, et écris <em>dans l’appli</em> (sauvegarde automatique) ou <em>sur papier</em>. Le chronomètre continue même si tu fermes
+            l’appli. À la fin, <em>Rendre la copie</em> ; pour une copie papier, photographie chaque page.
+          </li>
+          <li>
+            <strong>Plan en 15 minutes</strong> : un sujet au hasard, seulement la problématique et le plan détaillé ; l’IA les commente et propose un plan de
+            comparaison (une possibilité parmi d’autres).
+          </li>
+          <li>
+            <strong>Correction par l’IA</strong> (Mes copies et corrections) : grille de critères (problématique, structure, précision des exemples, références
+            aux œuvres, expression), note indicative sur 20, points forts, à améliorer, conseils. Elle complète la correction par un pair ou un enseignant, sans
+            la remplacer.
+          </li>
+          <li>
+            <strong>Banque de sujets</strong> : des sujets d’entraînement proposés (ce ne sont pas des sujets tombés), les sujets des rapports de jury que tu
+            ajoutes, et des sujets générés par l’IA à partir d’un thème.
+          </li>
+          <li>
+            <strong>Vocabulaire anglais</strong> : fiches mémo d’anglais de l’histoire de l’art et du musée (faux amis : <em>curator</em> = conservateur,{' '}
+            <em>conservator</em> = restaurateur), avec la même répétition espacée.
+          </li>
+          <li>
+            <strong>Activer l’IA</strong> : Menu › <em>Réglages</em> › <em>Intelligence artificielle</em>. Il faut ta propre clé d’API Anthropic (créée sur
+            console.anthropic.com, payante à l’usage : quelques dizaines de centimes par copie) et ton accord pour l’envoi du sujet et de la copie. La clé reste
+            sur cet appareil. Sans IA, les sujets blancs, le chronomètre et les copies fonctionnent quand même.
+          </li>
+        </ul>
+      </Rubrique>
+
       <Rubrique titre="Repères : frise, carte et quiz">
         <ul>
           <li>
@@ -204,6 +236,9 @@ export function Aide() {
             <strong>Exercices</strong> : identifier les œuvres, comparer deux œuvres, glossaire en cartes, quiz libre, quiz de repères.
           </li>
           <li>
+            <strong>Mode examen</strong> : sujets blancs, plan en 15 minutes, copies et corrections, banque de sujets, vocabulaire anglais.
+          </li>
+          <li>
             <strong>Ressources</strong> : œuvres de référence, comparaisons, glossaire, frise chronologique, carte des sites.
           </li>
           <li>
@@ -253,7 +288,7 @@ export function Aide() {
       </Rubrique>
 
       <Rubrique titre="Bientôt">
-        <p>Démarches et plan de préparation, bibliographie, sujets blancs, simulateur d’oral.</p>
+        <p>Démarches et plan de préparation, bibliographie, simulateur d’oral.</p>
       </Rubrique>
     </section>
   );
