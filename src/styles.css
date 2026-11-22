@@ -535,3 +535,6 @@ ul.sous-menu.bientot { margin: 0; padding: 0 4px 8px 28px; gap: 4px; color: var(
 .apercus-photo img { width: 45%; max-height: 220px; object-fit: contain; border-radius: 10px; background: #000; }
 .liens-preparation p { margin: 4px 0; }
 .visites .depot-photo { margin-top: 8px; }
+.calendrier-accueil .nav-calendrier { margin-top: 0; }
+.calendrier-accueil .case-jour { min-height: 44px; }
+.retour-aujourdhui { font-size: 0.8rem; text-transform: none; margin-left: auto; }

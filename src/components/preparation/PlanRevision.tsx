@@ -357,7 +357,7 @@ function Calendrier({ demande, lancer, modifier }: { demande: DemandePlan; lance
   );
 }
 
-function Mois({
+export function Mois({
   mois,
   changerMois,
   seances,

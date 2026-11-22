@@ -96,8 +96,8 @@ export function Aide() {
             qu’elle voit (révisions du jour, copie rendue, oral, visite, pages notées).
           </li>
           <li>
-            Vue <em>Semaine</em> ou <em>Mois</em>. <em>Recalculer avec mes lacunes</em> refait les séances à venir en gardant le passé et ce qui est fait. Les séances
-            du jour sont aussi sur l’accueil.
+            Vue <em>Semaine</em> ou <em>Mois</em>. <em>Recalculer avec mes lacunes</em> refait les séances à venir en gardant le passé et ce qui est fait. Le calendrier
+            du mois est aussi sur l’accueil : touche un jour pour voir ses séances.
           </li>
         </ul>
       </Rubrique>

@@ -57,7 +57,7 @@ Organisé en sections dépliables : **Préparation** (plan de révision, bibliog
   admissibilité, oraux), des jours et du temps disponibles, sur la logique du générateur de JeSuisCoach (charge
   progressive, semaine allégée toutes les 4 semaines, affûtage de 5 semaines avant les écrits, pause, bascule sur l'oral) ;
   séances pondérées par les lacunes mesurées (révisions, erreurs, couverture, glossaire, notes des copies et oraux) ;
-  démarches en jalons ; vues semaine et mois ; séances du jour sur l'accueil ; cochées automatiquement quand l'appli voit
+  démarches en jalons ; vues semaine et mois ; calendrier du mois et séances du jour sur l'accueil ; cochées automatiquement quand l'appli voit
   l'activité ; recalcul qui garde le passé et ce qui est fait
 - **Bibliographie** (`src/domain/preparation.ts`) : livres et articles, pages lues, notes, œuvres citées reliées aux
   fiches, suggestions à compléter (`src/data/preparation.ts`)
