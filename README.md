@@ -61,7 +61,7 @@ Organisé en sections dépliables : **Exercices** (identifier les œuvres, compa
   à améliorer, conseils ; copies tapées ou photographiées ; complète la correction par un pair, sans la remplacer
 - **Banque de sujets** : 27 sujets d'entraînement proposés (`src/data/sujets.ts`, pas des sujets tombés), sujets des
   rapports de jury ajoutés à la main, sujets générés par l'IA
-- **Vocabulaire anglais** (`src/data/anglais.ts`) : 76 mots d'histoire de l'art, de musée et de patrimoine, faux amis
+- **Vocabulaire anglais** (`src/data/anglais.ts`) : 77 mots d’histoire de l’art, de musée et de patrimoine, faux amis
   compris, révisés comme le glossaire
 - **IA** : API Claude (Claude Opus 5.5, sorties structurées vérifiées, repli automatique en cas de refus), avec la clé
   d'API personnelle stockée sur l'appareil et un accord explicite sur les données envoyées (comme JeSuisCoach)
