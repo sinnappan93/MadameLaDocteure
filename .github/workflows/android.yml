@@ -3,7 +3,7 @@ name: APK Android
 
 on:
   push:
-    branches: [main, master, 'claude/**']
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -66,4 +66,4 @@ jobs:
             --target "$GITHUB_SHA" \
             --prerelease \
             --title "MadameLaDocteure — APK Android (version 1.0.${{ github.run_number }})" \
-            --notes "APK construit automatiquement depuis la branche ${{ github.ref_name }} (commit ${GITHUB_SHA::7}). Téléchargez MadameLaDocteure.apk ci-dessous et ouvrez-le sur votre téléphone Android."
+            --notes "APK construit automatiquement depuis main (commit ${GITHUB_SHA::7}). Sur le téléphone Android : télécharge MadameLaDocteure.apk ci-dessous, ouvre-le et autorise l’installation depuis cette source. Les versions suivantes s’installent par-dessus, sans perdre les données."

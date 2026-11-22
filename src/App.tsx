@@ -1,5 +1,6 @@
+import { App as AppNative } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Accueil } from './components/Accueil';
 import { MiseAJour, PastilleHorsLigne } from './components/HorsLigne';
 import { Aide } from './components/Aide';
@@ -94,6 +95,21 @@ export function App() {
     setVue(historique.at(-1) ?? { type: 'accueil' });
     setHistorique((h) => h.slice(0, -1));
   };
+  // Bouton « retour » d'Android (APK) : ferme le menu ou revient à l'écran précédent, au lieu de quitter l'appli.
+  const surRetour = useRef<() => void>();
+  surRetour.current = () => {
+    if (menu) setMenu(false);
+    else if (vue.type !== 'accueil') retour();
+    else void AppNative.minimizeApp();
+  };
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    const ecoute = AppNative.addListener('backButton', () => surRetour.current?.());
+    return () => {
+      void ecoute.then((e) => e.remove());
+    };
+  }, []);
+
   /** Remplace l'écran courant sans l'ajouter à l'historique (après un enregistrement ou une suppression). */
   const remplacer = (v: Vue) => setVue(v);
 
