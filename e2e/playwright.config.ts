@@ -23,6 +23,8 @@ export default defineConfig({
   },
   webServer: {
     command: 'npx vite preview --port 4173 --strictPort',
+    // Lancé depuis la racine du projet (dossier `dist`), pas depuis `e2e/`.
+    cwd: '..',
     url: 'http://localhost:4173',
     reuseExistingServer: true,
     timeout: 60_000,
