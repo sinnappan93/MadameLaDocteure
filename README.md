@@ -46,7 +46,7 @@ Organisé en sections dépliables : **Réviser** (identifier les œuvres, compar
 ### Repères chronologiques et géographiques
 - **Frise chronologique** : une ligne par aire, périodes en barres (sans chevauchement), œuvres des fiches en points ;
   défilement, zoom, raccourcis Antiquité / Médiéval / Moderne ; détail d'une période (fiches, périodes contemporaines ailleurs)
-- **Carte des sites** (Leaflet, fonds CARTO / OpenStreetMap, chargée à la demande) : coordonnées de 48 fiches préparées,
+- **Carte des sites** (Leaflet, fonds Esri et OpenStreetMap sans clé, avec bascule automatique, chargée à la demande) : coordonnées de 48 fiches préparées,
   un point par lieu coloré selon l'aire, bulle avec liens vers les fiches ; coordonnées modifiables dans le formulaire
 - **Quiz de repères** : 28 questions de dynasties choisies à la main (« Quelle période au Xe siècle au Cambodge ? »)
   et « Place … sur la carte » sur un fond sans noms (réussi à moins de 200 km)
