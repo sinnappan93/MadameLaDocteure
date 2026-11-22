@@ -203,6 +203,7 @@ export function App() {
             ouvrirOeuvre={(id) => aller({ type: 'fiche', id })}
             ouvrirRevision={() => aller({ type: 'revision' })}
             ouvrirPlan={() => aller({ type: 'plan' })}
+            ouvrirProjection={() => aller({ type: 'projection' })}
             lancerSeance={lancerSeance}
             creer={() => aller({ type: 'edition' })}
           />

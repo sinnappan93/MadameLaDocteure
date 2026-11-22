@@ -63,7 +63,7 @@ Organisé en sections dépliables : **Préparation** (plan de révision, project
   moins 2 œuvres maîtrisées), de la mémorisation (répétition espacée), des notes des sujets blancs (correcteur ou IA) et
   de leur évolution, du rythme (temps fait par rapport au plan, date de couverture estimée au rythme des 4 dernières
   semaines grâce à une photo quotidienne de la progression) ; indicateurs « prêt pour l'écrit / l'oral » par épreuve,
-  présentés comme des repères
+  présentés comme des repères ; aperçu sur l'accueil
 - **Bibliographie** (`src/domain/preparation.ts`) : livres et articles, pages lues, notes, œuvres citées reliées aux
   fiches, suggestions à compléter (`src/data/preparation.ts`)
 - **Journal de visites** : date, salles du Guimet, notes, photos d'œuvres (et du cartel) transformées en fiches ; visites

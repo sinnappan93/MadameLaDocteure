@@ -32,8 +32,8 @@ const pct = (x: number) => `${Math.round(x * 100)} %`;
 const virgule = (n: number, d = 1) => n.toFixed(d).replace('.', ',').replace(/,0$/, '');
 const dateLongue = (jour: string) => new Date(`${jour}T00:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).replace(/^1 /, '1er ');
 
-/** Projection : prêt pour l'écrit et l'oral, couverture, mémorisation, notes, rythme. */
-export function Projection({ reglages, ouvrirCopie, ouvrirPlan }: { reglages: Reglages; ouvrirCopie: (id: string) => void; ouvrirPlan: () => void }) {
+/** Données et calculs de la projection (écran complet et aperçu de l'accueil). */
+function useProjection(reglages: Reglages) {
   const aujourdhui = cleJour(new Date());
   useEffect(() => {
     enregistrerInstantane().catch(console.error);
@@ -62,6 +62,55 @@ export function Projection({ reglages, ouvrirCopie, ouvrirPlan }: { reglages: Re
     const projections = GROUPES.map((g) => projeterCouverture(g.nom, g.aires, d.historique, actuel, aujourdhui, dateEcrits));
     return { couverture, memo, notes, bilans, dateEcrits, projections };
   }, [d, reglages.dateEcrits, aujourdhui]);
+  return { aujourdhui, d, calculs, activites };
+}
+
+/** Aperçu de la projection sur l'accueil : prêt pour l'écrit et l'oral, couverture, date de couverture. */
+export function ApercuProjection({ reglages, ouvrir }: { reglages: Reglages; ouvrir: () => void }) {
+  const { aujourdhui, d, calculs } = useProjection(reglages);
+  if (!d || !calculs) return null;
+  const { couverture, bilans, dateEcrits, projections } = calculs;
+  const estimees = projections.filter((p) => p.etat === 'estime' || p.etat === 'stagne');
+  return (
+    <div className="apercu-projection projection">
+      <div className="titre-section">
+        <h2>Projection</h2>
+        <button className="lien" onClick={ouvrir}>
+          Détails
+        </button>
+      </div>
+      <div className="tuiles-pret">
+        <TuilePret p={bilans.globalEcrit} />
+        <TuilePret p={bilans.globalOral} />
+      </div>
+      <div className="barre-aire couverture-globale">
+        <span className="barre-aire-nom">Couverture</span>
+        <span className="piste" role="img" aria-label={`${couverture.couvertes} périodes couvertes sur ${couverture.total}`}>
+          <span className="segment couverte" style={{ width: `${(couverture.couvertes / couverture.total) * 100}%` }} />
+        </span>
+        <span className="barre-aire-valeur">
+          {couverture.couvertes}/{couverture.total} périodes
+        </span>
+      </div>
+      {estimees.length > 0 ? (
+        <div className="projections-dates">
+          {estimees.map((p) => (
+            <PhraseProjection key={p.nom} p={p} dateEcrits={dateEcrits} possibleLe={projectionPossibleLe(d.historique, aujourdhui)} aCreer={0} courte />
+          ))}
+        </div>
+      ) : (
+        projections.some((p) => p.etat === 'pas-de-recul') && (
+          <p className="discret">Dates de couverture estimées à partir du {dateLongue(projectionPossibleLe(d.historique, aujourdhui))}, après une semaine de recul.</p>
+        )
+      )}
+      <p className="discret">Des repères, pas des notes garanties.</p>
+    </div>
+  );
+}
+
+/** Projection : prêt pour l'écrit et l'oral, couverture, mémorisation, notes, rythme. */
+export function Projection({ reglages, ouvrirCopie, ouvrirPlan }: { reglages: Reglages; ouvrirCopie: (id: string) => void; ouvrirPlan: () => void }) {
+  const { aujourdhui, d, calculs, activites } = useProjection(reglages);
   if (!d || !calculs) return <section className="panneau" />;
   const { couverture, memo, notes, bilans, dateEcrits, projections } = calculs;
   const semaines = activites && d.seances.length ? rythme(d.seances, activites, aujourdhui) : [];
@@ -238,7 +287,7 @@ function LignePret({ p }: { p: Preparation }) {
   );
 }
 
-function PhraseProjection({ p, dateEcrits, possibleLe, aCreer }: { p: ProjectionCouverture; dateEcrits: string; possibleLe: string; aCreer: number }) {
+function PhraseProjection({ p, dateEcrits, possibleLe, aCreer, courte }: { p: ProjectionCouverture; dateEcrits: string; possibleLe: string; aCreer: number; courte?: boolean }) {
   const fiches = aCreer > 0 ? ` Il te faut aussi ${aCreer} fiche${aCreer > 1 ? 's' : ''} de plus dans les périodes peu fournies : la date suppose que tu les crées.` : '';
   if (p.etat === 'couvert') return <p className="phrase-projection ok">Tu couvres déjà {p.nom}.</p>;
   if (p.etat === 'pas-de-recul')
@@ -253,6 +302,12 @@ function PhraseProjection({ p, dateEcrits, possibleLe, aCreer }: { p: Projection
       <p className="phrase-projection alerte">
         {p.nom.charAt(0).toUpperCase() + p.nom.slice(1)} : aucune nouvelle œuvre maîtrisée ces dernières semaines ({p.manquantes} manquent). À ce rythme, la
         couverture n’avance pas.{fiches}
+      </p>
+    );
+  if (courte)
+    return (
+      <p className={`phrase-projection ${p.avantEcrits ? 'ok' : 'alerte'}`}>
+        Tu couvres {p.nom} vers le <strong>{dateLongue(p.date!)}</strong>, soit <strong>{p.avantEcrits ? 'avant' : 'après'} les écrits</strong> si rien ne change.
       </p>
     );
   return (

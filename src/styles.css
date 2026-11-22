@@ -598,3 +598,7 @@ ul.sous-menu.bientot { margin: 0; padding: 0 4px 8px 28px; gap: 4px; color: var(
 .phrase-projection.ok { border-left-color: #2e9d5b; }
 .phrase-projection.alerte { border-left-color: var(--danger); }
 .note-correcteur h3 { margin-top: 0; }
+.apercu-projection { margin-bottom: 24px; }
+.apercu-projection .couverture-globale { margin: 12px 0 8px; grid-template-columns: 6.5em 1fr auto; }
+.apercu-projection .projections-dates { margin: 8px 0; }
+.apercu-projection > p.discret { margin: 4px 0 0; font-size: 0.8rem; }

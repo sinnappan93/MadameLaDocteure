@@ -1,5 +1,5 @@
 import { AIRES, aireParId, periodeParId } from '../domain/catalogue';
-import { completude, couverture, joursAvant } from '../domain/progression';
+import { completude, joursAvant } from '../domain/progression';
 import { GLOSSAIRE } from '../data/glossaire';
 import { bilanGlossaire } from '../domain/glossaire';
 import { bilan } from '../domain/revision';
@@ -9,6 +9,7 @@ import { useLive } from '../lib/useLive';
 import { Illustration } from './Illustration';
 import type { Seance } from '../domain/plan';
 import { Aujourdhui } from './preparation/Aujourdhui';
+import { ApercuProjection } from './preparation/Projection';
 import { Vignette } from './Vignette';
 
 interface Props {
@@ -18,10 +19,11 @@ interface Props {
   creer: () => void;
   ouvrirRevision: () => void;
   ouvrirPlan: () => void;
+  ouvrirProjection: () => void;
   lancerSeance: (s: Seance) => void;
 }
 
-export function Accueil({ reglages, ouvrirAire, ouvrirOeuvre, creer, ouvrirRevision, ouvrirPlan, lancerSeance }: Props) {
+export function Accueil({ reglages, ouvrirAire, ouvrirOeuvre, creer, ouvrirRevision, ouvrirPlan, ouvrirProjection, lancerSeance }: Props) {
   const oeuvres = useLive(() => db.oeuvres.toArray(), []);
   const etats = useLive(() => db.revisions.toArray(), []);
   const revision = oeuvres && etats ? bilan(oeuvres, etats, new Date()) : undefined;
@@ -29,7 +31,6 @@ export function Accueil({ reglages, ouvrirAire, ouvrirOeuvre, creer, ouvrirRevis
   const dues = (revision?.dues ?? 0) + (glossaire?.dues ?? 0);
   const recentes = [...(oeuvres ?? [])].sort((a, b) => b.modifieeLe.localeCompare(a.modifieeLe)).slice(0, 3);
   const jours = joursAvant(reglages.dateEcrits);
-  const total = couverture(oeuvres ?? []);
 
   return (
     <>
@@ -46,6 +47,7 @@ export function Accueil({ reglages, ouvrirAire, ouvrirOeuvre, creer, ouvrirRevis
 
       <section className="panneau">
         <Aujourdhui ouvrirPlan={ouvrirPlan} lancer={lancerSeance} />
+        <ApercuProjection reglages={reglages} ouvrir={ouvrirProjection} />
         {revision && dues + revision.nouvelles + (glossaire?.nouveaux ?? 0) > 0 && (
           <button className="carte-du-jour" onClick={ouvrirRevision}>
             <span>
@@ -108,17 +110,6 @@ export function Accueil({ reglages, ouvrirAire, ouvrirOeuvre, creer, ouvrirRevis
           );
         })}
 
-        <div className="carte-revision statique">
-          <span className="carte-revision-texte">
-            <span className="carte-revision-titre">Couverture du programme</span>
-            <span className="progression-libelle">
-              {total.couvertes} période{total.couvertes > 1 ? 's' : ''} sur {total.total} avec au moins une fiche
-            </span>
-            <span className="barre">
-              <span style={{ width: `${(total.couvertes / total.total) * 100}%` }} />
-            </span>
-          </span>
-        </div>
       </section>
     </>
   );

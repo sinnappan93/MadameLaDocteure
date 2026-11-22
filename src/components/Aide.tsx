@@ -107,7 +107,7 @@ export function Aide() {
           <li>
             Menu › <em>Préparation</em> › <em>Projection</em> : des <strong>repères</strong>, pas des notes garanties. « Prêt pour l’écrit » et « Prêt pour
             l’oral », puis un indicateur par épreuve (touche-le pour voir de quoi il est fait). Ce qui ne se mesure pas encore (pas de copie notée, pas d’oral)
-            est laissé de côté et l’indicateur est marqué « incomplet ».
+            est laissé de côté et l’indicateur est marqué « incomplet ». L’essentiel (prêt pour l’écrit et l’oral, couverture, dates estimées) est aussi sur l’accueil.
           </li>
           <li>
             <strong>Couverture</strong> : une période est couverte quand au moins 2 de ses œuvres sont maîtrisées (révisées avec succès sur plus de 3 semaines),
