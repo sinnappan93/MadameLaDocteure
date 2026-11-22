@@ -294,3 +294,36 @@ export function optionsMusee(oeuvre: Oeuvre, toutes: Oeuvre[], hasard: () => num
   const autres = toutes.filter((o) => o.id !== oeuvre.id);
   return choixDistincts(bonne, musees(autres.filter((o) => o.aireId === oeuvre.aireId)), [...musees(autres), ...MUSEES_DE_SECOURS], hasard);
 }
+
+/** Types de questions du quiz libre (QCM uniquement). */
+export type TypeQuiz = 'periode' | 'site' | 'musee' | 'definition';
+
+export interface OptionsQuiz {
+  types: TypeQuiz[];
+  nombre: number;
+  aireId?: string;
+  hasard?: () => number;
+}
+
+/**
+ * Quiz libre : une série de QCM tirés au hasard, sans tenir compte du calendrier de révision
+ * (et sans le modifier). Une seule question par œuvre ou par terme.
+ */
+export function composerQuiz(oeuvres: Oeuvre[], termes: Array<{ id: string }>, o: OptionsQuiz): Carte[] {
+  const possibles: Carte[] = [];
+  for (const oeuvre of oeuvres) {
+    if (o.aireId && oeuvre.aireId !== o.aireId) continue;
+    const types = cartesDe(oeuvre);
+    for (const t of o.types) if (t !== 'definition' && types.includes(t)) possibles.push({ id: idCarte(oeuvre.id, t), oeuvreId: oeuvre.id, type: t });
+  }
+  if (o.types.includes('definition')) for (const t of termes) possibles.push({ id: idCarte(t.id, 'definition'), oeuvreId: t.id, type: 'definition' });
+  const quiz: Carte[] = [];
+  const pris = new Set<string>();
+  for (const c of melanger(possibles, o.hasard)) {
+    if (quiz.length >= o.nombre) break;
+    if (pris.has(c.oeuvreId)) continue;
+    pris.add(c.oeuvreId);
+    quiz.push(c);
+  }
+  return quiz;
+}

@@ -14,7 +14,7 @@ export function Aide() {
       <Rubrique titre="L’accueil" ouverte>
         <ul>
           <li>
-            <strong>Compte à rebours</strong> : le nombre de jours avant les écrits. La date est une estimation (1er juillet 2027) : corrige-la dans le menu quand
+            <strong>Compte à rebours</strong> : le nombre de jours avant les écrits. La date est une estimation (1er juillet 2027) : corrige-la dans Menu › <em>Réglages</em> quand
             l’arrêté d’ouverture sera publié.
           </li>
           <li>
@@ -33,7 +33,7 @@ export function Aide() {
       <Rubrique titre="La révision « identifie cette œuvre »">
         <ul>
           <li>
-            Depuis l’accueil (<em>Révision du jour</em>) ou le menu › <em>Révision</em>. Seules les fiches avec une image sont révisées.
+            Depuis l’accueil (<em>Révision du jour</em>) ou Menu › <em>Réviser</em> › <em>Identifier les œuvres</em>. Seules les fiches avec une image sont révisées.
           </li>
           <li>
             <strong>Identifier</strong> : l’appli montre la photo. Cherche le titre, la datation, le lieu et le style, puis touche <em>Voir la réponse</em> et
@@ -46,7 +46,7 @@ export function Aide() {
           </li>
           <li>
             <strong>Comparer</strong> (onglet de la révision) : deux œuvres côte à côte, à identifier et à distinguer, puis le tableau des critères. Toutes les
-            comparaisons sont aussi consultables dans Menu › <em>Comparaisons</em>, et chaque fiche concernée affiche <em>À comparer avec</em>.
+            comparaisons sont aussi consultables dans Menu › <em>Consulter</em> › <em>Comparaisons</em>, et chaque fiche concernée affiche <em>À comparer avec</em>.
           </li>
           <li>
             <strong>Répétition espacée</strong> : une carte réussie revient de plus en plus tard (1 jour, 3 jours, une semaine, un mois…) ; une carte ratée
@@ -59,17 +59,32 @@ export function Aide() {
         </ul>
       </Rubrique>
 
+      <Rubrique titre="Le quiz libre">
+        <ul>
+          <li>
+            Menu › <em>Réviser</em> › <em>Quiz libre</em> (ou l’onglet <em>Quiz</em> de la révision) : une série de QCM corrigés tout de suite, sans attendre le
+            calendrier de la répétition espacée, et sans le modifier.
+          </li>
+          <li>
+            Au choix : <em>Mélange</em>, <em>Période</em>, <em>Site</em>, <em>Musée</em> ou <em>Termes</em> du glossaire ; filtre par aire ; 10, 20 ou 30 questions.
+          </li>
+          <li>
+            À la fin : ton score et la liste des réponses ; <em>Refaire mes erreurs</em> relance un quiz avec les seules questions ratées.
+          </li>
+        </ul>
+      </Rubrique>
+
       <Rubrique titre="Le glossaire">
         <ul>
           <li>
-            Menu › <em>Glossaire</em> : {GLOSSAIRE.length} termes d’iconographie et d’architecture (gestes, postures, attributs, divinités, montures,
+            Menu › <em>Consulter</em> › <em>Glossaire</em> : {GLOSSAIRE.length} termes d’iconographie et d’architecture (gestes, postures, attributs, divinités, montures,
             architecture, notions), avec recherche sans accents et filtre par catégorie. Chaque terme renvoie aux fiches où on le voit.
           </li>
           <li>
             Sur chaque fiche, <em>Vocabulaire à connaître</em> rappelle les termes utiles pour la décrire.
           </li>
           <li>
-            <strong>Réviser</strong> : menu › <em>Révision</em> › onglet <em>Glossaire</em>. D’abord le terme, dont tu retrouves la définition (auto-évaluation) ;
+            <strong>Réviser</strong> : Menu › <em>Réviser</em> › <em>Glossaire en cartes</em>. D’abord le terme, dont tu retrouves la définition (auto-évaluation) ;
             les jours suivants, la définition, dont tu retrouves le terme parmi quatre (QCM). Même répétition espacée que pour les œuvres.
           </li>
         </ul>
@@ -89,7 +104,7 @@ export function Aide() {
       <Rubrique titre="Les fiches d’œuvres">
         <ul>
           <li>
-            <strong>Consulter</strong> : depuis l’accueil ou <em>Œuvres de référence</em> dans le menu. La recherche fonctionne sans accents (titre, site, dynastie,
+            <strong>Consulter</strong> : depuis l’accueil ou Menu › <em>Consulter</em> › <em>Œuvres de référence</em>. La recherche fonctionne sans accents (titre, site, dynastie,
             étiquette…) et le menu déroulant filtre par aire.
           </li>
           <li>
@@ -119,7 +134,7 @@ export function Aide() {
             modifiée n’est jamais écrasée.
           </li>
           <li>
-            Une fiche préparée supprimée ne revient pas. Pour la récupérer : menu › <em>Restaurer les fiches préparées supprimées</em>.
+            Une fiche préparée supprimée ne revient pas. Pour la récupérer : Menu › <em>Réglages</em> › <em>Restaurer les fiches préparées supprimées</em>.
           </li>
         </ul>
       </Rubrique>
@@ -161,6 +176,20 @@ export function Aide() {
           </li>
           <li>Chercher en anglais : « Nataraja », « Gandhara Buddha », « Khmer Vishnu »… Si un musée ne répond pas, l’appli l’indique et montre les autres.</li>
           <li>Le Musée Guimet et les musées indiens ne publient pas de base ouverte : leurs œuvres ne sont pas dans cette recherche.</li>
+        </ul>
+      </Rubrique>
+
+      <Rubrique titre="Le menu">
+        <ul>
+          <li>
+            <strong>Réviser</strong> : identifier les œuvres, comparer deux œuvres, glossaire en cartes, quiz libre.
+          </li>
+          <li>
+            <strong>Consulter</strong> : œuvres de référence, comparaisons, glossaire.
+          </li>
+          <li>
+            <strong>Aide</strong>, <strong>Réglages</strong> et <strong>Bientôt</strong> (fonctions prévues) : touche le titre d’une section pour la déplier.
+          </li>
         </ul>
       </Rubrique>
 

@@ -4,14 +4,28 @@ import { type Comparaison } from '../data/comparaisons';
 import { comparaisonParId, comparaisonsDisponibles, composerSeanceComparaisons } from '../domain/comparaisons';
 import { bilanGlossaire, composerSeanceGlossaire, optionsTermes, termeParId, termesDeFiche } from '../domain/glossaire';
 import { AIRES, aireParId, formatAnnee, periodeParId } from '../domain/catalogue';
-import { apercuIntervalles, bilan, type Carte, composerSeance, estDue, idCarte, museeDe, type Note, optionsMusee, optionsPeriode, optionsSite, SEUIL_MAITRISE, type TypeCarte } from '../domain/revision';
+import { apercuIntervalles, bilan, type Carte, composerQuiz, composerSeance, estDue, idCarte, museeDe, type Note, optionsMusee, optionsPeriode, optionsSite, SEUIL_MAITRISE, type TypeCarte, type TypeQuiz } from '../domain/revision';
 import type { Oeuvre } from '../domain/types';
 import { db, enregistrerReponse } from '../lib/db';
 import { useLive } from '../lib/useLive';
 import { Bloc } from './Bloc';
 import { Vignette } from './Vignette';
 
-type Etape = { nom: 'depart' } | { nom: 'seance'; cartes: Carte[]; index: number; resultats: Resultat[]; repassees: Record<string, number> } | { nom: 'fin'; resultats: Resultat[] };
+type Etape =
+  | { nom: 'depart' }
+  | { nom: 'seance'; cartes: Carte[]; index: number; resultats: Resultat[]; repassees: Record<string, number> }
+  | { nom: 'fin'; resultats: Resultat[] }
+  | { nom: 'quiz'; cartes: Carte[]; index: number; resultats: Resultat[] }
+  | { nom: 'finQuiz'; resultats: Resultat[] };
+
+type ChoixQuiz = 'melange' | TypeQuiz;
+const CHOIX_QUIZ: Array<[ChoixQuiz, string]> = [
+  ['melange', 'Mélange'],
+  ['periode', 'Période'],
+  ['site', 'Site'],
+  ['musee', 'Musée'],
+  ['definition', 'Termes'],
+];
 
 interface Resultat {
   carte: Carte;
@@ -20,7 +34,7 @@ interface Resultat {
 
 const MAXIMUM = 30;
 
-export type ModeRevision = 'oeuvres' | 'comparaisons' | 'glossaire';
+export type ModeRevision = 'oeuvres' | 'comparaisons' | 'glossaire' | 'quiz';
 
 export function Revision({ retourAccueil, modeInitial = 'oeuvres' }: { retourAccueil: () => void; modeInitial?: ModeRevision }) {
   const oeuvres = useLive(() => db.oeuvres.toArray(), []);
@@ -30,6 +44,8 @@ export function Revision({ retourAccueil, modeInitial = 'oeuvres' }: { retourAcc
   const [nouvelles, setNouvelles] = useState(10);
   const [mode, setMode] = useState<ModeRevision>(modeInitial);
   const [categorie, setCategorie] = useState<CategorieGlossaire | ''>('');
+  const [choixQuiz, setChoixQuiz] = useState<ChoixQuiz>('melange');
+  const [nombreQuiz, setNombreQuiz] = useState(10);
 
   if (!oeuvres || !etats) return <section className="panneau" />;
   const parId = new Map(oeuvres.map((o) => [o.id, o]));
@@ -56,6 +72,9 @@ export function Revision({ retourAccueil, modeInitial = 'oeuvres' }: { retourAcc
       </button>
       <button role="tab" aria-selected={mode === 'glossaire'} className={mode === 'glossaire' ? 'actif' : ''} onClick={() => setMode('glossaire')}>
         Glossaire
+      </button>
+      <button role="tab" aria-selected={mode === 'quiz'} className={mode === 'quiz' ? 'actif' : ''} onClick={() => setMode('quiz')}>
+        Quiz
       </button>
     </div>
   );
@@ -109,6 +128,141 @@ export function Revision({ retourAccueil, modeInitial = 'oeuvres' }: { retourAcc
           </button>
         ) : (
           <p className="vide-etat">{b.dues + b.nouveaux === 0 ? 'Rien à réviser pour aujourd’hui. Reviens demain !' : 'Choisis au moins un nouveau terme par séance.'}</p>
+        )}
+      </section>
+    );
+  }
+
+  const typesQuiz: TypeQuiz[] = choixQuiz === 'melange' ? ['periode', 'site', 'musee', 'definition'] : [choixQuiz];
+  const lancerQuiz = (cartes: Carte[]) => cartes.length && setEtape({ nom: 'quiz', cartes, index: 0, resultats: [] });
+
+  if (etape.nom === 'depart' && mode === 'quiz') {
+    const disponibles = composerQuiz(oeuvres, GLOSSAIRE, { types: typesQuiz, nombre: 10_000, aireId: choixQuiz === 'definition' ? undefined : aire || undefined }).length;
+    const nombre = Math.min(nombreQuiz, disponibles);
+    return (
+      <section className="panneau revision">
+        {choixMode}
+        <p className="discret">
+          Une série de QCM corrigés tout de suite, sur toutes tes fiches, sans attendre : pour t’entraîner ou te tester. Le quiz ne change pas le calendrier de
+          la répétition espacée.
+        </p>
+        <div className="formulaire">
+          <div>
+            <span className="libelle">Questions</span>
+            <div className="puces" role="radiogroup" aria-label="Type de questions">
+              {CHOIX_QUIZ.map(([id, nom]) => (
+                <button key={id} role="radio" aria-checked={choixQuiz === id} className={choixQuiz === id ? 'actif' : ''} onClick={() => setChoixQuiz(id)}>
+                  {nom}
+                </button>
+              ))}
+            </div>
+          </div>
+          {choixQuiz !== 'definition' && (
+            <label>
+              Aire
+              <select value={aire} onChange={(e) => setAire(e.target.value)}>
+                <option value="">Toutes les aires</option>
+                {AIRES.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.nom}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          <div>
+            <span className="libelle">Nombre de questions</span>
+            <div className="onglets" role="radiogroup" aria-label="Nombre de questions">
+              {[10, 20, 30].map((n) => (
+                <button key={n} role="radio" aria-checked={nombreQuiz === n} className={nombreQuiz === n ? 'actif' : ''} onClick={() => setNombreQuiz(n)}>
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        {nombre > 0 ? (
+          <button
+            className="bouton principal large grand"
+            onClick={() => lancerQuiz(composerQuiz(oeuvres, GLOSSAIRE, { types: typesQuiz, nombre: nombreQuiz, aireId: choixQuiz === 'definition' ? undefined : aire || undefined }))}
+          >
+            Lancer le quiz · {nombre} question{nombre > 1 ? 's' : ''}
+          </button>
+        ) : (
+          <p className="vide-etat">Aucune question possible : il faut des fiches illustrées avec l’information demandée.</p>
+        )}
+      </section>
+    );
+  }
+
+  if (etape.nom === 'finQuiz') {
+    const justes = etape.resultats.filter((r) => r.note > 0).length;
+    const erreurs = etape.resultats.filter((r) => r.note === 0).map((r) => r.carte);
+    return (
+      <section className="panneau revision">
+        <div className="fin-seance">
+          <p className="fin-titre">Quiz terminé</p>
+          <div className="stats-revision">
+            <Stat valeur={`${justes} / ${etape.resultats.length}`} libelle="bonnes réponses" />
+            <Stat valeur={`${Math.round((justes / Math.max(1, etape.resultats.length)) * 100)} %`} libelle="de réussite" />
+          </div>
+          <ul className="liste-fin">
+            {etape.resultats.map((r, i) => (
+              <li key={i} className={r.note === 0 ? 'rate' : 'reussi'}>
+                <span aria-hidden>{r.note === 0 ? '✗' : '✓'}</span> {parId.get(r.carte.oeuvreId)?.titre ?? termeParId(r.carte.oeuvreId)?.terme}
+                <span className="discret"> · {LIBELLES_TYPES[r.carte.type]}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="actions actions-quiz">
+            <button className="bouton" onClick={() => setEtape({ nom: 'depart' })}>
+              Nouveau quiz
+            </button>
+            {erreurs.length > 0 && (
+              <button className="bouton principal" onClick={() => lancerQuiz(erreurs)}>
+                Refaire mes erreurs ({erreurs.length})
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (etape.nom === 'quiz') {
+    const carte = etape.cartes[etape.index];
+    const oeuvreQuiz = parId.get(carte.oeuvreId);
+    const termeQuiz = termeParId(carte.oeuvreId);
+    // Le quiz n'enregistre rien : il passe simplement à la question suivante.
+    const suivante = (note: Note) => {
+      const resultats = [...etape.resultats, { carte, note }];
+      const index = etape.index + 1;
+      setEtape(index < etape.cartes.length ? { ...etape, index, resultats } : { nom: 'finQuiz', resultats });
+    };
+    const cle = `${carte.id}-${etape.index}`;
+    return (
+      <section className="panneau revision">
+        <div className="progression-seance" aria-label={`Question ${etape.index + 1} sur ${etape.cartes.length}`}>
+          <span className="barre">
+            <span style={{ width: `${(etape.index / etape.cartes.length) * 100}%` }} />
+          </span>
+          <span className="discret">
+            {etape.index + 1} / {etape.cartes.length}
+          </span>
+          <button className="lien" onClick={() => setEtape(etape.resultats.length ? { nom: 'finQuiz', resultats: etape.resultats } : { nom: 'depart' })}>
+            Arrêter
+          </button>
+        </div>
+        {carte.type === 'definition' && termeQuiz ? (
+          <CarteDefinition key={cle} terme={termeQuiz} repondre={suivante} />
+        ) : !oeuvreQuiz ? (
+          <button className="bouton large" onClick={() => suivante(2)}>
+            Fiche supprimée, passer
+          </button>
+        ) : carte.type === 'periode' ? (
+          <CartePeriode key={cle} oeuvre={oeuvreQuiz} repondre={suivante} />
+        ) : (
+          <CarteChoix key={cle} type={carte.type as 'site' | 'musee'} oeuvre={oeuvreQuiz} oeuvres={oeuvres} repondre={suivante} />
         )}
       </section>
     );

@@ -144,3 +144,17 @@ describe('variantes : site, musée, iconographie', () => {
     expect(s.every((c) => ['periode', 'site', 'iconographie'].includes(c.type))).toBe(true);
   });
 });
+
+describe('quiz libre', () => {
+  it('tire des QCM des types demandés, une question par sujet, sans dépasser le nombre', async () => {
+    const { composerQuiz } = await import('./revision');
+    const fiches = ['a', 'b', 'c'].map((id) => oeuvre(id, { site: `site ${id}`, conservation: 'Musée Guimet, Paris' })).concat(oeuvre('sans', { imagePrincipaleId: undefined }));
+    const termes = [{ id: 'gl-1' }, { id: 'gl-2' }];
+    const q = composerQuiz(fiches, termes, { types: ['periode', 'site', 'musee', 'definition'], nombre: 10, hasard });
+    expect(q).toHaveLength(5);
+    expect(new Set(q.map((c) => c.oeuvreId)).size).toBe(5);
+    expect(q.some((c) => c.oeuvreId === 'sans')).toBe(false);
+    expect(composerQuiz(fiches, termes, { types: ['musee'], nombre: 2, hasard }).every((c) => c.type === 'musee')).toBe(true);
+    expect(composerQuiz(fiches, termes, { types: ['site'], nombre: 10, aireId: 'cambodge', hasard })).toEqual([]);
+  });
+});

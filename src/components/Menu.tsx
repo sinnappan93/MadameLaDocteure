@@ -3,11 +3,24 @@ import { REFERENCES } from '../data/references';
 import { restaurerReferences } from '../lib/db';
 import type { Reglages, Theme } from '../lib/reglages';
 
+export type EcranMenu =
+  | 'accueil'
+  | 'revision-oeuvres'
+  | 'revision-comparaisons'
+  | 'revision-glossaire'
+  | 'revision-quiz'
+  | 'oeuvres'
+  | 'comparaisons'
+  | 'glossaire'
+  | 'aide';
+
 interface Props {
   reglages: Reglages;
   modifier: (c: Partial<Reglages>) => void;
-  aller: (ecran: 'accueil' | 'oeuvres' | 'aide' | 'revision' | 'glossaire' | 'comparaisons') => void;
+  aller: (ecran: EcranMenu) => void;
   fermer: () => void;
+  /** Écran affiché, mis en évidence dans le menu. */
+  actuel?: EcranMenu;
 }
 
 const THEMES: Array<[Theme, string]> = [
@@ -16,12 +29,42 @@ const THEMES: Array<[Theme, string]> = [
   ['sombre', 'Sombre'],
 ];
 
-export function Menu({ reglages, modifier, aller, fermer }: Props) {
+const SECTIONS: Array<{ titre: string; icone: string; entrees: Array<[EcranMenu, string, string]> }> = [
+  {
+    titre: 'Réviser',
+    icone: '✦',
+    entrees: [
+      ['revision-oeuvres', 'Identifier les œuvres', 'Photo, puis datation, site, musée, iconographie'],
+      ['revision-comparaisons', 'Comparer deux œuvres', 'Côte à côte, puis les critères'],
+      ['revision-glossaire', 'Glossaire en cartes', 'Termes et définitions'],
+      ['revision-quiz', 'Quiz libre', 'QCM tout de suite, sans calendrier'],
+    ],
+  },
+  {
+    titre: 'Consulter',
+    icone: '❖',
+    entrees: [
+      ['oeuvres', 'Œuvres de référence', 'Fiches, images, notices de musées'],
+      ['comparaisons', 'Comparaisons', 'Paires d’œuvres et critères'],
+      ['glossaire', 'Glossaire', 'Vocabulaire iconographique'],
+    ],
+  },
+];
+
+const BIENTOT = ['Démarches et plan de préparation', 'Bibliographie', 'Frise chronologique et carte', 'Sujets blancs', 'Simulateur d’oral'];
+
+export function Menu({ reglages, modifier, aller, fermer, actuel }: Props) {
   const [restauration, setRestauration] = useState<string>();
   const restaurer = async () => {
     const n = await restaurerReferences();
     setRestauration(n === 0 ? 'Toutes les fiches préparées sont déjà présentes.' : `${n} fiche${n > 1 ? 's' : ''} restaurée${n > 1 ? 's' : ''}.`);
   };
+  const entree = (ecran: EcranMenu, nom: string, detail?: string) => (
+    <button key={ecran} className={`entree-menu ${actuel === ecran ? 'courante' : ''}`} aria-current={actuel === ecran ? 'page' : undefined} onClick={() => aller(ecran)}>
+      <span className="entree-nom">{nom}</span>
+      {detail && <span className="entree-detail">{detail}</span>}
+    </button>
+  );
   return (
     <div className="feuille-fond tiroir-fond" onClick={fermer}>
       <nav className="tiroir" aria-label="Menu" onClick={(e) => e.stopPropagation()}>
@@ -31,54 +74,68 @@ export function Menu({ reglages, modifier, aller, fermer }: Props) {
             ✕
           </button>
         </div>
-        <button className="entree-menu" onClick={() => aller('accueil')}>
-          Accueil
-        </button>
-        <button className="entree-menu" onClick={() => aller('revision')}>
-          Révision
-        </button>
-        <button className="entree-menu" onClick={() => aller('oeuvres')}>
-          Œuvres de référence
-        </button>
-        <button className="entree-menu entree-aide" onClick={() => aller('aide')}>
-          Comment m’utiliser ?
-        </button>
-        <button className="entree-menu" onClick={() => aller('comparaisons')}>
-          Comparaisons
-        </button>
-        <button className="entree-menu" onClick={() => aller('glossaire')}>
-          Glossaire
-        </button>
-        <p className="discret bientot">Bientôt : démarches, bibliographie, frise, carte, sujets blancs, oral.</p>
 
-        <h3>Réglages</h3>
-        <div className="formulaire">
-          <label>
-            Prénom
-            <input value={reglages.prenom} placeholder="Docteure" onChange={(e) => modifier({ prenom: e.target.value })} />
-          </label>
-          <label>
-            Date des écrits (estimation)
-            <input type="date" value={reglages.dateEcrits} onChange={(e) => e.target.value && modifier({ dateEcrits: e.target.value })} />
-          </label>
-          <div>
-            <span className="libelle">Thème</span>
-            <div className="onglets" role="radiogroup" aria-label="Thème">
-              {THEMES.map(([id, nom]) => (
-                <button key={id} role="radio" aria-checked={reglages.theme === id} className={reglages.theme === id ? 'actif' : ''} onClick={() => modifier({ theme: id })}>
-                  {nom}
-                </button>
-              ))}
+        {entree('accueil', 'Accueil')}
+
+        {SECTIONS.map((section) => (
+          <details key={section.titre} className="section-menu" open>
+            <summary>
+              <span aria-hidden>{section.icone}</span> {section.titre}
+            </summary>
+            <div className="sous-menu">{section.entrees.map(([ecran, nom, detail]) => entree(ecran, nom, detail))}</div>
+          </details>
+        ))}
+
+        <details className="section-menu">
+          <summary>
+            <span aria-hidden>?</span> Aide
+          </summary>
+          <div className="sous-menu">{entree('aide', 'Comment m’utiliser ?', 'Mode d’emploi rubrique par rubrique')}</div>
+        </details>
+
+        <details className="section-menu">
+          <summary>
+            <span aria-hidden>⚙</span> Réglages
+          </summary>
+          <div className="sous-menu formulaire">
+            <label>
+              Prénom
+              <input value={reglages.prenom} placeholder="Docteure" onChange={(e) => modifier({ prenom: e.target.value })} />
+            </label>
+            <label>
+              Date des écrits (estimation)
+              <input type="date" value={reglages.dateEcrits} onChange={(e) => e.target.value && modifier({ dateEcrits: e.target.value })} />
+            </label>
+            <div>
+              <span className="libelle">Thème</span>
+              <div className="onglets" role="radiogroup" aria-label="Thème">
+                {THEMES.map(([id, nom]) => (
+                  <button key={id} role="radio" aria-checked={reglages.theme === id} className={reglages.theme === id ? 'actif' : ''} onClick={() => modifier({ theme: id })}>
+                    {nom}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <span className="libelle">Fiches préparées ({REFERENCES.length})</span>
+              <button type="button" className="bouton large" onClick={restaurer}>
+                Restaurer les fiches préparées supprimées
+              </button>
+              {restauration && <p className="discret">{restauration}</p>}
             </div>
           </div>
-          <div>
-            <span className="libelle">Fiches préparées ({REFERENCES.length})</span>
-            <button type="button" className="bouton large" onClick={restaurer}>
-              Restaurer les fiches préparées supprimées
-            </button>
-            {restauration && <p className="discret">{restauration}</p>}
-          </div>
-        </div>
+        </details>
+
+        <details className="section-menu">
+          <summary>
+            <span aria-hidden>…</span> Bientôt
+          </summary>
+          <ul className="sous-menu bientot">
+            {BIENTOT.map((b) => (
+              <li key={b}>{b}</li>
+            ))}
+          </ul>
+        </details>
       </nav>
     </div>
   );

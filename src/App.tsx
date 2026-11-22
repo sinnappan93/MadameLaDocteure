@@ -7,7 +7,7 @@ import { Glossaire } from './components/Glossaire';
 import { FormulaireOeuvre } from './components/FormulaireOeuvre';
 import { ListeOeuvres } from './components/ListeOeuvres';
 import { type ModeRevision, Revision } from './components/Revision';
-import { Logo, Menu } from './components/Menu';
+import { type EcranMenu, Logo, Menu } from './components/Menu';
 import { aireParId } from './domain/catalogue';
 import { creerOeuvre, db, installerReferences, mettreAJourReferences, modifierOeuvre } from './lib/db';
 import { telechargerImagesReferences } from './lib/imagesReferences';
@@ -143,13 +143,46 @@ export function App() {
           reglages={reglages}
           modifier={modifierReglages}
           fermer={() => setMenu(false)}
+          actuel={ecranDuMenu(vue)}
           aller={(ecran) => {
             setMenu(false);
             setHistorique([]);
-            setVue(ecran === 'accueil' ? { type: 'accueil' } : ecran === 'aide' ? { type: 'aide' } : ecran === 'revision' ? { type: 'revision' } : ecran === 'glossaire' ? { type: 'glossaire' } : ecran === 'comparaisons' ? { type: 'comparaisons' } : { type: 'liste' });
+            setVue(vueDuMenu(ecran));
           }}
         />
       )}
     </div>
   );
+}
+
+/** Écran du menu correspondant à la vue affichée (pour le mettre en évidence). */
+function ecranDuMenu(vue: Vue): EcranMenu | undefined {
+  switch (vue.type) {
+    case 'accueil':
+    case 'aide':
+    case 'glossaire':
+    case 'comparaisons':
+      return vue.type;
+    case 'revision':
+      return `revision-${vue.mode ?? 'oeuvres'}`;
+    default:
+      return 'oeuvres';
+  }
+}
+
+function vueDuMenu(ecran: EcranMenu): Vue {
+  switch (ecran) {
+    case 'revision-oeuvres':
+      return { type: 'revision', mode: 'oeuvres' };
+    case 'revision-comparaisons':
+      return { type: 'revision', mode: 'comparaisons' };
+    case 'revision-glossaire':
+      return { type: 'revision', mode: 'glossaire' };
+    case 'revision-quiz':
+      return { type: 'revision', mode: 'quiz' };
+    case 'oeuvres':
+      return { type: 'liste' };
+    default:
+      return { type: ecran };
+  }
 }

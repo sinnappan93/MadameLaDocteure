@@ -9,6 +9,10 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
 
 ## Fonctionnalités (version actuelle)
 
+### Menu
+Organisé en sections dépliables : **Réviser** (identifier les œuvres, comparer, glossaire en cartes, quiz libre),
+**Consulter** (œuvres de référence, comparaisons, glossaire), **Aide**, **Réglages**, **Bientôt** ; l'écran affiché est mis en évidence.
+
 ### Accueil
 - « Bonjour … » avec le prénom choisi, et un compte à rebours jusqu'aux écrits (date réglable, estimée au 1er juillet 2027)
 - **Toutes les aires** : tuiles colorées (Inde du Nord, Inde du Sud, Gandhāra, Bengale, Sri Lanka, Cambodge, Champa,
@@ -28,6 +32,8 @@ Toutes les données restent sur le téléphone (IndexedDB), images comprises, po
   œuvre « maîtrisée » au-delà de 21 jours ; une seule carte par œuvre et par séance ; variantes proposées à partir du
   lendemain de la première identification (5 au plus par séance)
 - Séance du jour : cartes dues + 0, 5, 10 ou 20 nouvelles œuvres, filtre par aire ; bilan en fin de séance
+- **Quiz libre** : série de QCM (mélange, période, site, musée, termes du glossaire), 10 à 30 questions, filtre par aire,
+  corrigés tout de suite sans modifier le calendrier de révision ; score final et « Refaire mes erreurs »
 - Carte « Révision du jour » sur l'accueil
 
 ### Glossaire iconographique
